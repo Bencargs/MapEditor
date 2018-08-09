@@ -39,7 +39,10 @@ namespace MapEditor
         private void accept_Click(object sender, EventArgs e)
         {
             if (terrainCmb?.SelectedItem != null)
-                _tile.Terrain = ((FormattedTerrainItem)terrainCmb.SelectedItem).Value;
+            {
+                _tile.Terrain = ((FormattedTerrainItem) terrainCmb.SelectedItem).Value;
+                _tile.IsDirty = true;
+            }
             Close();
         }
     }

@@ -3,69 +3,44 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Newtonsoft.Json;
 
 namespace MapEditor
 {
     public partial class Form1 : Form
     {
-        private int _cellWidth = 20;
-        private int _cellHeight = 20;
-        private readonly Graphics _graphics;
-        private Pen _pen;
-        private bool _updated = true;
         private TileForm _contextMenu;
-        private Tile[,] _cells;
+        private Map _map;
 
         public Form1()
         {
             InitializeComponent();
-            _graphics = canvas.CreateGraphics();
-
-            _cells = new Tile[canvas.Width / _cellWidth, canvas.Height / _cellHeight];
-            for (var x = 0; x < canvas.Width / _cellWidth; x++)
-            {
-                for (var y = 0; y < canvas.Height / _cellHeight; y++)
+            _map = new Map(new WinFormGraphics(canvas), canvas.Width / 20, canvas.Height / 20)
                 {
-                    _cells[x, y] = new Tile();
-                }
-            }
+                    ShowGrid = gridChk.Checked
+                };
+
+            var timer = new Timer();
+            timer.Tick += Update;
+            timer.Interval = 500; // in miliseconds
+            timer.Start();
+        }
+
+        private void Update(object sender, EventArgs e)
+        {
+            _map.Update();
+            canvas.Invalidate();
         }
 
         private void canvas_Paint(object sender, PaintEventArgs e)
         {
-            if (_updated)
-            {
-                DrawGrid();
-                canvas.Refresh();
-                _updated = false;
-            }
-        }
-
-        private void DrawGrid()
-        {
-            for (var x = 0; x < canvas.Width / _cellWidth; x++)
-            {
-                DrawLine(new Point(x * _cellWidth, 0), new Point(x * _cellWidth, canvas.Height));
-            }
-            for (var y = 0; y < canvas.Height / _cellWidth; y++)
-            {
-                DrawLine(new Point(0, y * _cellHeight), new Point(canvas.Width, y * _cellHeight));
-            }
-        }
-
-        private void DrawLine(Point start, Point end)
-        {
-            var points = new[]
-            {
-                start,
-                end
-            };
-            _pen = new Pen(Color.LightBlue, 1);
-            _graphics.DrawLines(_pen, points);
+            //canvas.Invalidate();
+            _map.Render();
         }
 
         private void canvas_Click(object sender, EventArgs e)
@@ -73,28 +48,65 @@ namespace MapEditor
             _contextMenu?.Close();
             if ((e as MouseEventArgs)?.Button == MouseButtons.Right)
             {
-                var cell = GetCell();
+                var point = canvas.PointToClient(Cursor.Position);
+                var tile = _map.GetCell(point);
 
-                _contextMenu = new TileForm(cell);
+                _contextMenu = new TileForm(tile);
+                _contextMenu.SetDesktopLocation(point.X, point.Y);
                 _contextMenu.Show();
-                _contextMenu.SetDesktopLocation(Cursor.Position.X, Cursor.Position.Y);
             }
         }
 
-        private Tile GetCell()
+        private void button1_Click(object sender, EventArgs e)
         {
-            var point = canvas.PointToClient(Cursor.Position);
+            var dialog = new OpenFileDialog
+            {
+                Filter = "Image Files|*.bmp",
+                Title = "Select a Background File"
+            };
 
-            var maxX = _cells.GetLength(0);
-            var maxY = _cells.GetLength(1);
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                backgroundTxt.Text = dialog.FileName;
+                _map.Background = !string.IsNullOrWhiteSpace(backgroundTxt.Text)
+                    ? Image.FromFile(backgroundTxt.Text)
+                    : null;
+            }
+        }
 
-            var x = point.X * maxX / canvas.Width;
-            var y = point.Y * maxY  / canvas.Height;
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            _map.ShowGrid = gridChk.Checked;
+        }
 
-            x = x > maxX ? maxX : x;
-            y = y > maxY ? maxY : y;
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var dialog = new SaveFileDialog
+            {
+                Filter = "Map File|*.map",
+                Title = "Save File"
+            };
 
-            return _cells[x, y];
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                var json = JsonConvert.SerializeObject(_map);
+                File.WriteAllText(dialog.FileName, json);
+            }
+        }
+
+        private void openToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var dialog = new OpenFileDialog
+            {
+                Filter = "Image Files|*.map",
+                Title = "Select a File"
+            };
+
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                var json = File.ReadAllText(dialog.FileName);
+                //_map = JsonConvert.DeserializeObject<Map>(json);
+            }
         }
     }
 }
