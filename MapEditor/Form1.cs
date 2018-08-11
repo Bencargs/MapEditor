@@ -20,26 +20,25 @@ namespace MapEditor
         public Form1()
         {
             InitializeComponent();
-            _map = new Map(new WinFormGraphics(canvas), canvas.Width / 20, canvas.Height / 20)
+            _map = new Map(new WinFormGraphics(canvas), 50, 100)
                 {
                     ShowGrid = gridChk.Checked
                 };
+            _map.Init();
 
             var timer = new Timer();
             timer.Tick += Update;
-            timer.Interval = 500; // in miliseconds
+            timer.Interval = 100; // in miliseconds
             timer.Start();
         }
 
         private void Update(object sender, EventArgs e)
         {
             _map.Update();
-            canvas.Invalidate();
         }
 
         private void canvas_Paint(object sender, PaintEventArgs e)
         {
-            //canvas.Invalidate();
             _map.Render();
         }
 
@@ -49,11 +48,18 @@ namespace MapEditor
             if ((e as MouseEventArgs)?.Button == MouseButtons.Right)
             {
                 var point = canvas.PointToClient(Cursor.Position);
-                var tile = _map.GetCell(point);
+                var tile = _map.GetTile(point);
 
                 _contextMenu = new TileForm(tile);
                 _contextMenu.SetDesktopLocation(point.X, point.Y);
                 _contextMenu.Show();
+                _contextMenu.FormClosing += (o, s) =>
+                {
+                    if (!s.Cancel)
+                    {
+                        canvas.Invalidate();
+                    }
+                };
             }
         }
 
@@ -71,12 +77,14 @@ namespace MapEditor
                 _map.Background = !string.IsNullOrWhiteSpace(backgroundTxt.Text)
                     ? Image.FromFile(backgroundTxt.Text)
                     : null;
+                canvas.Invalidate();
             }
         }
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
             _map.ShowGrid = gridChk.Checked;
+            canvas.Invalidate();
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
@@ -89,7 +97,7 @@ namespace MapEditor
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                var json = JsonConvert.SerializeObject(_map);
+                var json = JsonConvert.SerializeObject(_map.Save());
                 File.WriteAllText(dialog.FileName, json);
             }
         }
@@ -105,7 +113,11 @@ namespace MapEditor
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 var json = File.ReadAllText(dialog.FileName);
-                //_map = JsonConvert.DeserializeObject<Map>(json);
+                var settings = JsonConvert.DeserializeObject<MapSettings>(json);
+
+                _map = new Map(new WinFormGraphics(canvas), settings);
+                _map.Init();
+                canvas.Invalidate();
             }
         }
     }

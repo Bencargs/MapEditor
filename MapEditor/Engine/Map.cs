@@ -4,36 +4,69 @@ using Newtonsoft.Json;
 
 namespace MapEditor
 {
+    public class MapSettings
+    {
+        [JsonConverter(typeof(JsonImageConverter))]
+        public Image Background { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
+        public bool ShowGrid { get; set; }
+        public Tile[,] Tiles { get; set; }
+    }
+
     public class Map : IDisposable
     {
-        private readonly Tile[,] _cells;
+        private readonly Tile[,] _tiles;
         private readonly IGraphics _graphics;
         private const int CellSize = 20;
-
-        [JsonConverter(typeof(JsonImageConverter))]
         public Image Background { get; set; }
         public int Width { get; }
         public int Height { get; }
         public bool ShowGrid { get; set; }
 
-        public Map(IGraphics graphics, int width, int height, Image background = null)
+        public Map(IGraphics graphics, int width, int height)
         {
-            _graphics = graphics;
             Width = width;
             Height = height;
-            Background = background;
 
-            _cells = new Tile[Width, Height];
+            _graphics = graphics;
+            _tiles = new Tile[Width, Height];
+        }
+
+        public Map(IGraphics graphics, MapSettings settings)
+            : this(graphics, settings.Width, settings.Height)
+        {
+            Background = settings.Background;
+            ShowGrid = settings.ShowGrid;
+
+            _tiles = settings.Tiles;
+            _graphics = graphics;
+        }
+
+        public void Init()
+        {
             for (var x = 0; x < Width; x++)
             {
                 for (var y = 0; y < Height; y++)
                 {
-                    _cells[x, y] = new Tile(x, y, CellSize, Terrain.Empty);
+                    _tiles[x, y] = new Tile(x, y, CellSize, Terrain.Empty);
                 }
             }
         }
 
-        public Tile GetCell(Point point)
+        public MapSettings Save()
+        {
+            return new MapSettings
+            {
+                Background = Background,
+                Width = Width,
+                Height = Height,
+                ShowGrid = ShowGrid,
+                Tiles = _tiles
+            };
+        }
+
+        public Tile GetTile(Point point)
         {
             var x = point.X * Width / _graphics.Width;
             var y = point.Y * Height / _graphics.Height;
@@ -48,7 +81,7 @@ namespace MapEditor
             else if (y < 0)
                 y = 0;
 
-            return _cells[x, y];
+            return _tiles[x, y];
         }
 
         public void Update()
@@ -82,7 +115,7 @@ namespace MapEditor
             {
                 for (var y = 0; y < Height; y++)
                 {
-                    var tile = _cells[x, y];
+                    var tile = _tiles[x, y];
                     if (!tile.IsDirty)
                         continue;
 
