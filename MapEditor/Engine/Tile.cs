@@ -15,7 +15,7 @@ namespace MapEditor
         ImpassableLand,
     }
 
-    public class Tile
+    public class Tile : IDisposable
     {
         public bool IsDirty { get; set; }
         public Terrain Terrain { get; set; }
@@ -42,6 +42,7 @@ namespace MapEditor
         public int X { get; set; }
         public int Y { get; set; }
         public int Size { get; set; }
+        public Image Image { get; set; }
 
         public Tile(int x, int y, int size, Terrain terrain)
         {
@@ -54,11 +55,15 @@ namespace MapEditor
 
         public void Render(IGraphics graphics)
         {
-            using (var brush = new SolidBrush(Colour))
+            if (Image != null)
             {
-                var area = new Rectangle(X * Size, Y * Size, Size, Size);
-                graphics.FillRectangle(brush, area);
+                graphics.DrawImage(Image, new Point(X, Y));
             }
+        }
+
+        public void Dispose()
+        {
+            Image?.Dispose();
         }
     }
 }

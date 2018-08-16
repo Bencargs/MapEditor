@@ -1,11 +1,13 @@
-﻿using MapEditor.Commands;
+﻿using System.Drawing;
+using MapEditor.Commands;
+using MapEditor.Engine;
 
 namespace MapEditor.Entities
 {
     public abstract class Entity
     {
-        public int X { get; set; }
-        public int Y { get; set; }
+        public Point Position { get; set; }
+        public Animation Animation { get; set; }
 
         public void Update(double elapsed)
         {
@@ -14,17 +16,14 @@ namespace MapEditor.Entities
             ChangeState(command);
         }
 
+        public void Render(IGraphics graphics)
+        {
+            //var image = _animation.GetImage();//use elapsed to calculate
+            var image = Animation.Next();
+            graphics.DrawImage(image, Position);
+        }
+
         protected abstract Entity ChangeState(ICommand c);
-    }
-
-    public class UnitController
-    {
-        // Create default of each unit type
-        // Place at correct possition
-        // Hold list of units (and active units)
-
-        //.CreateInfantry
-        //new IdleUnit() {a, b, c}
     }
 
     public class IdleUnit : Entity
@@ -53,13 +52,12 @@ namespace MapEditor.Entities
 
     public class MovingUnit : Entity
     {
-        public int DestinationX { get; set; }
-        public int DestinationY { get; set; }
+        public Point Destination { get; set; }
 
         protected override Entity ChangeState(ICommand c)
         {
             if (c is StopCommand)
-                return new MovingUnit();
+                return new StoppingUnit();
             // if c == Move - change move directions (if shift move, append to command queue
 
             return this;

@@ -49,7 +49,9 @@ namespace MapEditor
             {
                 for (var y = 0; y < Height; y++)
                 {
-                    _tiles[x, y] = new Tile(x, y, CellSize, Terrain.Empty);
+                    var worldX = x * CellSize;
+                    var worldY = y * CellSize;
+                    _tiles[x, y] = new Tile(worldX, worldY, CellSize, Terrain.Empty);
                 }
             }
         }
@@ -76,8 +78,8 @@ namespace MapEditor
             else if (x < 0)
                 x = 0;
 
-            if (y > Height)
-                y = Height;
+            if (y >= Height)
+                y = Height - 1;
             else if (y < 0)
                 y = 0;
 
@@ -116,9 +118,9 @@ namespace MapEditor
                 for (var y = 0; y < Height; y++)
                 {
                     var tile = _tiles[x, y];
-                    if (!tile.IsDirty)
-                        continue;
-
+                    //if (!tile.IsDirty)
+                    //    continue;
+                    
                     tile.Render(_graphics);
                     //tile.IsDirty = false;
                 }

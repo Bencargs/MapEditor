@@ -49,8 +49,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\MoveCommand.cs" />
+    <Compile Include="Engine\Animation.cs" />
     <Compile Include="Entities\Entity.cs" />
     <Compile Include="Engine\Game.cs" />
+    <Compile Include="Entities\UnitController.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -80,6 +82,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <EmbeddedResource Include="TileForm.resx">
       <DependentUpon>TileForm.cs</DependentUpon>
@@ -98,6 +101,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Map\Grass.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Map\Crater.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Map\Path.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
