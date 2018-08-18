@@ -15,7 +15,7 @@ namespace MapEditor
 
         void DrawLines(Color color, Point[] points);
         void FillRectangle(Brush brush, Rectangle area);
-        void DrawImage(Image image, Point point);
+        void DrawImage(Image image, Rectangle area);
     }
 
     public class WinFormGraphics : IGraphics
@@ -40,9 +40,9 @@ namespace MapEditor
             _graphics.DrawLines(pen, points);
         }
 
-        public void DrawImage(Image image, Point point)
+        public void DrawImage(Image image, Rectangle area)
         {
-            _graphics.DrawImageUnscaled(image, point);
+            _graphics.DrawImageUnscaled(image, area);
         }
 
         //Tech debt

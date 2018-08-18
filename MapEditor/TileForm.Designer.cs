@@ -40,7 +40,7 @@
             this.terrainCmb.Name = "terrainCmb";
             this.terrainCmb.Size = new System.Drawing.Size(159, 21);
             this.terrainCmb.TabIndex = 0;
-            this.terrainCmb.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
+            this.terrainCmb.SelectedIndexChanged += new System.EventHandler(this.ComboBox1_SelectedIndexChanged);
             // 
             // cancel
             // 
@@ -51,7 +51,7 @@
             this.cancel.TabIndex = 1;
             this.cancel.Text = "Cancel";
             this.cancel.UseVisualStyleBackColor = true;
-            this.cancel.Click += new System.EventHandler(this.button1_Click);
+            this.cancel.Click += new System.EventHandler(this.Button1_Click);
             // 
             // accept
             // 
@@ -61,7 +61,7 @@
             this.accept.TabIndex = 2;
             this.accept.Text = "Accept";
             this.accept.UseVisualStyleBackColor = true;
-            this.accept.Click += new System.EventHandler(this.accept_Click);
+            this.accept.Click += new System.EventHandler(this.Accept_Click);
             // 
             // TileForm
             // 

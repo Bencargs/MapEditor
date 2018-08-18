@@ -33,9 +33,9 @@ namespace MapEditor
             _unitController = new UnitController(graphics);
             //_unitController.CreateUnit(8, 8);
 
-            var tile1 = new Bitmap(@"C:\Source\MapEditor\MapEditor\Map\Grass.png");
-            tile1.MakeTransparent(Color.Fuchsia);
-            button2.Tag = new Tile(0, 0, 20, Terrain.Land) { Image = tile1};
+            var image = new Bitmap(@"C:\Source\MapEditor\MapEditor\Map\Grass.png");
+            image.MakeTransparent(Color.Fuchsia);
+            button2.Tag = new Terrain(TerrainType.Land, image, 20, 20);
 
             var timer = new Timer();
             timer.Tick += Update;
@@ -62,11 +62,11 @@ namespace MapEditor
             {
                 var point = ((MouseEventArgs) e).Location;// canvas.PointToClient(Cursor.Position);
                 var tile = _map.GetTile(point);
+                var terrain = _map.GetTerrain(tile.TerrainIndex);
 
-                _contextMenu = new TileForm(tile);
+                _contextMenu = new TileForm(terrain);
                 _contextMenu.StartPosition = FormStartPosition.Manual;
                 _contextMenu.Location = canvas.PointToScreen(point);
-                _contextMenu.Show(this);
                 _contextMenu.FormClosing += (o, s) =>
                 {
                     if (!s.Cancel)
@@ -74,6 +74,8 @@ namespace MapEditor
                         canvas.Invalidate();
                     }
                 };
+                _contextMenu.Show(this);
+                
             }
         }
 
@@ -137,19 +139,18 @@ namespace MapEditor
 
         private void button2_MouseDown(object sender, MouseEventArgs e)
         {
-            var tile = ((Tile) ((Button) sender).Tag);
+            var tile = (Terrain) ((Button) sender).Tag;
             button2.DoDragDrop(tile, DragDropEffects.Copy);
         }
 
         private void canvas_DragDrop(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(typeof(Tile)))
+            if (e.Data.GetDataPresent(typeof(Terrain)))
             {
                 var dropPoint = new Point(e.X, e.Y);
                 var point = canvas.PointToClient(dropPoint);
-                var tile = (Tile)e.Data.GetData(typeof(Tile));
-                var target = _map.GetTile(point);
-                target.Image = tile.Image;
+                var tile = (Terrain)e.Data.GetData(typeof(Terrain));
+                _map.SetTile(point, tile);
                 thumbnail.Visible = false;
                 canvas.Invalidate();
             }
@@ -157,7 +158,7 @@ namespace MapEditor
 
         private void canvas_DragEnter(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(typeof(Tile)))
+            if (e.Data.GetDataPresent(typeof(Terrain)))
             {
                 e.Effect = DragDropEffects.Move | DragDropEffects.Copy;
                 return;
@@ -167,16 +168,16 @@ namespace MapEditor
 
         private void canvas_DragOver(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(typeof(Tile)))
+            if (e.Data.GetDataPresent(typeof(Terrain)))
             {
                 e.Effect = DragDropEffects.Move | DragDropEffects.Copy;
 
-                var tile = (Tile)e.Data.GetData(typeof(Tile));
+                var terrain = (Terrain)e.Data.GetData(typeof(Terrain));
 
-                thumbnail.Width = tile.Image.Width;
-                thumbnail.Height = tile.Image.Height;
+                thumbnail.Width = terrain.Image.Width;
+                thumbnail.Height = terrain.Image.Height;
                 thumbnail.Location = canvas.PointToClient(Cursor.Position);
-                thumbnail.Image = tile.Image;
+                thumbnail.Image = terrain.Image;
                 thumbnail.BringToFront();
                 thumbnail.Visible = true;
                 return;

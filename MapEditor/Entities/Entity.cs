@@ -20,7 +20,7 @@ namespace MapEditor.Entities
         {
             //var image = _animation.GetImage();//use elapsed to calculate
             var image = Animation.Next();
-            graphics.DrawImage(image, Position);
+            //graphics.DrawImage(image, Position);
         }
 
         protected abstract Entity ChangeState(ICommand c);
