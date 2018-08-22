@@ -37,6 +37,8 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -50,6 +52,7 @@
   <ItemGroup>
     <Compile Include="Commands\MoveCommand.cs" />
     <Compile Include="Engine\Animation.cs" />
+    <Compile Include="Entities\ComponentController.cs" />
     <Compile Include="Entities\Entity.cs" />
     <Compile Include="Engine\Game.cs" />
     <Compile Include="Entities\UnitController.cs" />
@@ -101,15 +104,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Map\Grass.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Map\Crater.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Map\Path.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

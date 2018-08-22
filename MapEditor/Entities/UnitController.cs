@@ -20,33 +20,34 @@ namespace MapEditor.Entities
             _units = new List<Entity>();
         }
 
-        public void CreateUnit(int x, int y)
-        {
-            var images = new List<Image>
-            {
-                Image.FromFile(@"C:\Source\MapEditor\MapEditor\Entities\Unit.png"),
-                Image.FromFile(@"C:\Source\MapEditor\MapEditor\Entities\Unit1.png")
-            };
+        //todo: refactor
+        //public void CreateUnit(int x, int y)
+        //{
+        //    var images = new List<Image>
+        //    {
+        //        Image.FromFile(@"C:\Source\MapEditor\MapEditor\Entities\Unit.png"),
+        //        Image.FromFile(@"C:\Source\MapEditor\MapEditor\Entities\Unit1.png")
+        //    };
 
-            var newUnit = new IdleUnit 
-            {
-                Position = new Point(x, y),
-                Animation = new Animation(images)
-            };
-            _units.Add(newUnit);
-        }
+        //    var newUnit = new IdleUnit 
+        //    {
+        //        Position = new Point(x, y),
+        //        Animation = new Animation(images)
+        //    };
+        //    _units.Add(newUnit);
+        //}
 
-        public void Update()
-        {
+        //public void Update()
+        //{
             
-        }
+        //}
 
-        public void Render()
-        {
-            foreach (var u in _units)
-            {
-                u.Render(_graphics);
-            }
-        }
+        //public void Render()
+        //{
+        //    foreach (var u in _units)
+        //    {
+        //        u.Render(_graphics);
+        //    }
+        //}
     }
 }

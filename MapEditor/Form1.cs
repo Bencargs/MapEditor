@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO.Compression;
 using System.Windows.Forms;
 using MapEditor.Entities;
 using Newtonsoft.Json;
@@ -24,18 +19,15 @@ namespace MapEditor
             InitializeComponent();
 
             var graphics = new WinFormGraphics(canvas);
-            _map = new Map(graphics, canvas.Width / 20, canvas.Height / 20)
-                {
-                    ShowGrid = gridChk.Checked
-                };
+            _map = new Map(graphics, canvas.Width / 20, canvas.Height / 20);
+            // todo: replace with an OnChecked handler
+            _map.ShowGrid(gridChk.Checked);
             _map.Init();
 
             _unitController = new UnitController(graphics);
             //_unitController.CreateUnit(8, 8);
 
-            var image = new Bitmap(@"C:\Source\MapEditor\MapEditor\Map\Grass.png");
-            image.MakeTransparent(Color.Fuchsia);
-            button2.Tag = new Terrain(TerrainType.Land, image, 20, 20);
+            LoadTerrains();
 
             var timer = new Timer();
             timer.Tick += Update;
@@ -43,19 +35,39 @@ namespace MapEditor
             timer.Start();
         }
 
+        private void LoadTerrains()
+        {
+            var terrainImagePath = @"C:\Source\MapEditor\MapEditor\Map\Terrains";
+            var imageFiles = Directory.GetFiles(terrainImagePath, "*.png");
+            for (int i = 0; i < imageFiles.Length; i++)
+            {
+                var image = new Bitmap(imageFiles[i]);
+                image.MakeTransparent(Color.Fuchsia);
+                var tag = new Terrain(TerrainType.Land, image, 20, 20);
+                var button = new Button
+                {
+                    BackgroundImage = image,
+                    BackgroundImageLayout = ImageLayout.Stretch,
+                    Size = new Size(70, 70),
+                    Location = new Point(0, i * 70),
+                    Tag = tag
+                };
+                button.MouseDown += TileTab_MouseDown;
+                tileTab.Controls.Add(button);
+            }
+        }
+
         private void Update(object sender, EventArgs e)
         {
             _map.Update();
-            _unitController.Update();
         }
 
-        private void canvas_Paint(object sender, PaintEventArgs e)
+        private void Canvas_Paint(object sender, PaintEventArgs e)
         {
             _map.Render();
-            _unitController.Render();
         }
 
-        private void canvas_Click(object sender, EventArgs e)
+        private void Canvas_Click(object sender, EventArgs e)
         {
             _contextMenu?.Close();
             if ((e as MouseEventArgs)?.Button == MouseButtons.Right)
@@ -79,51 +91,66 @@ namespace MapEditor
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void Button1_Click(object sender, EventArgs e)
         {
             var dialog = new OpenFileDialog
             {
-                Filter = "Image Files|*.bmp",
-                Title = "Select a Background File"
+                Filter = @"Image Files|*.bmp",
+                Title = @"Select a Background File"
             };
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                backgroundTxt.Text = dialog.FileName;
-                _map.Background = !string.IsNullOrWhiteSpace(backgroundTxt.Text)
-                    ? Image.FromFile(backgroundTxt.Text)
-                    : null;
-                canvas.Invalidate();
+                //todo: re-implement
+                // get image, have map set each tile individually
+                // what do we set the TerrainTypes as - None for all?
+
+                //backgroundTxt.Text = dialog.FileName;
+                //_map.Background = !string.IsNullOrWhiteSpace(backgroundTxt.Text)
+                //    ? Image.FromFile(backgroundTxt.Text)
+                //    : null;
+                //canvas.Invalidate();
             }
         }
 
-        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        private void CheckBox1_CheckedChanged(object sender, EventArgs e)
         {
-            _map.ShowGrid = gridChk.Checked;
+            _map.ShowGrid(gridChk.Checked);
             canvas.Invalidate();
         }
 
-        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        private void SaveToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var dialog = new SaveFileDialog
             {
-                Filter = "Map File|*.map",
-                Title = "Save File"
+                Filter = @"Map File|*.map",
+                Title = @"Save File"
             };
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                var json = JsonConvert.SerializeObject(_map.Save());
-                File.WriteAllText(dialog.FileName, json);
+                //save map file as json
+                // save terrain images as bitmaps..?
+                var mapSettings = _map.Save();
+                var path = Path.GetFullPath(dialog.FileName);
+
+                // get the path, make an archive file there
+                // in the archive make a Terrains folder
+                // save each Terrain.Image as [key].png
+                // save mapSettings.Json
+                //ZipFile.CreateFromDirectory("", "");
+
+                //var json = JsonConvert.SerializeObject(_map.Save());
+                //File.WriteAllText(dialog.FileName, json);
             }
         }
 
-        private void openToolStripMenuItem_Click(object sender, EventArgs e)
+        private void OpenToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var dialog = new OpenFileDialog
             {
-                Filter = "Image Files|*.map",
-                Title = "Select a File"
+                Filter = @"Image Files|*.map",
+                Title = @"Select a File"
             };
 
             if (dialog.ShowDialog() == DialogResult.OK)
@@ -137,13 +164,14 @@ namespace MapEditor
             }
         }
 
-        private void button2_MouseDown(object sender, MouseEventArgs e)
+        private void TileTab_MouseDown(object sender, MouseEventArgs e)
         {
-            var tile = (Terrain) ((Button) sender).Tag;
-            button2.DoDragDrop(tile, DragDropEffects.Copy);
+            var button = (Button) sender;
+            var tile = (Terrain) button.Tag;
+            button.DoDragDrop(tile, DragDropEffects.Copy);
         }
 
-        private void canvas_DragDrop(object sender, DragEventArgs e)
+        private void Canvas_DragDrop(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(typeof(Terrain)))
             {
@@ -156,7 +184,7 @@ namespace MapEditor
             }
         }
 
-        private void canvas_DragEnter(object sender, DragEventArgs e)
+        private void Canvas_DragEnter(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(typeof(Terrain)))
             {
@@ -166,7 +194,7 @@ namespace MapEditor
             e.Effect = DragDropEffects.None;
         }
 
-        private void canvas_DragOver(object sender, DragEventArgs e)
+        private void Canvas_DragOver(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(typeof(Terrain)))
             {
@@ -185,20 +213,18 @@ namespace MapEditor
             e.Effect = DragDropEffects.None;
         }
 
-        // Set transperancy
-        //var bitmap = new Bitmap(tile.Image);
-        //    for (var w = 0; w<bitmap.Width; w++)
-        //{
-        //    for (var h = 0; h<bitmap.Height; h++)
-        //    {
-        //        var c = bitmap.GetPixel(w, h);
-        //        if (c != Color.Transparent)
-        //        {
-        //            var newC = Color.FromArgb(200, c.R, c.G, c.B);
-        //            bitmap.SetPixel(w, h, newC);
-        //        }
-        //    }
-        //}
-        //thumbnail.Image = bitmap;
+        private void Button2_Click(object sender, EventArgs e)
+        {
+            var tab = sidePanel.SelectedTab;
+            foreach (Button t in tab.Controls)
+            {
+                t.BackgroundImage.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                var previous = (Terrain) t.Tag;
+                var image = new Bitmap(t.BackgroundImage);
+                var terrain = new Terrain(previous.TerrainType, image, previous.Width, previous.Height);
+                t.Tag = terrain;
+                t.Refresh();
+            }
+        }
     }
 }
