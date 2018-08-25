@@ -7,13 +7,6 @@ using MapEditor.Engine;
 namespace MapEditor.Entities
 {
 
-    public class Entity
-    {
-        // todo: replace TileId and EntityId with long, use static class to generate
-        public Guid Id { get; } = Guid.NewGuid();
-        public List<IComponent> Components { get; set; }
-    }
-
     // below: Handling units as Finite State Machines
     // replaced with an Entity Component System, 
     // FSM can be retrofitted as a component later
