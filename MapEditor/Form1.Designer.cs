@@ -48,6 +48,11 @@
             this.tileTab = new System.Windows.Forms.TabPage();
             this.unitTab = new System.Windows.Forms.TabPage();
             this.button2 = new System.Windows.Forms.Button();
+            this.fileToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.openToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.exitToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.menu.SuspendLayout();
             this.topPanel.SuspendLayout();
             this.canvas.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.thumbnail)).BeginInit();
@@ -57,10 +62,12 @@
             // menu
             // 
             this.menu.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.menu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.fileToolStripMenuItem1});
             this.menu.Location = new System.Drawing.Point(0, 0);
             this.menu.Name = "menu";
             this.menu.Padding = new System.Windows.Forms.Padding(8, 2, 0, 2);
-            this.menu.Size = new System.Drawing.Size(821, 24);
+            this.menu.Size = new System.Drawing.Size(821, 28);
             this.menu.TabIndex = 0;
             this.menu.Text = "menuStrip1";
             // 
@@ -134,7 +141,7 @@
             this.topPanel.Controls.Add(this.button1);
             this.topPanel.Controls.Add(this.backgroundTxt);
             this.topPanel.Dock = System.Windows.Forms.DockStyle.Top;
-            this.topPanel.Location = new System.Drawing.Point(0, 24);
+            this.topPanel.Location = new System.Drawing.Point(0, 28);
             this.topPanel.Margin = new System.Windows.Forms.Padding(4);
             this.topPanel.Name = "topPanel";
             this.topPanel.Size = new System.Drawing.Size(821, 54);
@@ -239,7 +246,7 @@
             this.unitTab.Margin = new System.Windows.Forms.Padding(4);
             this.unitTab.Name = "unitTab";
             this.unitTab.Padding = new System.Windows.Forms.Padding(4);
-            this.unitTab.Size = new System.Drawing.Size(108, 341);
+            this.unitTab.Size = new System.Drawing.Size(101, 341);
             this.unitTab.TabIndex = 1;
             this.unitTab.Text = "Units";
             this.unitTab.UseVisualStyleBackColor = true;
@@ -253,6 +260,35 @@
             this.button2.Text = "Rotate";
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.Button2_Click);
+            // 
+            // fileToolStripMenuItem1
+            // 
+            this.fileToolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.saveToolStripMenuItem1,
+            this.openToolStripMenuItem1,
+            this.exitToolStripMenuItem1});
+            this.fileToolStripMenuItem1.Name = "fileToolStripMenuItem1";
+            this.fileToolStripMenuItem1.Size = new System.Drawing.Size(44, 24);
+            this.fileToolStripMenuItem1.Text = "File";
+            // 
+            // saveToolStripMenuItem1
+            // 
+            this.saveToolStripMenuItem1.Name = "saveToolStripMenuItem1";
+            this.saveToolStripMenuItem1.Size = new System.Drawing.Size(181, 26);
+            this.saveToolStripMenuItem1.Text = "Save";
+            this.saveToolStripMenuItem1.Click += new System.EventHandler(this.SaveToolStripMenuItem_Click);
+            // 
+            // openToolStripMenuItem1
+            // 
+            this.openToolStripMenuItem1.Name = "openToolStripMenuItem1";
+            this.openToolStripMenuItem1.Size = new System.Drawing.Size(181, 26);
+            this.openToolStripMenuItem1.Text = "Open";
+            // 
+            // exitToolStripMenuItem1
+            // 
+            this.exitToolStripMenuItem1.Name = "exitToolStripMenuItem1";
+            this.exitToolStripMenuItem1.Size = new System.Drawing.Size(181, 26);
+            this.exitToolStripMenuItem1.Text = "Exit";
             // 
             // Form1
             // 
@@ -270,6 +306,8 @@
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Form1";
             this.Text = "Form1";
+            this.menu.ResumeLayout(false);
+            this.menu.PerformLayout();
             this.topPanel.ResumeLayout(false);
             this.topPanel.PerformLayout();
             this.canvas.ResumeLayout(false);
@@ -302,6 +340,10 @@
         private System.Windows.Forms.TabPage unitTab;
         private System.Windows.Forms.PictureBox thumbnail;
         private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem1;
     }
 }
 

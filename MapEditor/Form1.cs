@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.IO.Compression;
 using System.Windows.Forms;
@@ -49,7 +50,7 @@ namespace MapEditor
                     BackgroundImage = image,
                     BackgroundImageLayout = ImageLayout.Stretch,
                     Size = new Size(70, 70),
-                    Location = new Point(0, i * 70),
+                    Location = new System.Drawing.Point(0, i * 70),
                     Tag = tag
                 };
                 button.MouseDown += TileTab_MouseDown;
@@ -129,19 +130,29 @@ namespace MapEditor
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                //save map file as json
-                // save terrain images as bitmaps..?
-                var mapSettings = _map.Save();
                 var path = Path.GetFullPath(dialog.FileName);
 
-                // get the path, make an archive file there
-                // in the archive make a Terrains folder
-                // save each Terrain.Image as [key].png
-                // save mapSettings.Json
-                //ZipFile.CreateFromDirectory("", "");
+                var tempPath = Path.Combine(Path.GetDirectoryName(path) ?? Directory.GetCurrentDirectory(), "TempMapSave");
+                Directory.CreateDirectory(tempPath);
+                var mapSettings = _map.Save();
+                foreach (var t in mapSettings.Terrains.Values)
+                {
+                    if (t.Image == null)
+                        continue;
 
-                //var json = JsonConvert.SerializeObject(_map.Save());
-                //File.WriteAllText(dialog.FileName, json);
+                    var imagePath = Path.Combine(tempPath, $"{t.Key}.png");
+                    t.Image.Save(imagePath, ImageFormat.Png);
+                }
+                var json = JsonConvert.SerializeObject(mapSettings);
+                var mapFilePath = Path.Combine(tempPath, "map.json");
+                File.WriteAllText(mapFilePath, json);
+
+                ZipFile.CreateFromDirectory(tempPath, path);
+
+                if (File.Exists(path))
+                {
+                    Directory.Delete(tempPath, true);
+                }
             }
         }
 

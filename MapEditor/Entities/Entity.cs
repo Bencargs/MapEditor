@@ -1,11 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using MapEditor.Commands;
-using MapEditor.Engine;
+using System.Linq;
 
 namespace MapEditor.Entities
 {
+    public class Entity
+    {
+        // todo: replace TileId and EntityId with long, use static class to generate
+        public Guid Id { get; } = Guid.NewGuid();
+        public List<IComponent> Components { get; set; }
+
+        public T GetComponent<T>()
+            where T : IComponent
+        {
+            var component = Components.OfType<T>().SingleOrDefault();
+            if (component == null)
+            {
+                throw new Exception($"Component {typeof(T)} does not exist in dictionary");
+            }
+            return component;
+        }
+
+        public void AddComponent<T>(T component)
+            where T : IComponent
+        {
+            if (!Components.Any(x => x is T))
+                Components.Add(component);
+        }
+    }
 
     // below: Handling units as Finite State Machines
     // replaced with an Entity Component System, 

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using MapEditor.Common;
+using MapEditor.Entities;
 
 namespace MapEditor
 {
@@ -101,6 +103,115 @@ namespace MapEditor
             
             return Settings.Tiles[x, y];
         }
+
+        // todo: replace bresenhams with supercover algorithm
+        public IEnumerable<Tile> GetTiles(Vector2 position)
+        {
+            // https://stackoverflow.com/questions/11678693/all-cases-covered-bresenhams-line-algorithm
+            var startPoint = new Point(position.X, position.Y);
+            var endPoint = startPoint.Add(position.Normalize() * position.Length());
+
+            var w = endPoint.X - startPoint.X;
+            var h = endPoint.Y - startPoint.Y;
+            int dx1 = 0, dy1 = 0, dx2 = 0, dy2 = 0;
+            if (w < 0) dx1 = -1; else if (w > 0) dx1 = 1;
+            if (h < 0) dy1 = -1; else if (h > 0) dy1 = 1;
+            if (w < 0) dx2 = -1; else if (w > 0) dx2 = 1;
+            var longest = Math.Abs(w);
+            var shortest = Math.Abs(h);
+            if (!(longest > shortest))
+            {
+                longest = Math.Abs(h);
+                shortest = Math.Abs(w);
+                if (h < 0) dy2 = -1; else if (h > 0) dy2 = 1;
+                dx2 = 0;
+            }
+
+            var x = 0;
+            var y = 0;
+            var numerator = longest >> 1;
+            for (var i = 0; i <= longest; i++)
+            {
+                yield return GetTile(new Point(x, y));
+
+                numerator += shortest;
+                if (!(numerator < longest))
+                {
+                    numerator -= longest;
+                    x += dx1;
+                    y += dy1;
+                }
+                else
+                {
+                    x += dx2;
+                    y += dy2;
+                }
+            }
+        }
+
+        //// todo: compare against http://ericw.ca/notes/bresenhams-line-algorithm-in-csharp.html
+        //// https://www.codeproject.com/Articles/30686/Bresenham-s-Line-Algorithm-Revisited
+        //var startPoint = new Point(position.X, position.Y);
+        //var endPoint = startPoint.Add(position.Normalize() * position.Length());
+
+        //var deltaX = endPoint.X - startPoint.X;
+        //var deltaY = endPoint.Y - endPoint.Y;
+        //var error = deltaX / 2;
+        //var yStep = 1;
+
+        //if (endPoint.Y < startPoint.Y)
+        //    yStep = 1;
+
+        //var nextPoint = startPoint;
+        //while (nextPoint.X < endPoint.X)
+        //{
+        //    if (nextPoint != startPoint)
+        //        yield return GetTile(nextPoint);
+
+        //    nextPoint.X++;
+        //    error -= deltaY;
+        //    if (error < 0)
+        //    {
+        //        nextPoint.Y += yStep;
+        //        error += deltaX;
+        //    }
+        //}
+
+        // https://www.redblobgames.com/grids/line-drawing.html
+        //function supercover_line(p0, p1)
+        //{
+        //    var dx = p1.x - p0.x, dy = p1.y - p0.y;
+        //    var nx = Math.abs(dx), ny = Math.abs(dy);
+        //    var sign_x = dx > 0 ? 1 : -1, sign_y = dy > 0 ? 1 : -1;
+
+        //    var p = new Point(p0.x, p0.y);
+        //    var points = [new Point(p.x, p.y)];
+        //    for (var ix = 0, iy = 0; ix < nx || iy < ny;)
+        //    {
+        //        if ((0.5 + ix) / nx == (0.5 + iy) / ny)
+        //        {
+        //            // next step is diagonal
+        //            p.x += sign_x;
+        //            p.y += sign_y;
+        //            ix++;
+        //            iy++;
+        //        }
+        //        else if ((0.5 + ix) / nx < (0.5 + iy) / ny)
+        //        {
+        //            // next step is horizontal
+        //            p.x += sign_x;
+        //            ix++;
+        //        }
+        //        else
+        //        {
+        //            // next step is vertical
+        //            p.y += sign_y;
+        //            iy++;
+        //        }
+        //        points.push(new Point(p.x, p.y));
+        //    }
+        //    return points;
+        //}
 
         public void SetTile(Point point, Terrain tile)
         {

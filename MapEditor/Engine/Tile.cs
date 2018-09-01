@@ -5,6 +5,8 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using MapEditor.Components;
+using MapEditor.Entities;
 using Newtonsoft.Json;
 
 namespace MapEditor
@@ -106,6 +108,7 @@ namespace MapEditor
         public int Y { get; }
         public bool IsDirty { get; set; }
         public Guid TerrainIndex { get; set; }
+        public List<ICollider> Colliders { get; set; }
         //public Color Colour
         //{
         //    get

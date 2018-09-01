@@ -51,11 +51,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\MoveCommand.cs" />
+    <Compile Include="Common\Vector2.cs" />
+    <Compile Include="Components\CollisionController.cs" />
+    <Compile Include="Components\MovementHandler.cs" />
     <Compile Include="Engine\Animation.cs" />
     <Compile Include="Entities\ComponentController.cs" />
     <Compile Include="Entities\Entity.cs" />
     <Compile Include="Engine\Game.cs" />
     <Compile Include="Entities\UnitController.cs" />
+    <Compile Include="Common\Extensions.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
