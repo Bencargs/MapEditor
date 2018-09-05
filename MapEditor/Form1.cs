@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Windows.Forms;
 using MapEditor.Entities;
 using Newtonsoft.Json;
@@ -166,12 +167,42 @@ namespace MapEditor
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                var json = File.ReadAllText(dialog.FileName);
-                var settings = JsonConvert.DeserializeObject<MapSettings>(json);
+                MapSettings data = null;
 
-                _map = new Map(new WinFormGraphics(canvas), settings);
-                _map.Init();
-                canvas.Invalidate();
+                var archive = ZipFile.OpenRead(dialog.FileName);
+                var mapdata = archive.GetEntry("map.json");
+                if (mapdata != null)
+                {
+                    using (var stream = mapdata.Open())
+                    using (var reader = new StreamReader(stream))
+                    {
+                        var json = reader.ReadToEnd();
+                        data = JsonConvert.DeserializeObject<MapSettings>(json);
+                    }
+
+                    data.Terrains = data.Terrains.Select(x =>
+                    {
+                        // todo: customer serializer/deserializer
+                        Bitmap tileImage = null;
+                        var imageData = archive.GetEntry($"{x.Key}.png");
+                        if (imageData != null)
+                        {
+                            using (var stream = imageData.Open())
+                            using (var image = Image.FromStream(stream))
+                            {
+                                tileImage = new Bitmap(image);
+                            }
+                        }
+                        return new Terrain(x.Value.TerrainType, tileImage, x.Value.Width, x.Value.Height);
+                    }).ToDictionary(k => k.Key);
+                }
+
+                if (data != null)
+                {
+                    _map = new Map(new WinFormGraphics(canvas), data);
+                    _map.Render();
+                    canvas.Invalidate();
+                }
             }
         }
 

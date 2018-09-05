@@ -39,7 +39,7 @@ namespace MapEditor
 
             Key = new Guid(GetImageHashcode());
         }
-
+        
         public override int GetHashCode()
         {
             return Key.GetHashCode() ^ TerrainType.GetHashCode() ^ Width ^ Height;
