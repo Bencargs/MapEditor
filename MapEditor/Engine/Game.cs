@@ -12,7 +12,8 @@ namespace MapEditor.Engine
 
         public Game(IGraphics graphics)
         {
-            _map = new Map(graphics, 50, 100)
+            var messageHub = new MessageHub();
+            _map = new Map(messageHub, graphics, 50, 100)
             {
                 //ShowGrid = gridChk.Checked
             };

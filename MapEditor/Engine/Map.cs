@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using MapEditor.Common;
-using MapEditor.Entities;
+using MapEditor.Engine;
 
 namespace MapEditor
 {
@@ -14,27 +15,30 @@ namespace MapEditor
         public int Width { get; set; }
         public int Height { get; set; }
         public bool ShowGrid { get; set; }
+        public bool ShowTerrain { get; set; }
         public Tile[,] Tiles { get; set; }
         public Dictionary<Guid, Terrain> Terrains { get; set; } = new Dictionary<Guid, Terrain>();
     }
 
-    public class Map : IDisposable
+    public class Map : IHandleCommand, IDisposable
     {
+        private readonly MessageHub _messageHub;
         private readonly IGraphics _graphics;
         private const int CellSize = 20;
-        private MapSettings Settings { get; } = new MapSettings();
+        protected MapSettings Settings { get; } = new MapSettings();
 
-        public Map(IGraphics graphics, int width, int height)
+        public Map(MessageHub messageHub, IGraphics graphics, int width, int height)
         {
             Settings.Width = width;
             Settings.Height = height;
 
+            _messageHub = messageHub;
             _graphics = graphics;
             Settings.Tiles = new Tile[width, height];
         }
 
-        public Map(IGraphics graphics, MapSettings settings)
-            : this(graphics, settings.Width, settings.Height)
+        public Map(MessageHub messageHub, IGraphics graphics, MapSettings settings)
+            : this(messageHub, graphics, settings.Width, settings.Height)
         {
             Settings.Tiles = settings.Tiles;
             Settings.ShowGrid = settings.ShowGrid;
@@ -43,6 +47,9 @@ namespace MapEditor
 
         public void Init()
         {
+            // todo: remove the requirement to manually subscribe with IHandleCommand<...> ?
+            _messageHub.Subscribe(this, CommandType.PlaceTile);
+
             for (var x = 0; x < Settings.Width; x++)
             {
                 for (var y = 0; y < Settings.Height; y++)
@@ -58,11 +65,6 @@ namespace MapEditor
                     Settings.Tiles[x, y] = new Tile(worldX, worldY, terrain.Key);
                 }
             }
-        }
-
-        public void ShowGrid(bool show)
-        {
-            Settings.ShowGrid = show;
         }
 
         public MapSettings Save()
@@ -231,6 +233,10 @@ namespace MapEditor
                     {
                         Settings.Terrains.Add(terrain.Key, terrain);
                     }
+                    else
+                    {
+                        Settings.Terrains[terrain.Key] = terrain;
+                    }
 
                     var offsetX = x + i > Settings.Width - 1 ? Settings.Width - 1 : x + i;
                     var offsetY = y + j > Settings.Height - 1 ? Settings.Height - 1 : y + j;
@@ -246,6 +252,16 @@ namespace MapEditor
             return terrain;
         }
 
+        public List<Tile> GetTiles(Point point, Terrain terrain)
+        {
+            var lengthX = (int) Math.Ceiling((double) terrain.Width / CellSize);
+            var lengthY = (int) Math.Ceiling((double) terrain.Height / CellSize);
+
+            return (from x in Enumerable.Range(point.X, lengthX).Select(MapXToTileX)
+                    from y in Enumerable.Range(point.Y, lengthY).Select(MapYToTileY)
+                    select Settings.Tiles[x, y]).ToList();
+        }
+
         public void Update()
         {
             //todo:
@@ -258,6 +274,11 @@ namespace MapEditor
             if (Settings.ShowGrid)
             {
                 RenderGrid();
+            }
+
+            if (Settings.ShowTerrain)
+            {
+                RenderTerrain();
             }
         }
 
@@ -316,6 +337,41 @@ namespace MapEditor
             }
         }
 
+        private void RenderTerrain()
+        {
+            Enumerate(tile =>
+            {
+                var terrain = Settings.Terrains[tile.TerrainIndex];
+
+                var area = new Rectangle(tile.X, tile.Y, terrain.Width, terrain.Height);
+                switch (terrain.TerrainType)
+                {
+                    case TerrainType.Empty:
+                        break;
+                    case TerrainType.Water:
+                        using (var brush = new SolidBrush(Color.FromArgb(128, 0, 0, 255)))
+                        {
+                            _graphics.FillRectangle(brush, area);
+                        }
+                        break;
+                    case TerrainType.Land:
+                        using (var brush = new SolidBrush(Color.FromArgb(128, 0, 128, 0)))
+                        {
+                            _graphics.FillRectangle(brush, area);
+                        }
+                        break;
+                    case TerrainType.ImpassableLand:
+                        using (var brush = new SolidBrush(Color.FromArgb(128, 128, 128, 128)))
+                        {
+                            _graphics.FillRectangle(brush, area);
+                        }
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            });
+        }
+
         public void Dispose()
         {
             _graphics?.Dispose();
@@ -326,6 +382,22 @@ namespace MapEditor
                     t.Dispose();
                 }
             }
+        }
+
+        public void Handle(ICommand command)
+        {
+            // todo: implement IHandleCommand<T> to remove this switch statement
+            switch (command)
+            {
+                case PlaceTileCommand c:
+                    SetTile(c.Point, c.Terrain);
+                    break;
+            }
+        }
+
+        public void Undo(ICommand command)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -52,6 +52,7 @@
             this.openToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.menu = new System.Windows.Forms.MenuStrip();
+            this.terrainChk = new System.Windows.Forms.CheckBox();
             this.canvas.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.thumbnail)).BeginInit();
             this.sidePanel.SuspendLayout();
@@ -238,6 +239,7 @@
             // 
             this.topPanel.BackColor = System.Drawing.SystemColors.ControlLight;
             this.topPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.topPanel.Controls.Add(this.terrainChk);
             this.topPanel.Controls.Add(this.gridChk);
             this.topPanel.Controls.Add(this.label1);
             this.topPanel.Controls.Add(this.button1);
@@ -290,6 +292,17 @@
             this.menu.Size = new System.Drawing.Size(821, 28);
             this.menu.TabIndex = 0;
             this.menu.Text = "menuStrip1";
+            // 
+            // terrainChk
+            // 
+            this.terrainChk.AutoSize = true;
+            this.terrainChk.Location = new System.Drawing.Point(392, 12);
+            this.terrainChk.Name = "terrainChk";
+            this.terrainChk.Size = new System.Drawing.Size(114, 21);
+            this.terrainChk.TabIndex = 4;
+            this.terrainChk.Text = "Show Terrain";
+            this.terrainChk.UseVisualStyleBackColor = true;
+            this.terrainChk.CheckedChanged += new System.EventHandler(this.terrainChk_CheckedChanged);
             // 
             // Form1
             // 
@@ -344,6 +357,7 @@
         private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem1;
         private System.Windows.Forms.MenuStrip menu;
+        private System.Windows.Forms.CheckBox terrainChk;
     }
 }
 

@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Windows.Forms;
+using MapEditor.Engine;
 using MapEditor.Entities;
 using Newtonsoft.Json;
 
@@ -12,16 +14,19 @@ namespace MapEditor
 {
     public partial class Form1 : Form
     {
+        private readonly MessageHub _messageHub;
         private readonly UnitController _unitController;
         private TileForm _contextMenu;
-        private Map _map;
+        private Editor.MapEditor _map;
 
         public Form1()
         {
             InitializeComponent();
 
+            _messageHub = new MessageHub();
+
             var graphics = new WinFormGraphics(canvas);
-            _map = new Map(graphics, canvas.Width / 20, canvas.Height / 20);
+            _map = new Editor.MapEditor(_messageHub, graphics, canvas.Width / 20, canvas.Height / 20);
             // todo: replace with an OnChecked handler
             _map.ShowGrid(gridChk.Checked);
             _map.Init();
@@ -30,6 +35,7 @@ namespace MapEditor
             //_unitController.CreateUnit(8, 8);
 
             LoadTerrains();
+            LoadUnits();
 
             var timer = new Timer();
             timer.Tick += Update;
@@ -39,24 +45,62 @@ namespace MapEditor
 
         private void LoadTerrains()
         {
-            var terrainImagePath = @"C:\Source\MapEditor\MapEditor\Map\Terrains";
-            var imageFiles = Directory.GetFiles(terrainImagePath, "*.png");
-            for (int i = 0; i < imageFiles.Length; i++)
+            var i = 0;
+            const string terrainImagePath = @"C:\Source\MapEditor\MapEditor\Map\Terrains";
+            foreach (var image in LoadImages(terrainImagePath))
             {
-                var image = new Bitmap(imageFiles[i]);
-                image.MakeTransparent(Color.Fuchsia);
-                var tag = new Terrain(TerrainType.Land, image, 20, 20);
+                var terrain = new Terrain(TerrainType.Land, image, 20, 20);
                 var button = new Button
                 {
                     BackgroundImage = image,
                     BackgroundImageLayout = ImageLayout.Stretch,
                     Size = new Size(70, 70),
-                    Location = new System.Drawing.Point(0, i * 70),
-                    Tag = tag
+                    Location = new Point(0, i++ * 70),
+                    Tag = terrain
                 };
                 button.MouseDown += TileTab_MouseDown;
                 tileTab.Controls.Add(button);
             }
+        }
+
+        private void LoadUnits()
+        {
+            var i = 0;
+            const string unitImagePath = @"C:\Source\MapEditor\MapEditor\Map\Units";
+            foreach (var image in LoadImages(unitImagePath))
+            {
+                // todo: replace with a factory
+                // units should be a .ent file
+                // Json, plus animations, sounds etc
+                // better yet, store this data in a database and have teh unit file simply be guids
+                // if a unit contains new data, should be installed with an installer? packaged in unit file?
+                var unit = new Entity();
+                unit.AddComponent(new ImageComponent {Image = image });
+
+                var button = new Button
+                {
+                    BackgroundImage = image,
+                    BackgroundImageLayout = ImageLayout.Stretch,
+                    Size = new Size(70, 70),
+                    Location = new Point(0, i++ * 70),
+                    Tag = unit,
+                };
+                //button.MouseDown += TileTab_MouseDown;
+                unitTab.Controls.Add(button);
+            }
+        }
+
+        private static IEnumerable<Bitmap> LoadImages(string path)
+        {
+            var bitmaps = new List<Bitmap>();
+            var imageFiles = Directory.GetFiles(path, "*.png");
+            foreach (var t in imageFiles)
+            {
+                var image = new Bitmap(t);
+                image.MakeTransparent(Color.Fuchsia);
+                bitmaps.Add(image);
+            }
+            return bitmaps;
         }
 
         private void Update(object sender, EventArgs e)
@@ -74,7 +118,7 @@ namespace MapEditor
             _contextMenu?.Close();
             if ((e as MouseEventArgs)?.Button == MouseButtons.Right)
             {
-                var point = ((MouseEventArgs) e).Location;// canvas.PointToClient(Cursor.Position);
+                var point = ((MouseEventArgs) e).Location;
                 var tile = _map.GetTile(point);
                 var terrain = _map.GetTerrain(tile.TerrainIndex);
 
@@ -85,11 +129,14 @@ namespace MapEditor
                 {
                     if (!s.Cancel)
                     {
+                        var newTerrain = ((TileForm) o).Terrain;
+                        _map.SetTile(point, newTerrain);
+                        // add new Terrain at X, Y
+
                         canvas.Invalidate();
                     }
                 };
                 _contextMenu.Show(this);
-                
             }
         }
 
@@ -117,7 +164,14 @@ namespace MapEditor
 
         private void CheckBox1_CheckedChanged(object sender, EventArgs e)
         {
+            // todo: these should be editor concerns, not map concerns
             _map.ShowGrid(gridChk.Checked);
+            canvas.Invalidate();
+        }
+
+        private void terrainChk_CheckedChanged(object sender, EventArgs e)
+        {
+            _map.ShowTerrain(terrainChk.Checked);
             canvas.Invalidate();
         }
 
@@ -126,7 +180,8 @@ namespace MapEditor
             var dialog = new SaveFileDialog
             {
                 Filter = @"Map File|*.map",
-                Title = @"Save File"
+                Title = @"Save File",
+                InitialDirectory = @"C:\Source\MapEditor\MapEditor\Map\Saves"
             };
 
             if (dialog.ShowDialog() == DialogResult.OK)
@@ -159,10 +214,12 @@ namespace MapEditor
 
         private void OpenToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            // todo: helper class to set relative paths
             var dialog = new OpenFileDialog
             {
                 Filter = @"Image Files|*.map",
-                Title = @"Select a File"
+                Title = @"Select a File",
+                InitialDirectory = @"C:\Source\MapEditor\MapEditor\Map\Saves"
             };
 
             if (dialog.ShowDialog() == DialogResult.OK)
@@ -199,8 +256,7 @@ namespace MapEditor
 
                 if (data != null)
                 {
-                    _map = new Map(new WinFormGraphics(canvas), data);
-                    _map.Render();
+                    _map = new Editor.MapEditor(_messageHub, new WinFormGraphics(canvas), data);
                     canvas.Invalidate();
                 }
             }
@@ -220,7 +276,12 @@ namespace MapEditor
                 var dropPoint = new Point(e.X, e.Y);
                 var point = canvas.PointToClient(dropPoint);
                 var tile = (Terrain)e.Data.GetData(typeof(Terrain));
-                _map.SetTile(point, tile);
+                _messageHub.Post(new PlaceTileCommand
+                {
+                    Point = point,
+                    Terrain = tile,
+                    PreviousTerrain = _map.GetTiles(point, tile)
+                });
                 thumbnail.Visible = false;
                 canvas.Invalidate();
             }

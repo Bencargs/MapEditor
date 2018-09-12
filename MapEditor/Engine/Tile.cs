@@ -109,25 +109,6 @@ namespace MapEditor
         public bool IsDirty { get; set; }
         public Guid TerrainIndex { get; set; }
         public List<ICollider> Colliders { get; set; }
-        //public Color Colour
-        //{
-        //    get
-        //    {
-        //        switch (Terrain)
-        //        {
-        //            case TerrainType.Empty:
-        //                return Color.Transparent;
-        //            case TerrainType.Water:
-        //                return SystemColors.ActiveCaption;
-        //            case TerrainType.Land:
-        //                return Color.Green;
-        //            case TerrainType.ImpassableLand:
-        //                return Color.LightSlateGray;
-        //            default:
-        //                return Color.Empty;
-        //        }
-        //    }
-        //}
         
         public Tile(int x, int y, Guid terrainIndex)
         {

@@ -12,16 +12,16 @@ namespace MapEditor
 {
     public partial class TileForm : Form
     {
-        private Terrain _terrain;
+        public Terrain Terrain { get; set; }
 
         public TileForm(Terrain terrain)
         {
             InitializeComponent();
 
-            _terrain = terrain;
+            Terrain = terrain;
             var comboItems = ((TerrainType[]) Enum.GetValues(typeof(TerrainType))).Select(x => new FormattedTerrainItem(x));
             terrainCmb.Items.AddRange(comboItems.ToArray());
-            terrainCmb.SelectedIndex = (int)_terrain.TerrainType;
+            terrainCmb.SelectedIndex = (int)Terrain.TerrainType;
             terrainCmb.ValueMember = "Value";
             terrainCmb.DisplayMember = "Description";
         }
@@ -41,9 +41,9 @@ namespace MapEditor
             if (terrainCmb?.SelectedItem != null)
             {
                 //todo: _map.SetTerrain
-                var previous = _terrain;
+                var previous = Terrain;
                 var type = ((FormattedTerrainItem) terrainCmb.SelectedItem).Value;
-                _terrain = new Terrain(type, previous.Image, previous.Width, previous.Height);
+                Terrain = new Terrain(type, previous.Image, previous.Width, previous.Height);
             }
             Close();
         }

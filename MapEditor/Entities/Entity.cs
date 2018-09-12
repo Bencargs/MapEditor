@@ -7,8 +7,14 @@ namespace MapEditor.Entities
     public class Entity
     {
         // todo: replace TileId and EntityId with long, use static class to generate
-        public Guid Id { get; } = Guid.NewGuid();
+        public Guid Id { get; }
         public List<IComponent> Components { get; set; }
+
+        public Entity()
+        {
+            Id = Guid.NewGuid();
+            Components = new List<IComponent>();
+        }
 
         public T GetComponent<T>()
             where T : IComponent
