@@ -18,6 +18,8 @@ namespace MapEditor
         private readonly UnitController _unitController;
         private TileForm _contextMenu;
         private Editor.MapEditor _map;
+        private Editor.EditorInput _input;
+        private Camera _camera;
 
         public Form1()
         {
@@ -31,8 +33,17 @@ namespace MapEditor
             _map.ShowGrid(gridChk.Checked);
             _map.Init();
 
-            _unitController = new UnitController(graphics);
-            //_unitController.CreateUnit(8, 8);
+            _unitController = new UnitController(_messageHub, graphics);
+            _unitController.Init();
+
+            // todo: is camera the responsibility of Map class?
+            _camera = new Camera(_messageHub, new Point(0, 0), canvas.Width / 20, canvas.Height / 20);
+
+            _input = new Editor.EditorInput(_messageHub, _camera);
+            canvas.MouseMove += (sender, eventArgs) =>
+            {
+                _input.OnMouseEvent(eventArgs);
+            };
 
             LoadTerrains();
             LoadUnits();
@@ -65,27 +76,26 @@ namespace MapEditor
 
         private void LoadUnits()
         {
+            const string unitPath = @"C:\Source\MapEditor\MapEditor\Units";
+            var unitFiles = Directory.GetFiles(unitPath);
+            var templates = unitFiles.Select(_unitController.LoadTemplate);
+
             var i = 0;
-            const string unitImagePath = @"C:\Source\MapEditor\MapEditor\Map\Units";
-            foreach (var image in LoadImages(unitImagePath))
+            foreach (var t in templates)
             {
-                // todo: replace with a factory
-                // units should be a .ent file
-                // Json, plus animations, sounds etc
-                // better yet, store this data in a database and have teh unit file simply be guids
-                // if a unit contains new data, should be installed with an installer? packaged in unit file?
-                var unit = new Entity();
-                unit.AddComponent(new ImageComponent {Image = image });
+                var imageComponent = t.GetComponent<ImageComponent>();
+                if (imageComponent == null)
+                    return;
 
                 var button = new Button
                 {
-                    BackgroundImage = image,
+                    BackgroundImage = imageComponent.Image,
                     BackgroundImageLayout = ImageLayout.Stretch,
                     Size = new Size(70, 70),
                     Location = new Point(0, i++ * 70),
-                    Tag = unit,
+                    Tag = t
                 };
-                //button.MouseDown += TileTab_MouseDown;
+                button.MouseDown += TileTab_MouseDown;
                 unitTab.Controls.Add(button);
             }
         }
@@ -111,6 +121,7 @@ namespace MapEditor
         private void Canvas_Paint(object sender, PaintEventArgs e)
         {
             _map.Render();
+            _unitController.Render();
         }
 
         private void Canvas_Click(object sender, EventArgs e)
@@ -265,16 +276,17 @@ namespace MapEditor
         private void TileTab_MouseDown(object sender, MouseEventArgs e)
         {
             var button = (Button) sender;
-            var tile = (Terrain) button.Tag;
-            button.DoDragDrop(tile, DragDropEffects.Copy);
+            //var tile = (Terrain) button.Tag;
+            button.DoDragDrop(button.Tag, DragDropEffects.Copy);
         }
 
         private void Canvas_DragDrop(object sender, DragEventArgs e)
         {
+            var dropPoint = new Point(e.X, e.Y);
+            var point = canvas.PointToClient(dropPoint);
+
             if (e.Data.GetDataPresent(typeof(Terrain)))
             {
-                var dropPoint = new Point(e.X, e.Y);
-                var point = canvas.PointToClient(dropPoint);
                 var tile = (Terrain)e.Data.GetData(typeof(Terrain));
                 _messageHub.Post(new PlaceTileCommand
                 {
@@ -285,11 +297,23 @@ namespace MapEditor
                 thumbnail.Visible = false;
                 canvas.Invalidate();
             }
+            else if (e.Data.GetDataPresent(typeof(Entity)))
+            {
+                var unit = (Entity)e.Data.GetData(typeof(Entity));
+                _messageHub.Post(new AddUnitCommand
+                {
+                    Point = point,
+                    Unit = unit
+                });
+                thumbnail.Visible = false;
+                canvas.Invalidate();
+            }
         }
 
         private void Canvas_DragEnter(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(typeof(Terrain)))
+            if (e.Data.GetDataPresent(typeof(Terrain)) ||
+                e.Data.GetDataPresent(typeof(Entity)))
             {
                 e.Effect = DragDropEffects.Move | DragDropEffects.Copy;
                 return;
@@ -313,6 +337,21 @@ namespace MapEditor
                 thumbnail.Visible = true;
                 return;
             }
+            if (e.Data.GetDataPresent(typeof(Entity)))
+            {
+                e.Effect = DragDropEffects.Move | DragDropEffects.Copy;
+
+                var unit = (Entity)e.Data.GetData(typeof(Entity));
+                var imageComponent = unit.GetComponent<ImageComponent>();
+
+                thumbnail.Width = imageComponent.Image.Width;
+                thumbnail.Height = imageComponent.Image.Height;
+                thumbnail.Location = canvas.PointToClient(Cursor.Position);
+                thumbnail.Image = imageComponent.Image;
+                thumbnail.BringToFront();
+                thumbnail.Visible = true;
+                return;
+            }
             e.Effect = DragDropEffects.None;
         }
 
@@ -322,6 +361,10 @@ namespace MapEditor
             foreach (Button t in tab.Controls)
             {
                 t.BackgroundImage.RotateFlip(RotateFlipType.Rotate90FlipNone);
+
+                if (!(t.Tag is Terrain))
+                    return;
+
                 var previous = (Terrain) t.Tag;
                 var image = new Bitmap(t.BackgroundImage);
                 var terrain = new Terrain(previous.TerrainType, image, previous.Width, previous.Height);

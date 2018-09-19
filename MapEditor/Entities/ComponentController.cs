@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using MapEditor.Common;
 using MapEditor.Components;
+using Newtonsoft.Json;
 
 namespace MapEditor.Entities
 {
@@ -64,6 +65,8 @@ namespace MapEditor.Entities
 
     public class ImageComponent : IComponent
     {
+        public Guid Id { get; set; }
+        [JsonIgnore]
         public Bitmap Image { get; set; }
     }
 
@@ -80,7 +83,7 @@ namespace MapEditor.Entities
     //        throw new NotImplementedException();
     //    }
     //}
-    
+
 
     public class ImageRenderHandler : IComponentHandler
     {

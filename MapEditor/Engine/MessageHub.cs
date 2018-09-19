@@ -11,7 +11,9 @@ namespace MapEditor.Engine
         Stop,
         Undo,
         Redo,
-        PlaceTile
+        PlaceTile,
+        AddUnit,
+        MoveCamera
     }
 
     public interface ICommand

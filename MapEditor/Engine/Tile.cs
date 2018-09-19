@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using MapEditor.Common;
 using MapEditor.Components;
 using MapEditor.Entities;
 using Newtonsoft.Json;
@@ -37,7 +38,7 @@ namespace MapEditor
             TerrainType = terrainType;
             Key = Guid.Empty;
 
-            Key = new Guid(GetImageHashcode());
+            Key = new Guid(Image.GetImageHashcode());
         }
         
         public override int GetHashCode()
@@ -58,16 +59,6 @@ namespace MapEditor
                    Height == other.Height && 
                    /*ImageCompare(other.Image)*/
                    Key == other.Key;
-        }
-
-        private byte[] GetImageHashcode()
-        {
-            var converter = new ImageConverter();
-            using (var md5 = new MD5CryptoServiceProvider())
-            {
-                var rawImageData = converter.ConvertTo(Image, typeof(byte[])) as byte[];
-                return rawImageData != null ? md5.ComputeHash(rawImageData) : null;
-            }
         }
 
         private bool ImageCompare(object obj)

@@ -269,6 +269,8 @@ namespace MapEditor
 
         public void Render()
         {
+            //todo: Camera.Contains - render only objects in camera view
+
             RenderTiles();
 
             if (Settings.ShowGrid)

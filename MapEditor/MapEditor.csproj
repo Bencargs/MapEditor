@@ -51,12 +51,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\MoveCommand.cs" />
+    <Compile Include="Common\CollisionEx.cs" />
+    <Compile Include="Common\Matrix.cs" />
     <Compile Include="Common\Vector2.cs" />
+    <Compile Include="Common\Vector3.cs" />
     <Compile Include="Components\CollisionController.cs" />
     <Compile Include="Components\MovementHandler.cs" />
     <Compile Include="Editor\EditorInput.cs" />
     <Compile Include="Editor\MapEditor.cs" />
     <Compile Include="Engine\Animation.cs" />
+    <Compile Include="Engine\Camera.cs" />
     <Compile Include="Engine\MessageHub.cs" />
     <Compile Include="Engine\Input.cs" />
     <Compile Include="Entities\ComponentController.cs" />

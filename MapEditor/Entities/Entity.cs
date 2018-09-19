@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 
 namespace MapEditor.Entities
 {
@@ -19,11 +20,12 @@ namespace MapEditor.Entities
         public T GetComponent<T>()
             where T : IComponent
         {
-            var component = Components.OfType<T>().SingleOrDefault();
-            if (component == null)
-            {
-                throw new Exception($"Component {typeof(T)} does not exist in dictionary");
-            }
+            //var component = Components.OfType<T>().SingleOrDefault();
+            //if (component == null)
+            //{
+            //    throw new Exception($"Component {typeof(T)} does not exist in dictionary");
+            //}
+            var component = Components.OfType<T>().LastOrDefault();
             return component;
         }
 
