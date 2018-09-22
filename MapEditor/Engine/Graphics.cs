@@ -1,23 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Drawing;
 using System.Windows.Forms;
 
-namespace MapEditor
+namespace MapEditor.Engine
 {
-    public interface IGraphics : IDisposable
-    {
-        int Width { get; }
-        int Height { get; }
-
-        void DrawLines(Color color, Point[] points);
-        void FillRectangle(Brush brush, Rectangle area);
-        void DrawImage(Image image, Rectangle area);
-    }
-
     public class WinFormGraphics : IGraphics
     {
         private readonly Graphics _graphics;

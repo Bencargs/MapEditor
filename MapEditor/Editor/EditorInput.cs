@@ -1,4 +1,5 @@
 ﻿using System.Windows.Forms;
+using MapEditor.Commands;
 using MapEditor.Engine;
 
 namespace MapEditor.Editor

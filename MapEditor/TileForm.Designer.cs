@@ -40,7 +40,6 @@
             this.terrainCmb.Name = "terrainCmb";
             this.terrainCmb.Size = new System.Drawing.Size(159, 21);
             this.terrainCmb.TabIndex = 0;
-            this.terrainCmb.SelectedIndexChanged += new System.EventHandler(this.ComboBox1_SelectedIndexChanged);
             // 
             // cancel
             // 
@@ -51,7 +50,7 @@
             this.cancel.TabIndex = 1;
             this.cancel.Text = "Cancel";
             this.cancel.UseVisualStyleBackColor = true;
-            this.cancel.Click += new System.EventHandler(this.Button1_Click);
+            this.cancel.Click += new System.EventHandler(this.Close_Click);
             // 
             // accept
             // 

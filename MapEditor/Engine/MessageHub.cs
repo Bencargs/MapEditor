@@ -1,56 +1,12 @@
 ﻿using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
+using MapEditor.Commands;
 
 namespace MapEditor.Engine
 {
-    public enum CommandType
-    {
-        None = 0,
-        Move,
-        Stop,
-        Undo,
-        Redo,
-        PlaceTile,
-        AddUnit,
-        MoveCamera
-    }
-
-    public interface ICommand
-    {
-        CommandType Id { get; }
-    }
-
-    public class PlaceTileCommand : ICommand
-    {
-        public CommandType Id { get; } = CommandType.PlaceTile;
-
-        public Point Point { get; set; }
-        public Terrain Terrain { get; set; }
-        public List<Tile> PreviousTerrain { get; set; }    //todo: lazy initialize?
-    }
-
-    public class UndoCommand : ICommand
-    {
-        public CommandType Id { get; } = CommandType.Undo;
-    }
-
-    public class RedoCommand : ICommand
-    {
-        public CommandType Id { get; } = CommandType.Redo;
-    }
-
-    public interface IHandleCommand
-    {
-        void Handle(ICommand command);
-        void Undo(ICommand command);
-    }
-
     public class MessageHub
     {
         private readonly Dictionary<CommandType, List<IHandleCommand>> _subscribers =
             new Dictionary<CommandType, List<IHandleCommand>>();
-
 
         private const int QueueSize = 100;
         private readonly List<ICommand> _commands = new List<ICommand>(QueueSize);

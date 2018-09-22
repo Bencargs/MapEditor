@@ -4,78 +4,29 @@ using System.Drawing;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
-using System.Threading.Tasks;
+using MapEditor.Commands;
 using MapEditor.Common;
 using MapEditor.Components;
+using MapEditor.Controllers.CollisionHandler;
+using MapEditor.Controllers.MovementHandler;
 using MapEditor.Engine;
+using MapEditor.Entities;
 using Newtonsoft.Json;
 
-namespace MapEditor.Entities
+namespace MapEditor.Handlers
 {
-    public static class UnitEx
-    {
-        public static T Clone<T>(this T source)
-        {
-            if (ReferenceEquals(source, null))
-            {
-                return default(T);
-            }
-
-            var serialized = JsonConvert.SerializeObject(source, new JsonSerializerSettings
-            {
-                TypeNameHandling = TypeNameHandling.Objects
-            });
-            return JsonConvert.DeserializeObject<T>(serialized, new JsonSerializerSettings
-            {
-                ObjectCreationHandling = ObjectCreationHandling.Replace,
-                TypeNameHandling = TypeNameHandling.Objects
-            });
-        }
-
-        public static Entity Clone(this Entity source)
-        {
-            var entity = new Entity();
-            foreach (var c in source.Components)
-            {
-                entity.Components.Add(c.Clone());
-            }
-            var imageComponent = entity.GetComponent<ImageComponent>();
-            if (imageComponent != null)
-            {
-                imageComponent.Image = source.GetComponent<ImageComponent>().Image;
-            }
-            return entity;
-        }
-    }
-
-    public class AddUnitCommand : ICommand
-    {
-        public CommandType Id { get; } = CommandType.AddUnit;
-
-        public Point Point { get; set; }
-        public Entity Unit { get; set; }
-    }
-
-    public class NameComponent : IComponent
-    {
-        public string Title { get; set; }
-        public string Name { get; set; }
-    }
-
-    public class UnitController : IHandleCommand
+    public class UnitHandler : IHandleCommand
     {
         private readonly List<Entity> _units;
         private int _index;
         private const int Buffer = 1000;
         private readonly IGraphics _graphics;
+        private readonly Map _map;
 
-        public UnitController(MessageHub messageHub, IGraphics graphics)
+        public UnitHandler(MessageHub messageHub, IGraphics graphics, Map map)
         {
             _graphics = graphics;
+            _map = map;
             _units = new List<Entity>();
             messageHub.Subscribe(this, CommandType.AddUnit);
         }
@@ -96,11 +47,21 @@ namespace MapEditor.Entities
         /// </summary>
         public void SaveTemplate()
         {
-            var entityImage = Image.FromFile(@"C:\Source\MapEditor\MapEditor\Units\Soldier\Images\bea468cd-fc00-32a3-0b1b-5a6f70869010.png");
+            var entityImage = Image.FromFile(@"C:\Source\MapEditor\MapEditor\Units\Images\bea468cd-fc00-32a3-0b1b-5a6f70869010.png");
             var entity = new Entity();
-            entity.AddComponent(new NameComponent { Name = "Soldier" });
-            entity.AddComponent(new PositionComponent { Position = new Vector2 { X = 0, Y = 0 } });
+            entity.AddComponent(new UnitComponent { Name = "Soldier" });
+            entity.AddComponent(new PositionComponent { Position = new Vector2 { X = 0, Y = 0 } }); //todo: do we need position if we have a collider?
             entity.AddComponent(new PhysicsComponent { Mass = 5 });
+            entity.AddComponent(new CollisionComponent
+            {
+                Collider = new BoundingBox
+                {
+                    // todo: constructor?
+                    Width = entityImage.Width,
+                    Height = entityImage.Height,
+                    Position = new Point {X = 0, Y = 0}
+                }
+            });
             entity.AddComponent(new PathingComponent());
             entity.AddComponent(new ImageComponent
             {
@@ -120,8 +81,8 @@ namespace MapEditor.Entities
             {
                 TypeNameHandling = TypeNameHandling.Objects
             });
-            File.WriteAllText(@"C:\Source\MapEditor\MapEditor\Units\Soldier\data.json", json);
-            ZipFile.CreateFromDirectory(@"C:\Source\MapEditor\MapEditor\Units\Soldier", @"C:\Source\MapEditor\MapEditor\Units\soldier.unit");
+            File.WriteAllText(@"C:\Source\MapEditor\MapEditor\Units\data.json", json);
+            ZipFile.CreateFromDirectory(@"C:\Source\MapEditor\MapEditor\Units\", @"C:\Source\MapEditor\MapEditor\soldier.unit");
         }
 
         /// <summary>
@@ -175,7 +136,19 @@ namespace MapEditor.Entities
             if (_index > Buffer)
                 throw new Exception("Too many units");  //todo: handle this nicely - DisplayErrorCommand ?
 
-            _units[_index++] = unit.Clone();
+            var tile = _map.GetTile(point);
+            var colliders = tile.GetUnits()
+                .Select(x => x.GetComponent<CollisionComponent>())
+                .Where(x => x != null)
+                .Select(x => x.Collider);
+            if (colliders.Any())
+            {
+                return;
+            }
+
+            var newUnit = unit.Clone();
+            _units[_index++] = newUnit;
+            tile.Entities.Add(newUnit);
         }
 
         //public void Update()
@@ -209,6 +182,7 @@ namespace MapEditor.Entities
                     // todo: change signiture to only accept unit, position should be concern of the unit
                     AddUnit(c.Point, c.Unit);
                     break;
+                // MoveCommand - Set BoundingBox Position & Position Components
             }
         }
 

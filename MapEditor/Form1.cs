@@ -6,8 +6,11 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Windows.Forms;
+using MapEditor.Commands;
+using MapEditor.Components;
 using MapEditor.Engine;
 using MapEditor.Entities;
+using MapEditor.Handlers;
 using Newtonsoft.Json;
 
 namespace MapEditor
@@ -15,7 +18,7 @@ namespace MapEditor
     public partial class Form1 : Form
     {
         private readonly MessageHub _messageHub;
-        private readonly UnitController _unitController;
+        private readonly UnitHandler _unitHandler;
         private TileForm _contextMenu;
         private Editor.MapEditor _map;
         private Editor.EditorInput _input;
@@ -33,8 +36,8 @@ namespace MapEditor
             _map.ShowGrid(gridChk.Checked);
             _map.Init();
 
-            _unitController = new UnitController(_messageHub, graphics);
-            _unitController.Init();
+            _unitHandler = new UnitHandler(_messageHub, graphics, _map);
+            _unitHandler.Init();
 
             // todo: is camera the responsibility of Map class?
             _camera = new Camera(_messageHub, new Point(0, 0), canvas.Width / 20, canvas.Height / 20);
@@ -77,8 +80,8 @@ namespace MapEditor
         private void LoadUnits()
         {
             const string unitPath = @"C:\Source\MapEditor\MapEditor\Units";
-            var unitFiles = Directory.GetFiles(unitPath);
-            var templates = unitFiles.Select(_unitController.LoadTemplate);
+            var unitFiles = Directory.GetFiles(unitPath, "*.unit");
+            var templates = unitFiles.Select(_unitHandler.LoadTemplate);
 
             var i = 0;
             foreach (var t in templates)
@@ -121,7 +124,7 @@ namespace MapEditor
         private void Canvas_Paint(object sender, PaintEventArgs e)
         {
             _map.Render();
-            _unitController.Render();
+            _unitHandler.Render();
         }
 
         private void Canvas_Click(object sender, EventArgs e)
@@ -151,7 +154,7 @@ namespace MapEditor
             }
         }
 
-        private void Button1_Click(object sender, EventArgs e)
+        private void ImportBackground_Click(object sender, EventArgs e)
         {
             var dialog = new OpenFileDialog
             {
@@ -312,17 +315,30 @@ namespace MapEditor
 
         private void Canvas_DragEnter(object sender, DragEventArgs e)
         {
+            e.Effect = DragDropEffects.None;
             if (e.Data.GetDataPresent(typeof(Terrain)) ||
                 e.Data.GetDataPresent(typeof(Entity)))
             {
                 e.Effect = DragDropEffects.Move | DragDropEffects.Copy;
-                return;
             }
-            e.Effect = DragDropEffects.None;
+            //{
+            //    var unit = (Entity)e.Data.GetData(typeof(Entity));
+            //    var unitCollider = unit.GetComponent<CollisionComponent>().Collider;
+
+            //    var point = new Point(e.X, e.Y);
+            //    var tile = _map.GetTile(point);
+            //    var colliders = tile.GetUnits().Select(x => x.GetComponent<CollisionComponent>().Collider);
+            //    if (colliders.Any(c => c.IsCollided(unitCollider)))
+            //    {
+            //        return;
+            //    }
+            //    e.Effect = DragDropEffects.Move | DragDropEffects.Copy;
+            //}
         }
 
         private void Canvas_DragOver(object sender, DragEventArgs e)
         {
+            e.Effect = DragDropEffects.None;
             if (e.Data.GetDataPresent(typeof(Terrain)))
             {
                 e.Effect = DragDropEffects.Move | DragDropEffects.Copy;
@@ -339,23 +355,22 @@ namespace MapEditor
             }
             if (e.Data.GetDataPresent(typeof(Entity)))
             {
+                // Ensure we arn't overlapping any existing units
                 e.Effect = DragDropEffects.Move | DragDropEffects.Copy;
 
                 var unit = (Entity)e.Data.GetData(typeof(Entity));
-                var imageComponent = unit.GetComponent<ImageComponent>();
 
+                var imageComponent = unit.GetComponent<ImageComponent>();
                 thumbnail.Width = imageComponent.Image.Width;
                 thumbnail.Height = imageComponent.Image.Height;
                 thumbnail.Location = canvas.PointToClient(Cursor.Position);
                 thumbnail.Image = imageComponent.Image;
                 thumbnail.BringToFront();
                 thumbnail.Visible = true;
-                return;
             }
-            e.Effect = DragDropEffects.None;
         }
 
-        private void Button2_Click(object sender, EventArgs e)
+        private void RotateClick(object sender, EventArgs e)
         {
             var tab = sidePanel.SelectedTab;
             foreach (Button t in tab.Controls)

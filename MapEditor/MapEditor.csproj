@@ -50,23 +50,52 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\AddUnitCommand.cs" />
+    <Compile Include="Commands\CommandType.cs" />
+    <Compile Include="Commands\ICommand.cs" />
+    <Compile Include="Commands\MoveCameraCommand.cs" />
     <Compile Include="Commands\MoveCommand.cs" />
+    <Compile Include="Commands\PlaceTileCommand.cs" />
+    <Compile Include="Commands\RedoCommand.cs" />
+    <Compile Include="Commands\StopCommand.cs" />
+    <Compile Include="Commands\UndoCommand.cs" />
+    <Compile Include="Commands\UnitComponent.cs" />
     <Compile Include="Common\CollisionEx.cs" />
+    <Compile Include="Common\EntityEx.cs" />
     <Compile Include="Common\Matrix.cs" />
     <Compile Include="Common\Vector2.cs" />
     <Compile Include="Common\Vector3.cs" />
-    <Compile Include="Components\CollisionController.cs" />
-    <Compile Include="Components\MovementHandler.cs" />
+    <Compile Include="Components\AnimationComponent.cs" />
+    <Compile Include="Components\CollisionComponent.cs" />
+    <Compile Include="Components\IComponent.cs" />
+    <Compile Include="Components\ImageComponent.cs" />
+    <Compile Include="Components\MovementComponent.cs" />
+    <Compile Include="Components\PathingComponent.cs" />
+    <Compile Include="Components\PhysicsComponent.cs" />
+    <Compile Include="Components\PositionComponent.cs" />
+    <Compile Include="Engine\IHandleCommand.cs" />
+    <Compile Include="Engine\ITarget.cs" />
+    <Compile Include="Engine\Terrain.cs" />
+    <Compile Include="Engine\TerrainType.cs" />
+    <Compile Include="Handlers\CollisionHandler\CollisionHandler.cs" />
+    <Compile Include="Handlers\IComponentHandler.cs" />
+    <Compile Include="Handlers\ImageComponentHandler.cs" />
+    <Compile Include="Handlers\MovementHandler\MovementHandler.cs" />
+    <Compile Include="Handlers\CollisionHandler\BoundingBox.cs" />
+    <Compile Include="Handlers\CollisionHandler\BoundingCircle.cs" />
+    <Compile Include="Handlers\CollisionHandler\ICollider.cs" />
+    <Compile Include="Handlers\MovementHandler\MovementMode.cs" />
     <Compile Include="Editor\EditorInput.cs" />
     <Compile Include="Editor\MapEditor.cs" />
     <Compile Include="Engine\Animation.cs" />
     <Compile Include="Engine\Camera.cs" />
+    <Compile Include="Engine\IGraphics.cs" />
+    <Compile Include="Engine\MapSettings.cs" />
     <Compile Include="Engine\MessageHub.cs" />
     <Compile Include="Engine\Input.cs" />
-    <Compile Include="Entities\ComponentController.cs" />
     <Compile Include="Entities\Entity.cs" />
     <Compile Include="Engine\Game.cs" />
-    <Compile Include="Entities\UnitController.cs" />
+    <Compile Include="Handlers\UnitHandler.cs" />
     <Compile Include="Common\Extensions.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
@@ -75,7 +104,6 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="Engine\Graphics.cs" />
-    <Compile Include="JsonImageConverter.cs" />
     <Compile Include="Engine\Map.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -117,5 +145,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

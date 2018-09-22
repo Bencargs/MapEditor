@@ -1,23 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using MapEditor.Common;
+using MapEditor.Components;
+using MapEditor.Controllers.MovementHandler;
+using MapEditor.Engine;
 using MapEditor.Entities;
 
-namespace MapEditor.Components
+namespace MapEditor.Handlers.MovementHandler
 {
-    // https://gamedevelopment.tutsplus.com/series/understanding-steering-behaviors--gamedev-12732
-    public enum MovementMode
-    {
-        Move = 0,
-        Follow,
-        Intercept,
-        Evade,
-        Roam,
-        Patrol,
-    }
-
     public class MovementHandler : IComponentHandler
     {
         // todo: ensure this is checked on loan, not during game runtime
@@ -29,11 +20,11 @@ namespace MapEditor.Components
             typeof(PathingComponent)
         };
 
-        private readonly CollisionController _collisions;
+        private readonly Controllers.CollisionHandler.CollisionHandler _collisions;
 
-        public MovementHandler(CollisionController collisionController)
+        public MovementHandler(Controllers.CollisionHandler.CollisionHandler collisionHandler)
         {
-            _collisions = collisionController;
+            _collisions = collisionHandler;
         }
 
         public void Handle(Entity entity, double elapsed)

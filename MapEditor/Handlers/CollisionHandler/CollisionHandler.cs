@@ -1,57 +1,14 @@
-﻿using System.Drawing;
-using System.Linq;
+﻿using System.Linq;
 using MapEditor.Common;
+using MapEditor.Engine;
 
-namespace MapEditor.Components
+namespace MapEditor.Controllers.CollisionHandler
 {
-    public interface ICollider
-    {
-        Point Position { get; set; }
-        bool IsCollided(ICollider collider);
-    }
-
-    public class BoundingCircle : ICollider
-    {
-        public float Radius { get; set; }
-        public Point Position { get; set; }
-
-        public bool IsCollided(ICollider collider)
-        {
-            if (collider is BoundingCircle circle)
-                return this.Contains(circle);
-
-            if (collider is BoundingBox box)
-                return this.Contains(box);
-
-            return false;
-        }
-    }
-
-    public class BoundingBox : ICollider
-    {
-        //todo: Non-axis alligned: https://yal.cc/rot-rect-vs-circle-intersection/
-
-        public float Width { get; set; }
-        public float Height { get; set; }
-        public Point Position { get; set; }
-
-        public bool IsCollided(ICollider collider)
-        {
-            if (collider is BoundingCircle circle)
-                return this.Contains(circle);
-
-            if (collider is BoundingBox box)
-                return this.Contains(box);
-
-            return false;
-        }
-    }
-
-    public class CollisionController
+    public class CollisionHandler
     {
         private readonly Map _map;
 
-        public CollisionController(Map map)
+        public CollisionHandler(Map map)
         {
             _map = map;
         }
@@ -68,10 +25,10 @@ namespace MapEditor.Components
                 //line circle intersection - https://yal.cc/gamemaker-collision-line-point/
                 //https://stackoverflow.com/questions/23016676/line-segment-and-circle-intersection
                 //return t.Colliders.FirstOrDefault();
-                if (t.Colliders.Any())
-                {
-                    return t.Colliders.FirstOrDefault();
-                }
+
+                var collider = t.GetColliders().FirstOrDefault();
+                if (collider != null)
+                    return collider;
             }
             return null;
         }
@@ -82,7 +39,7 @@ namespace MapEditor.Components
             ICollider collider = null;
 
             var tile = _map.GetTile(circle.Position);
-            foreach (var c in tile.Colliders)
+            foreach (var c in tile.GetColliders())
             {
                 if (!c.IsCollided(circle))
                     continue;

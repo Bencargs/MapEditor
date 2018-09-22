@@ -1,15 +1,10 @@
 ﻿using System.Drawing;
+using MapEditor.Commands;
 using MapEditor.Common;
-using MapEditor.Components;
+using MapEditor.Controllers.CollisionHandler;
 
 namespace MapEditor.Engine
 {
-    public class MoveCameraCommand : ICommand
-    {
-        public CommandType Id { get; } = CommandType.MoveCamera;
-        public Camera.CameraMotion Direction { get; set; }
-    }
-
     public class Camera : IHandleCommand
     {
         private Rectangle _viewport;

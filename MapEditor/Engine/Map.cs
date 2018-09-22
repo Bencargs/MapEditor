@@ -2,24 +2,11 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using MapEditor.Commands;
 using MapEditor.Common;
-using MapEditor.Engine;
 
-namespace MapEditor
+namespace MapEditor.Engine
 {
-    public class MapSettings
-    {
-        // Tiles & Terrains should contain all Background data
-        //[JsonConverter(typeof(JsonImageConverter))]
-        //public Image Background { get; set; }
-        public int Width { get; set; }
-        public int Height { get; set; }
-        public bool ShowGrid { get; set; }
-        public bool ShowTerrain { get; set; }
-        public Tile[,] Tiles { get; set; }
-        public Dictionary<Guid, Terrain> Terrains { get; set; } = new Dictionary<Guid, Terrain>();
-    }
-
     public class Map : IHandleCommand, IDisposable
     {
         private readonly MessageHub _messageHub;
