@@ -6,6 +6,7 @@ namespace MapEditor.Components
 {
     public class ImageComponent : IComponent
     {
+        public ComponentType Type { get; set; } = ComponentType.Image;
         public Guid Id { get; set; }
         [JsonIgnore]
         public Bitmap Image { get; set; }

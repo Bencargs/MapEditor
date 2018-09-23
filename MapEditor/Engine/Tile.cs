@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using MapEditor.Commands;
 using MapEditor.Components;
-using MapEditor.Controllers.CollisionHandler;
 using MapEditor.Entities;
+using MapEditor.Handlers.CollisionHandler;
 
 namespace MapEditor.Engine
 {

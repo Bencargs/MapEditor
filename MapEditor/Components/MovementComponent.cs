@@ -7,6 +7,7 @@ namespace MapEditor.Components
 {
     public class MovementComponent : IComponent
     {
+        public ComponentType Type { get; set; } = ComponentType.Movement;
         // todo: rather than a single mode, it is possible to have multiple modes
         // eg- seek this target, while avoiding this area - replace with flag instead?
         public MovementMode MovementMode { get; set; }

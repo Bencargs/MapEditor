@@ -4,6 +4,7 @@ namespace MapEditor.Components
 {
     public class PositionComponent : IComponent
     {
+        public ComponentType Type { get; set; } = ComponentType.Position;
         public Vector2 Position { get; set; }
 
         // todo: where neccessary:

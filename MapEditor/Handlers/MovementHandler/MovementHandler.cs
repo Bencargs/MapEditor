@@ -20,9 +20,9 @@ namespace MapEditor.Handlers.MovementHandler
             typeof(PathingComponent)
         };
 
-        private readonly Controllers.CollisionHandler.CollisionHandler _collisions;
+        private readonly CollisionHandler.CollisionHandler _collisions;
 
-        public MovementHandler(Controllers.CollisionHandler.CollisionHandler collisionHandler)
+        public MovementHandler(CollisionHandler.CollisionHandler collisionHandler)
         {
             _collisions = collisionHandler;
         }

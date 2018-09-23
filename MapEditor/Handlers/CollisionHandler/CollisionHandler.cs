@@ -2,7 +2,7 @@
 using MapEditor.Common;
 using MapEditor.Engine;
 
-namespace MapEditor.Controllers.CollisionHandler
+namespace MapEditor.Handlers.CollisionHandler
 {
     public class CollisionHandler
     {

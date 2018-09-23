@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MapEditor.Common;
 using MapEditor.Components;
+using Newtonsoft.Json;
 
 namespace MapEditor.Entities
 {

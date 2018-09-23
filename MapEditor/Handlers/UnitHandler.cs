@@ -7,10 +7,10 @@ using System.Linq;
 using MapEditor.Commands;
 using MapEditor.Common;
 using MapEditor.Components;
-using MapEditor.Controllers.CollisionHandler;
 using MapEditor.Controllers.MovementHandler;
 using MapEditor.Engine;
 using MapEditor.Entities;
+using MapEditor.Handlers.CollisionHandler;
 using Newtonsoft.Json;
 
 namespace MapEditor.Handlers
@@ -77,10 +77,7 @@ namespace MapEditor.Handlers
                 SlowRadius = 5,
                 StopRadius = 1
             });
-            var json = JsonConvert.SerializeObject(entity, new JsonSerializerSettings
-            {
-                TypeNameHandling = TypeNameHandling.Objects
-            });
+            var json = JsonConvert.SerializeObject(entity);
             File.WriteAllText(@"C:\Source\MapEditor\MapEditor\Units\data.json", json);
             ZipFile.CreateFromDirectory(@"C:\Source\MapEditor\MapEditor\Units\", @"C:\Source\MapEditor\MapEditor\soldier.unit");
         }
@@ -100,10 +97,7 @@ namespace MapEditor.Handlers
                     using (var reader = new StreamReader(stream))
                     {
                         var unitJson = reader.ReadToEnd();
-                        unit = JsonConvert.DeserializeObject<Entity>(unitJson, new JsonSerializerSettings
-                        {
-                            TypeNameHandling = TypeNameHandling.Objects
-                        });
+                        unit = JsonConvert.DeserializeObject<Entity>(unitJson);
                     }
 
                     // todo: foreach and load multiple images to populate an animation component

@@ -1,10 +1,11 @@
 ﻿using System.Drawing;
 using MapEditor.Common;
 
-namespace MapEditor.Controllers.CollisionHandler
+namespace MapEditor.Handlers.CollisionHandler
 {
     public class BoundingCircle : ICollider
     {
+        public ColliderType Type { get; } = ColliderType.BoundingCircle;
         public float Radius { get; set; }
         public Point Position { get; set; }
 

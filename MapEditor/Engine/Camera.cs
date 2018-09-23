@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using MapEditor.Commands;
 using MapEditor.Common;
-using MapEditor.Controllers.CollisionHandler;
+using MapEditor.Handlers.CollisionHandler;
 
 namespace MapEditor.Engine
 {

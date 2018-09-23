@@ -1,5 +1,5 @@
 ﻿using System;
-using MapEditor.Controllers.CollisionHandler;
+using MapEditor.Handlers.CollisionHandler;
 
 namespace MapEditor.Common
 {

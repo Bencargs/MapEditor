@@ -67,6 +67,7 @@
     <Compile Include="Common\Vector3.cs" />
     <Compile Include="Components\AnimationComponent.cs" />
     <Compile Include="Components\CollisionComponent.cs" />
+    <Compile Include="Components\ComponentType.cs" />
     <Compile Include="Components\IComponent.cs" />
     <Compile Include="Components\ImageComponent.cs" />
     <Compile Include="Components\MovementComponent.cs" />
@@ -77,6 +78,7 @@
     <Compile Include="Engine\ITarget.cs" />
     <Compile Include="Engine\Terrain.cs" />
     <Compile Include="Engine\TerrainType.cs" />
+    <Compile Include="Handlers\ColliderType.cs" />
     <Compile Include="Handlers\CollisionHandler\CollisionHandler.cs" />
     <Compile Include="Handlers\IComponentHandler.cs" />
     <Compile Include="Handlers\ImageComponentHandler.cs" />
