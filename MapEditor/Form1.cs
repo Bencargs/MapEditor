@@ -47,6 +47,14 @@ namespace MapEditor
             {
                 _input.OnMouseEvent(eventArgs);
             };
+            canvas.MouseDown += (sender, eventArgs) =>
+            {
+                _input
+            };
+            canvas.MouseUp += (sender, eventArgs) =>
+            {
+
+            };
             KeyPreview = true;
             KeyPress += (sender, eventArgs) =>
             {

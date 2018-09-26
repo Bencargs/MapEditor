@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using System.Drawing;
+using System.Windows.Forms;
 
 namespace MapEditor.Engine
 {
@@ -8,6 +9,21 @@ namespace MapEditor.Engine
     public interface IInputController
     {
         void OnKeyboardEvent(KeyPressEventArgs e);
-        void OnMouseEvent(MouseEventArgs e);
+        void OnMouseEvent(MouseState e);
+    }
+
+    public class MouseState
+    {
+        public Point Location { get; set; }
+        public ButtonState State { get; set; }
+    }
+
+    public enum ButtonState
+    {
+        None = 0,
+        LeftReleased = 1,
+        LeftPressed = 2,
+        RightReleased = 3,
+        RightPressed = 4
     }
 }

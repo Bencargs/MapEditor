@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 using MapEditor.Commands;
 using MapEditor.Engine;
+using ButtonState = MapEditor.Engine.ButtonState;
 
 namespace MapEditor.Editor
 {
@@ -9,8 +9,7 @@ namespace MapEditor.Editor
     {
         private readonly MessageHub _messageHub;
         private readonly Camera _camera;
-        private List<ICommand> Commands { get; set; } = new List<ICommand>();
-        private int Index { get; set; }
+        private ButtonState _previousMouseState;
 
         public EditorInput(MessageHub messageHub, Camera camera)
         {
@@ -20,7 +19,6 @@ namespace MapEditor.Editor
 
         public void OnKeyboardEvent(KeyPressEventArgs e)
         {
-            //if ((Control.ModifierKeys & Keys.Shift) && (e.KeyChar & (char) Keys.Z) != 0)
             if (Control.ModifierKeys == Keys.Control)
             {
                 if ((e.KeyChar & (char) Keys.Z) != 0)
@@ -37,28 +35,38 @@ namespace MapEditor.Editor
             }
         }
 
-        public void OnMouseEvent(MouseEventArgs e)
+        public void OnMouseEvent(MouseState e)
         {
             var direction = _camera.GetMoveDirection(e.Location);
             if (direction != Camera.CameraMotion.None &&
                 direction != _camera.CurrentMotion)
             {
-                Commands.Insert(Index, new MoveCameraCommand
+                _messageHub.Post(new MoveCameraCommand
                 {
                     Direction = direction
                 });
-                _messageHub.Post(Commands[Index++]);
             }
 
-            var button = e.Button;
-            if (button == MouseButtons.Right)
+            switch (e.State)
             {
-                // create and post command
+                case ButtonState.None:
+                    break;
+                case ButtonState.LeftPressed:
+                    //Post StartSelectionCommand {e.Location}
+                    break;
+                case ButtonState.LeftReleased:
+                    if (_previousMouseState == ButtonState.LeftPressed)
+                    {
+                        //Post CompleteSelectionCommand {e.Location}
+                    }
+                    break;
+                case ButtonState.RightReleased:
+                    break;
+                case ButtonState.RightPressed:
+                    // Post a command
+                    break;
             }
-            else if (button == MouseButtons.Left)
-            {
-
-            }
+            _previousMouseState = e.State;
         }
     }
 }
