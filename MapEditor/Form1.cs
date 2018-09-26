@@ -19,9 +19,9 @@ namespace MapEditor
     {
         private readonly MessageHub _messageHub;
         private readonly UnitHandler _unitHandler;
+        private readonly Editor.EditorInput _input;
         private TileForm _contextMenu;
         private Editor.MapEditor _map;
-        private Editor.EditorInput _input;
         private Camera _camera;
 
         public Form1()
@@ -46,6 +46,11 @@ namespace MapEditor
             canvas.MouseMove += (sender, eventArgs) =>
             {
                 _input.OnMouseEvent(eventArgs);
+            };
+            KeyPreview = true;
+            KeyPress += (sender, eventArgs) =>
+            {
+                _input.OnKeyboardEvent(eventArgs);
             };
 
             LoadTerrains();
@@ -141,7 +146,7 @@ namespace MapEditor
                 _contextMenu.Location = canvas.PointToScreen(point);
                 _contextMenu.FormClosing += (o, s) =>
                 {
-                    if (!s.Cancel)
+                    if (!_contextMenu.Cancel)
                     {
                         var newTerrain = ((TileForm) o).Terrain;
                         _map.SetTile(point, newTerrain);

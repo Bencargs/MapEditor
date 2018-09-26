@@ -94,7 +94,7 @@
     <Compile Include="Engine\IGraphics.cs" />
     <Compile Include="Engine\MapSettings.cs" />
     <Compile Include="Engine\MessageHub.cs" />
-    <Compile Include="Engine\Input.cs" />
+    <Compile Include="Engine\IInputController.cs" />
     <Compile Include="Entities\Entity.cs" />
     <Compile Include="Engine\Game.cs" />
     <Compile Include="Handlers\UnitHandler.cs" />

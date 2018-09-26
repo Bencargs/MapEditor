@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using System.Collections.Generic;
+using System.Windows.Forms;
 using MapEditor.Commands;
 using MapEditor.Engine;
 
@@ -8,6 +9,8 @@ namespace MapEditor.Editor
     {
         private readonly MessageHub _messageHub;
         private readonly Camera _camera;
+        private List<ICommand> Commands { get; set; } = new List<ICommand>();
+        private int Index { get; set; }
 
         public EditorInput(MessageHub messageHub, Camera camera)
         {
@@ -17,7 +20,21 @@ namespace MapEditor.Editor
 
         public void OnKeyboardEvent(KeyPressEventArgs e)
         {
+            //if ((Control.ModifierKeys & Keys.Shift) && (e.KeyChar & (char) Keys.Z) != 0)
+            if (Control.ModifierKeys == Keys.Control)
+            {
+                if ((e.KeyChar & (char) Keys.Z) != 0)
+                {
+                    //_messageHub.Post(new UndoCommand
+                    //{
+                        
+                    //})
+                }
+                else if ((e.KeyChar & (char) Keys.Z) != 0)
+                {
 
+                }
+            }
         }
 
         public void OnMouseEvent(MouseEventArgs e)
@@ -26,10 +43,11 @@ namespace MapEditor.Editor
             if (direction != Camera.CameraMotion.None &&
                 direction != _camera.CurrentMotion)
             {
-                _messageHub.Post(new MoveCameraCommand
+                Commands.Insert(Index, new MoveCameraCommand
                 {
                     Direction = direction
                 });
+                _messageHub.Post(Commands[Index++]);
             }
 
             var button = e.Button;

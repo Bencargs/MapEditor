@@ -10,7 +10,7 @@ namespace MapEditor.Editor
         }
 
         public MapEditor(MessageHub messageHub, IGraphics graphics, MapSettings settings)
-            : base(messageHub, graphics, settings.Width, settings.Height)
+            : base(messageHub, graphics, settings)
         {
         }
 

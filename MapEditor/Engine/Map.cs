@@ -56,6 +56,13 @@ namespace MapEditor.Engine
 
         public MapSettings Save()
         {
+            Enumerate(x =>
+            {
+                if (x.Entities.Any())
+                {
+
+                }
+            });
             return Settings;
         }
 
@@ -280,7 +287,7 @@ namespace MapEditor.Engine
                 //    continue;
 
                 //tile.Render(_graphics);
-                if (Settings.Terrains.TryGetValue(tile.TerrainIndex, out Terrain terrain) && terrain.Image != null)
+                if (tile != null && Settings.Terrains.TryGetValue(tile.TerrainIndex, out Terrain terrain) && terrain.Image != null)
                 {
                     var area = new Rectangle(tile.X, tile.Y, terrain.Width, terrain.Height);
                     _graphics.DrawImage(terrain.Image, area);

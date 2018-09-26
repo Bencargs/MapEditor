@@ -131,11 +131,11 @@ namespace MapEditor.Handlers
                 throw new Exception("Too many units");  //todo: handle this nicely - DisplayErrorCommand ?
 
             var tile = _map.GetTile(point);
-            var colliders = tile.GetUnits()
+            if (tile.GetUnits()
                 .Select(x => x.GetComponent<CollisionComponent>())
                 .Where(x => x != null)
-                .Select(x => x.Collider);
-            if (colliders.Any())
+                .Select(x => x.Collider)
+                .Any())
             {
                 return;
             }
