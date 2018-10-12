@@ -3,12 +3,19 @@
     public enum CommandType
     {
         None = 0,
-        Move,
-        Stop,
         Undo,
         Redo,
-        PlaceTile,
+
+        Move,
+        Stop,
+        RenderSelection,
+        SelectUnits,
         AddUnit,
+
+        CreateMap,
+        PlaceTile,
+
+        CreateCamera,
         MoveCamera
     }
 }

@@ -1,42 +1,53 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using MapEditor.Commands;
 using MapEditor.Common;
+using MapEditor.Repository;
 
 namespace MapEditor.Engine
 {
     public class Map : IHandleCommand, IDisposable
     {
         private readonly MessageHub _messageHub;
-        private readonly IGraphics _graphics;
+        private readonly ISession _session;
         private const int CellSize = 20;
-        protected MapSettings Settings { get; } = new MapSettings();
+        protected MapSettings Settings { get; private set; } = new MapSettings();
 
-        public Map(MessageHub messageHub, IGraphics graphics, int width, int height)
+        public Map(MessageHub messageHub, ISession session, int width, int height)
         {
-            Settings.Width = width;
-            Settings.Height = height;
-
             _messageHub = messageHub;
-            _graphics = graphics;
-            Settings.Tiles = new Tile[width, height];
+            _session = session;
+
+            _messageHub.Post(new CreateMapCommand
+            {
+                MapSettings = new MapSettings
+                {
+                    Width = width,
+                    Height = height
+                }
+            });
         }
 
-        public Map(MessageHub messageHub, IGraphics graphics, MapSettings settings)
-            : this(messageHub, graphics, settings.Width, settings.Height)
+        public Map(MessageHub messageHub, ISession session, MapSettings settings)
         {
-            Settings.Tiles = settings.Tiles;
-            Settings.ShowGrid = settings.ShowGrid;
-            Settings.Terrains = settings.Terrains;
+            _session = session;
+            _messageHub = messageHub;
+            _messageHub.Post(new CreateMapCommand
+            {
+                MapSettings = settings
+            });
         }
 
         public void Init()
         {
+            Settings = _session.GetMapSettings();
+
             // todo: remove the requirement to manually subscribe with IHandleCommand<...> ?
             _messageHub.Subscribe(this, CommandType.PlaceTile);
 
+            var tiles = _session.GetTiles();
+            var terrains = _session.GetTerrains();
             for (var x = 0; x < Settings.Width; x++)
             {
                 for (var y = 0; y < Settings.Height; y++)
@@ -44,62 +55,16 @@ namespace MapEditor.Engine
                     var worldX = x * CellSize;
                     var worldY = y * CellSize;
                     var terrain = new Terrain(TerrainType.Empty, null, Settings.Width, Settings.Height);
-                    if (!Settings.Terrains.ContainsKey(terrain.Key))
+                    if (!terrains.ContainsKey(terrain.Key))
                     {
-                        Settings.Terrains.Add(terrain.Key, terrain);
+                        terrains.Add(terrain.Key, terrain);
                     }
 
-                    Settings.Tiles[x, y] = new Tile(worldX, worldY, terrain.Key);
+                    tiles[x, y] = new Tile(worldX, worldY, terrain.Key);
                 }
             }
         }
-
-        public MapSettings Save()
-        {
-            Enumerate(x =>
-            {
-                if (x.Entities.Any())
-                {
-
-                }
-            });
-            return Settings;
-        }
-
-        private int MapXToTileX(int x)
-        {
-            var tileX = x * Settings.Width / _graphics.Width;
-            
-            // todo: Should be uneccessary as long as all code correctly calls Enumerate
-            if (tileX == 0)
-                tileX = 1;
-            else if (tileX >= Settings.Width - 1)
-                tileX = Settings.Width - 2;
-
-            return tileX;
-        }
-
-        private int MapYToTileY(int y)
-        {
-            var tileY = y * Settings.Height / _graphics.Height;
-
-            // todo: Should be uneccessary as long as all code correctly calls Enumerate
-            if (tileY == 0)
-                tileY = 1;
-            else if (tileY >= Settings.Height - 1)
-                tileY = Settings.Height - 2;
-
-            return tileY;
-        }
-
-        public Tile GetTile(Point point)
-        {
-            var x = MapXToTileX(point.X);
-            var y = MapYToTileY(point.Y);
-            
-            return Settings.Tiles[x, y];
-        }
-
+        
         // todo: replace bresenhams with supercover algorithm
         public IEnumerable<Tile> GetTiles(Vector2 position)
         {
@@ -128,7 +93,7 @@ namespace MapEditor.Engine
             var numerator = longest >> 1;
             for (var i = 0; i <= longest; i++)
             {
-                yield return GetTile(new Point(x, y));
+                yield return _session.GetTile(new Point(x, y));
 
                 numerator += shortest;
                 if (!(numerator < longest))
@@ -211,8 +176,12 @@ namespace MapEditor.Engine
 
         public void SetTile(Point point, Terrain tile)
         {
-            var x = MapXToTileX(point.X);
-            var y = MapYToTileY(point.Y);
+            if (tile.Image == null)
+            {
+                return;
+            }
+
+            var mapTile = _session.GetTile(point);
 
             var image = new Bitmap(tile.Image);
             for (var i = 0; i < tile.Image.Width / tile.Width; i++)
@@ -222,38 +191,24 @@ namespace MapEditor.Engine
                     var area = new Rectangle(i * tile.Width, j * tile.Height, tile.Width, tile.Height);
                     var cropped = image.Clone(area, image.PixelFormat);
 
+                    var terrains = _session.GetTerrains();
                     var terrain = new Terrain(tile.TerrainType, cropped, tile.Width, tile.Height);
-                    if (!Settings.Terrains.ContainsKey(terrain.Key))
+                    if (!terrains.ContainsKey(terrain.Key))
                     {
-                        Settings.Terrains.Add(terrain.Key, terrain);
+                        terrains.Add(terrain.Key, terrain);
                     }
                     else
                     {
-                        Settings.Terrains[terrain.Key] = terrain;
+                        terrains[terrain.Key] = terrain;
                     }
 
-                    var offsetX = x + i > Settings.Width - 1 ? Settings.Width - 1 : x + i;
-                    var offsetY = y + j > Settings.Height - 1 ? Settings.Height - 1 : y + j;
-                    var previous = Settings.Tiles[offsetX, offsetY];
-                    Settings.Tiles[offsetX, offsetY] = new Tile(previous.X, previous.Y, terrain.Key);
+                    var tiles = _session.GetTiles();
+                    var offsetX = mapTile.X + i > Settings.Width - 1 ? Settings.Width - 1 : mapTile.X + i;
+                    var offsetY = mapTile.Y + j > Settings.Height - 1 ? Settings.Height - 1 : mapTile.Y + j;
+                    var previous = tiles[offsetX, offsetY];
+                    tiles[offsetX, offsetY] = new Tile(previous.X, previous.Y, terrain.Key);
                 }
             }
-        }
-
-        public Terrain GetTerrain(Guid terrainKey)
-        {
-            Settings.Terrains.TryGetValue(terrainKey, out Terrain terrain);
-            return terrain;
-        }
-
-        public List<Tile> GetTiles(Point point, Terrain terrain)
-        {
-            var lengthX = (int) Math.Ceiling((double) terrain.Width / CellSize);
-            var lengthY = (int) Math.Ceiling((double) terrain.Height / CellSize);
-
-            return (from x in Enumerable.Range(point.X, lengthX).Select(MapXToTileX)
-                    from y in Enumerable.Range(point.Y, lengthY).Select(MapYToTileY)
-                    select Settings.Tiles[x, y]).ToList();
         }
 
         public void Update()
@@ -261,119 +216,12 @@ namespace MapEditor.Engine
             //todo:
         }
 
-        public void Render()
-        {
-            //todo: Camera.Contains - render only objects in camera view
-
-            RenderTiles();
-
-            if (Settings.ShowGrid)
-            {
-                RenderGrid();
-            }
-
-            if (Settings.ShowTerrain)
-            {
-                RenderTerrain();
-            }
-        }
-
-        private void RenderTiles()
-        {
-            Enumerate(tile =>
-            {
-                // todo: replace with foreach (var tile in DirtyTiles)
-                //if (!tile.IsDirty)
-                //    continue;
-
-                //tile.Render(_graphics);
-                if (tile != null && Settings.Terrains.TryGetValue(tile.TerrainIndex, out Terrain terrain) && terrain.Image != null)
-                {
-                    var area = new Rectangle(tile.X, tile.Y, terrain.Width, terrain.Height);
-                    _graphics.DrawImage(terrain.Image, area);
-                }
-                //tile.IsDirty = false;
-            });
-        }
-
-        private void Enumerate(Action<Tile> action)
-        {
-            // todo: Ensure camera cannot see map indexs 0
-            // Starting at index 1 prevents ever having to do bounds checks
-            for (var x = 1; x < Settings.Width - 1; x++)
-            {
-                for (var y = 1; y < Settings.Height - 1; y++)
-                {
-                    action(Settings.Tiles[x, y]);
-                }
-            }
-        }
-
-        private void RenderGrid()
-        {
-            // todo: just save this to an image?
-            for (var x = 0; x < Settings.Width; x++)
-            {
-                var points = new[]
-                {
-                    new Point(x * CellSize, 0),
-                    new Point(x * CellSize, _graphics.Height)
-                };
-                _graphics.DrawLines(Color.LightBlue, points);
-            }
-
-            for (var y = 0; y < Settings.Height; y++)
-            {
-                var points = new[]
-                {
-                    new Point(0, y * CellSize),
-                    new Point(_graphics.Width, y * CellSize)
-                };
-                _graphics.DrawLines(Color.LightBlue, points);
-            }
-        }
-
-        private void RenderTerrain()
-        {
-            Enumerate(tile =>
-            {
-                var terrain = Settings.Terrains[tile.TerrainIndex];
-
-                var area = new Rectangle(tile.X, tile.Y, terrain.Width, terrain.Height);
-                switch (terrain.TerrainType)
-                {
-                    case TerrainType.Empty:
-                        break;
-                    case TerrainType.Water:
-                        using (var brush = new SolidBrush(Color.FromArgb(128, 0, 0, 255)))
-                        {
-                            _graphics.FillRectangle(brush, area);
-                        }
-                        break;
-                    case TerrainType.Land:
-                        using (var brush = new SolidBrush(Color.FromArgb(128, 0, 128, 0)))
-                        {
-                            _graphics.FillRectangle(brush, area);
-                        }
-                        break;
-                    case TerrainType.ImpassableLand:
-                        using (var brush = new SolidBrush(Color.FromArgb(128, 128, 128, 128)))
-                        {
-                            _graphics.FillRectangle(brush, area);
-                        }
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            });
-        }
-
         public void Dispose()
         {
-            _graphics?.Dispose();
-            if (Settings.Terrains != null)
+            var terrains = _session.GetTerrains();
+            if (terrains != null)
             {
-                foreach (var t in Settings.Terrains.Values)
+                foreach (var t in terrains.Values)
                 {
                     t.Dispose();
                 }
@@ -393,7 +241,18 @@ namespace MapEditor.Engine
 
         public void Undo(ICommand command)
         {
-            throw new NotImplementedException();
+            switch (command)
+            {
+                case PlaceTileCommand c:
+                    //todo: add a removeTile method
+                    // command has image height on it, so remove all tiles over that area
+                    //var terrainIndex = c.PreviousTerrain.FirstOrDefault()?.TerrainIndex;
+                    //if (!terrainIndex.HasValue)
+                    //    return;
+                    //var terrain = Settings.Terrains[terrainIndex.Value];
+                    //SetTile(c.Point, terrain);
+                    break;
+            }
         }
     }
 }

@@ -10,50 +10,54 @@ using MapEditor.Commands;
 using MapEditor.Components;
 using MapEditor.Engine;
 using MapEditor.Entities;
+using MapEditor.File;
 using MapEditor.Handlers;
+using MapEditor.Repository;
 using Newtonsoft.Json;
+using ButtonState = MapEditor.Engine.ButtonState;
 
 namespace MapEditor
 {
     public partial class Form1 : Form
     {
         private readonly MessageHub _messageHub;
+        private readonly ISession _session;
         private readonly UnitHandler _unitHandler;
         private readonly Editor.EditorInput _input;
         private TileForm _contextMenu;
         private Editor.MapEditor _map;
+        private IGraphics _graphics;
         private Camera _camera;
+        private MouseState _mouseState;
 
         public Form1()
         {
             InitializeComponent();
 
             _messageHub = new MessageHub();
+            _session = new Session(_messageHub);
+            _session.Init();
 
-            var graphics = new WinFormGraphics(canvas);
-            _map = new Editor.MapEditor(_messageHub, graphics, canvas.Width / 20, canvas.Height / 20);
+            _graphics = new WinFormGraphics(_messageHub, _session, canvas);
+
+            _map = new Editor.MapEditor(_messageHub, _session, canvas.Width / 20, canvas.Height / 20);
             // todo: replace with an OnChecked handler
             _map.ShowGrid(gridChk.Checked);
             _map.Init();
 
-            _unitHandler = new UnitHandler(_messageHub, graphics, _map);
+            _unitHandler = new UnitHandler(_messageHub, _session);
             _unitHandler.Init();
 
             // todo: is camera the responsibility of Map class?
-            _camera = new Camera(_messageHub, new Point(0, 0), canvas.Width / 20, canvas.Height / 20);
+            _camera = new Camera(_messageHub, new Point(0, 0), canvas.Width, canvas.Height);
+            _camera.Init();
 
             _input = new Editor.EditorInput(_messageHub, _camera);
+            _mouseState = new MouseState();
             canvas.MouseMove += (sender, eventArgs) =>
             {
-                _input.OnMouseEvent(eventArgs);
-            };
-            canvas.MouseDown += (sender, eventArgs) =>
-            {
-                _input
-            };
-            canvas.MouseUp += (sender, eventArgs) =>
-            {
-
+                _mouseState.GetState(eventArgs.Location, eventArgs.Button);
+                _input.OnMouseEvent(_mouseState);
             };
             KeyPreview = true;
             KeyPress += (sender, eventArgs) =>
@@ -131,13 +135,13 @@ namespace MapEditor
 
         private void Update(object sender, EventArgs e)
         {
-            _map.Update();
+            _graphics.Render();
         }
 
         private void Canvas_Paint(object sender, PaintEventArgs e)
         {
-            _map.Render();
-            _unitHandler.Render();
+            //_map.Render();
+            //_unitHandler.Render();
         }
 
         private void Canvas_Click(object sender, EventArgs e)
@@ -146,8 +150,8 @@ namespace MapEditor
             if ((e as MouseEventArgs)?.Button == MouseButtons.Right)
             {
                 var point = ((MouseEventArgs) e).Location;
-                var tile = _map.GetTile(point);
-                var terrain = _map.GetTerrain(tile.TerrainIndex);
+                var tile = _session.GetTile(point);
+                var terrain = _session.GetTerrain(tile.TerrainIndex);
 
                 _contextMenu = new TileForm(terrain);
                 _contextMenu.StartPosition = FormStartPosition.Manual;
@@ -158,9 +162,6 @@ namespace MapEditor
                     {
                         var newTerrain = ((TileForm) o).Terrain;
                         _map.SetTile(point, newTerrain);
-                        // add new Terrain at X, Y
-
-                        canvas.Invalidate();
                     }
                 };
                 _contextMenu.Show(this);
@@ -193,13 +194,28 @@ namespace MapEditor
         {
             // todo: these should be editor concerns, not map concerns
             _map.ShowGrid(gridChk.Checked);
-            canvas.Invalidate();
         }
 
         private void terrainChk_CheckedChanged(object sender, EventArgs e)
         {
             _map.ShowTerrain(terrainChk.Checked);
-            canvas.Invalidate();
+        }
+
+        private MapFile Save()
+        {
+            var settings = _session.GetMapSettings();
+            return new MapFile
+            {
+                Width = settings.Width,
+                Height = settings.Height,
+                ShowGrid = settings.ShowGrid,
+                ShowTerrain = settings.ShowTerrain,
+                Tiles = _session.GetTiles(),
+                Terrains = _session.GetTerrains(),
+                Units = _session.GetUnits(),
+                Viewport = _session.GetViewport()
+
+            };
         }
 
         private void SaveToolStripMenuItem_Click(object sender, EventArgs e)
@@ -217,22 +233,22 @@ namespace MapEditor
 
                 var tempPath = Path.Combine(Path.GetDirectoryName(path) ?? Directory.GetCurrentDirectory(), "TempMapSave");
                 Directory.CreateDirectory(tempPath);
-                var mapSettings = _map.Save();
-                foreach (var t in mapSettings.Terrains.Values)
+                var mapFile = Save();
+                foreach (var t in mapFile.Terrains)
                 {
-                    if (t.Image == null)
+                    if (t.Value.Image == null)
                         continue;
-
+                    
                     var imagePath = Path.Combine(tempPath, $"{t.Key}.png");
-                    t.Image.Save(imagePath, ImageFormat.Png);
+                    t.Value.Image.Save(imagePath, ImageFormat.Png);
                 }
-                var json = JsonConvert.SerializeObject(mapSettings);
+                var json = JsonConvert.SerializeObject(mapFile);
                 var mapFilePath = Path.Combine(tempPath, "map.json");
-                File.WriteAllText(mapFilePath, json);
+                System.IO.File.WriteAllText(mapFilePath, json);
 
                 ZipFile.CreateFromDirectory(tempPath, path);
 
-                if (File.Exists(path))
+                if (System.IO.File.Exists(path))
                 {
                     Directory.Delete(tempPath, true);
                 }
@@ -251,7 +267,7 @@ namespace MapEditor
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                MapSettings data = null;
+                MapFile data = null;
 
                 var archive = ZipFile.OpenRead(dialog.FileName);
                 var mapdata = archive.GetEntry("map.json");
@@ -261,7 +277,7 @@ namespace MapEditor
                     using (var reader = new StreamReader(stream))
                     {
                         var json = reader.ReadToEnd();
-                        data = JsonConvert.DeserializeObject<MapSettings>(json);
+                        data = JsonConvert.DeserializeObject<MapFile>(json);
                     }
 
                     data.Terrains = data.Terrains.Select(x =>
@@ -283,8 +299,7 @@ namespace MapEditor
 
                 if (data != null)
                 {
-                    _map = new Editor.MapEditor(_messageHub, new WinFormGraphics(canvas), data);
-                    canvas.Invalidate();
+                    _map = new Editor.MapEditor(_messageHub, _session, data.Width, data.Height);
                 }
             }
         }
@@ -292,7 +307,6 @@ namespace MapEditor
         private void TileTab_MouseDown(object sender, MouseEventArgs e)
         {
             var button = (Button) sender;
-            //var tile = (Terrain) button.Tag;
             button.DoDragDrop(button.Tag, DragDropEffects.Copy);
         }
 
@@ -303,15 +317,15 @@ namespace MapEditor
 
             if (e.Data.GetDataPresent(typeof(Terrain)))
             {
-                var tile = (Terrain)e.Data.GetData(typeof(Terrain));
+                var terrain = (Terrain)e.Data.GetData(typeof(Terrain));
+                var area = new Rectangle(point.X, point.Y, terrain.Width, terrain.Height);
                 _messageHub.Post(new PlaceTileCommand
                 {
                     Point = point,
-                    Terrain = tile,
-                    PreviousTerrain = _map.GetTiles(point, tile)
+                    Terrain = terrain,
+                    PreviousTile = _session.GetTiles(area).ToList()
                 });
                 thumbnail.Visible = false;
-                canvas.Invalidate();
             }
             else if (e.Data.GetDataPresent(typeof(Entity)))
             {

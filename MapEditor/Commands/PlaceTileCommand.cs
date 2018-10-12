@@ -5,12 +5,12 @@ using MapEditor.Engine;
 
 namespace MapEditor.Commands
 {
-    public class PlaceTileCommand : ICommand
+    public class PlaceTileCommand : IReversableCommand
     {
         public CommandType Id { get; } = CommandType.PlaceTile;
 
         public Point Point { get; set; }
         public Terrain Terrain { get; set; }
-        public List<Tile> PreviousTerrain { get; set; }    //todo: lazy initialize?
+        public List<Tile> PreviousTile { get; set; }    //todo: lazy initialize?
     }
 }

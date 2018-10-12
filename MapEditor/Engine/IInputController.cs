@@ -16,6 +16,34 @@ namespace MapEditor.Engine
     {
         public Point Location { get; set; }
         public ButtonState State { get; set; }
+
+        public void GetState(Point location, MouseButtons button)
+        {
+            Location = location;
+            switch (button)
+            {
+                case MouseButtons.Left:
+                    State = ButtonState.LeftPressed;
+                    break;
+                case MouseButtons.Right:
+                    State = ButtonState.RightPressed;
+                    break;
+                default:
+                    switch (State)
+                    {
+                        case ButtonState.LeftPressed:
+                            State = ButtonState.LeftReleased;
+                            break;
+                        case ButtonState.RightPressed:
+                            State = ButtonState.RightReleased;
+                            break;
+                        default:
+                            State = ButtonState.None;
+                            break;
+                    }
+                    break;
+            }
+        }
     }
 
     public enum ButtonState

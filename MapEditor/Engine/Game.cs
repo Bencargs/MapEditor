@@ -9,11 +9,11 @@ namespace MapEditor.Engine
 
         public Game(IGraphics graphics)
         {
-            var messageHub = new MessageHub();
-            _map = new Map(messageHub, graphics, 50, 100)
-            {
-                //ShowGrid = gridChk.Checked
-            };
+            //var messageHub = new MessageHub();
+            //_map = new Map(messageHub, graphics, 50, 100)
+            //{
+            //    //ShowGrid = gridChk.Checked
+            //};
         }
 
         public void Init()

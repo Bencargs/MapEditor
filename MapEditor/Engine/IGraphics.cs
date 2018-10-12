@@ -11,5 +11,7 @@ namespace MapEditor.Engine
         void DrawLines(Color color, Point[] points);
         void FillRectangle(Brush brush, Rectangle area);
         void DrawImage(Image image, Rectangle area);
+
+        void Render();
     }
 }

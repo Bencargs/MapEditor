@@ -11,35 +11,28 @@ using MapEditor.Controllers.MovementHandler;
 using MapEditor.Engine;
 using MapEditor.Entities;
 using MapEditor.Handlers.CollisionHandler;
+using MapEditor.Repository;
 using Newtonsoft.Json;
 
 namespace MapEditor.Handlers
 {
     public class UnitHandler : IHandleCommand
     {
-        private readonly List<Entity> _units;
-        private int _index;
+        private readonly MessageHub _messageHub;
+        private readonly ISession _session;
         private const int Buffer = 1000;
-        private readonly IGraphics _graphics;
-        private readonly Map _map;
+        private int _index = 0;
 
-        public UnitHandler(MessageHub messageHub, IGraphics graphics, Map map)
+        public UnitHandler(MessageHub messageHub, ISession session)
         {
-            _graphics = graphics;
-            _map = map;
-            _units = new List<Entity>();
-            messageHub.Subscribe(this, CommandType.AddUnit);
+            _messageHub = messageHub;
+            _session = session;
         }
 
         public void Init()
         {
-            for (var i = 0; i < Buffer; i++)
-            {
-                _units.Add(new Entity
-                {
-                    // todo: IdGenerator.NewId -- Determinate Id's based on a common game seed
-                });
-            }
+            _messageHub.Subscribe(this, CommandType.AddUnit);
+            _messageHub.Subscribe(this, CommandType.SelectUnits);
         }
 
         /// <summary>
@@ -78,7 +71,7 @@ namespace MapEditor.Handlers
                 StopRadius = 1
             });
             var json = JsonConvert.SerializeObject(entity);
-            File.WriteAllText(@"C:\Source\MapEditor\MapEditor\Units\data.json", json);
+            System.IO.File.WriteAllText(@"C:\Source\MapEditor\MapEditor\Units\data.json", json);
             ZipFile.CreateFromDirectory(@"C:\Source\MapEditor\MapEditor\Units\", @"C:\Source\MapEditor\MapEditor\soldier.unit");
         }
 
@@ -130,8 +123,8 @@ namespace MapEditor.Handlers
             if (_index > Buffer)
                 throw new Exception("Too many units");  //todo: handle this nicely - DisplayErrorCommand ?
 
-            var tile = _map.GetTile(point);
-            if (tile.GetUnits()
+            var units = _session.GetUnits(point);
+            if (units
                 .Select(x => x.GetComponent<CollisionComponent>())
                 .Where(x => x != null)
                 .Select(x => x.Collider)
@@ -141,33 +134,19 @@ namespace MapEditor.Handlers
             }
 
             var newUnit = unit.Clone();
-            _units[_index++] = newUnit;
-            tile.Entities.Add(newUnit);
+            units.Add(newUnit);
         }
 
-        //public void Update()
-        //{
-
-        //}
-
-        public void Render()
+        public void SelectUnits(Rectangle area)
         {
-            // todo: camera.Contains
-
-            foreach (var u in _units)
+            var units = _session.GetUnits(area);
+            var selectionComponent = units.Select(t => t.GetComponent<UnitComponent>());    //todo: replace with get components
+            foreach (var u in selectionComponent)
             {
-                var imageComponent = u.GetComponent<ImageComponent>();
-                if (imageComponent != null)
-                {
-                    var positionComponent = u.GetComponent<PositionComponent>();
-                    var image = imageComponent.Image;   //todo: these are use a lot - assuming all units have an image and position, extension methods?
-                    var position = positionComponent.Position;
-                    var area = new Rectangle(position.X, position.Y, image.Width, image.Height);
-                    _graphics.DrawImage(image, area);
-                }
+                u.IsSelected = true;
             }
         }
-
+        
         public void Handle(ICommand command)
         {
             switch (command)
@@ -176,7 +155,9 @@ namespace MapEditor.Handlers
                     // todo: change signiture to only accept unit, position should be concern of the unit
                     AddUnit(c.Point, c.Unit);
                     break;
-                // MoveCommand - Set BoundingBox Position & Position Components
+                case SelectUnitsCommand c:
+                    SelectUnits(c.Area);
+                    break;
             }
         }
 

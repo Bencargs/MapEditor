@@ -7,6 +7,7 @@ namespace MapEditor.Engine
 {
     public class Camera : IHandleCommand
     {
+        private readonly MessageHub _messageHub;
         private Rectangle _viewport;
         private Rectangle _innerViewport;
         private const int MoveSpeed = 10;   //todo: this should be editable via settings
@@ -26,13 +27,22 @@ namespace MapEditor.Engine
         //todo: replace parameter with service locator
         public Camera(MessageHub messageHub, Point position, int width, int height)
         {
-            messageHub.Subscribe(this, CommandType.MoveCamera);
+            _messageHub = messageHub;
             var innerViewportOffset = 30;
             _viewport = new Rectangle(position, new Size(width, height));
             _innerViewport = new Rectangle(_viewport.X + innerViewportOffset,
                                            _viewport.Y + innerViewportOffset,
                                            _viewport.Width - innerViewportOffset,
                                            _viewport.Height - innerViewportOffset);
+        }
+
+        public void Init()
+        {
+            _messageHub.Post(new CreateCameraCommand
+            {
+                Viewport = _viewport
+            });
+            _messageHub.Subscribe(this, CommandType.MoveCamera);
         }
 
         public CameraMotion GetMoveDirection(Point point)

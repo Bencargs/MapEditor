@@ -1,4 +1,6 @@
-﻿using System.Windows.Forms;
+﻿using System;
+using System.Drawing;
+using System.Windows.Forms;
 using MapEditor.Commands;
 using MapEditor.Engine;
 using ButtonState = MapEditor.Engine.ButtonState;
@@ -10,6 +12,8 @@ namespace MapEditor.Editor
         private readonly MessageHub _messageHub;
         private readonly Camera _camera;
         private ButtonState _previousMouseState;
+        private Rectangle _selectionBox;
+        private Point _startPoint;
 
         public EditorInput(MessageHub messageHub, Camera camera)
         {
@@ -23,10 +27,7 @@ namespace MapEditor.Editor
             {
                 if ((e.KeyChar & (char) Keys.Z) != 0)
                 {
-                    //_messageHub.Post(new UndoCommand
-                    //{
-                        
-                    //})
+                    _messageHub.Post(new UndoCommand());
                 }
                 else if ((e.KeyChar & (char) Keys.Z) != 0)
                 {
@@ -52,13 +53,23 @@ namespace MapEditor.Editor
                 case ButtonState.None:
                     break;
                 case ButtonState.LeftPressed:
-                    //Post StartSelectionCommand {e.Location}
+                    if (_previousMouseState != ButtonState.LeftPressed)
+                    {
+                        _selectionBox = new Rectangle(e.Location.X, e.Location.Y, 1, 1);
+                        _startPoint = e.Location;
+                    }
+                    else
+                    {
+                        _selectionBox.Width = Math.Abs(e.Location.X - _startPoint.X);
+                        _selectionBox.Height = Math.Abs(e.Location.Y - _startPoint.Y);
+                        _selectionBox.X = Math.Min(_startPoint.X, e.Location.X);
+                        _selectionBox.Y = Math.Min(_startPoint.Y, e.Location.Y);
+                    }
+                    _messageHub.Post(new RenderSelectionCommand {Area = _selectionBox});
                     break;
                 case ButtonState.LeftReleased:
                     if (_previousMouseState == ButtonState.LeftPressed)
-                    {
-                        //Post CompleteSelectionCommand {e.Location}
-                    }
+                        _messageHub.Post(new SelectUnitsCommand { Area = _selectionBox});
                     break;
                 case ButtonState.RightReleased:
                     break;
