@@ -1,11 +1,12 @@
 ﻿using System.Drawing;
 using MapEditor.Commands;
 using MapEditor.Common;
+using MapEditor.Engine;
 using MapEditor.Handlers.CollisionHandler;
 
-namespace MapEditor.Engine
+namespace MapEditor.Handlers
 {
-    public class Camera : IHandleCommand
+    public class CameraHandler : IHandleCommand
     {
         private readonly MessageHub _messageHub;
         private Rectangle _viewport;
@@ -25,7 +26,7 @@ namespace MapEditor.Engine
         }
 
         //todo: replace parameter with service locator
-        public Camera(MessageHub messageHub, Point position, int width, int height)
+        public CameraHandler(MessageHub messageHub, Point position, int width, int height)
         {
             _messageHub = messageHub;
             var innerViewportOffset = 30;
@@ -91,7 +92,7 @@ namespace MapEditor.Engine
 
             //-- Game ->
             //var screenScale = GetScreenScale();
-            //var viewMatrix = Camera.GetTransform();
+            //var viewMatrix = CameraHandler.GetTransform();
 
             //_spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied,
             //    null, null, null, null, viewMatrix * Matrix.CreateScale(screenScale));

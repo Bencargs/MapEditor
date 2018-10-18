@@ -14,7 +14,6 @@ using MapEditor.File;
 using MapEditor.Handlers;
 using MapEditor.Repository;
 using Newtonsoft.Json;
-using ButtonState = MapEditor.Engine.ButtonState;
 
 namespace MapEditor
 {
@@ -25,9 +24,9 @@ namespace MapEditor
         private readonly UnitHandler _unitHandler;
         private readonly Editor.EditorInput _input;
         private TileForm _contextMenu;
-        private Editor.MapEditor _map;
-        private IGraphics _graphics;
-        private Camera _camera;
+        private Editor.MapEditor _mapHandler;
+        private Scene _scene;
+        private CameraHandler _cameraHandler;
         private MouseState _mouseState;
 
         public Form1()
@@ -38,21 +37,22 @@ namespace MapEditor
             _session = new Session(_messageHub);
             _session.Init();
 
-            _graphics = new WinFormGraphics(_messageHub, _session, canvas);
+            var graphics = new WinFormGraphics(canvas);
+            _scene = new Scene(_session, graphics);
 
-            _map = new Editor.MapEditor(_messageHub, _session, canvas.Width / 20, canvas.Height / 20);
+            _mapHandler = new Editor.MapEditor(_messageHub, _session, canvas.Width / 20, canvas.Height / 20);
             // todo: replace with an OnChecked handler
-            _map.ShowGrid(gridChk.Checked);
-            _map.Init();
+            _mapHandler.ShowGrid(gridChk.Checked);
+            _mapHandler.Init();
 
             _unitHandler = new UnitHandler(_messageHub, _session);
             _unitHandler.Init();
 
-            // todo: is camera the responsibility of Map class?
-            _camera = new Camera(_messageHub, new Point(0, 0), canvas.Width, canvas.Height);
-            _camera.Init();
+            // todo: is cameraHandler the responsibility of Map class?
+            _cameraHandler = new CameraHandler(_messageHub, new Point(0, 0), canvas.Width, canvas.Height);
+            _cameraHandler.Init();
 
-            _input = new Editor.EditorInput(_messageHub, _camera);
+            _input = new Editor.EditorInput(_messageHub, _cameraHandler);
             _mouseState = new MouseState();
             canvas.MouseMove += (sender, eventArgs) =>
             {
@@ -135,7 +135,7 @@ namespace MapEditor
 
         private void Update(object sender, EventArgs e)
         {
-            _graphics.Render();
+            _scene.Render();
         }
 
         private void Canvas_Paint(object sender, PaintEventArgs e)
@@ -161,7 +161,7 @@ namespace MapEditor
                     if (!_contextMenu.Cancel)
                     {
                         var newTerrain = ((TileForm) o).Terrain;
-                        _map.SetTile(point, newTerrain);
+                        _mapHandler.SetTile(point, newTerrain);
                     }
                 };
                 _contextMenu.Show(this);
@@ -193,12 +193,12 @@ namespace MapEditor
         private void CheckBox1_CheckedChanged(object sender, EventArgs e)
         {
             // todo: these should be editor concerns, not map concerns
-            _map.ShowGrid(gridChk.Checked);
+            _mapHandler.ShowGrid(gridChk.Checked);
         }
 
         private void terrainChk_CheckedChanged(object sender, EventArgs e)
         {
-            _map.ShowTerrain(terrainChk.Checked);
+            _mapHandler.ShowTerrain(terrainChk.Checked);
         }
 
         private MapFile Save()
@@ -299,7 +299,7 @@ namespace MapEditor
 
                 if (data != null)
                 {
-                    _map = new Editor.MapEditor(_messageHub, _session, data.Width, data.Height);
+                    _mapHandler = new Editor.MapEditor(_messageHub, _session, data.Width, data.Height);
                 }
             }
         }
@@ -323,7 +323,7 @@ namespace MapEditor
                 {
                     Point = point,
                     Terrain = terrain,
-                    PreviousTile = _session.GetTiles(area).ToList()
+                    PreviousTile = _session.GetTiles(area)
                 });
                 thumbnail.Visible = false;
             }

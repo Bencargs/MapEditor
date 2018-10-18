@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using MapEditor.Commands;
 using MapEditor.Engine;
+using MapEditor.Handlers;
 using ButtonState = MapEditor.Engine.ButtonState;
 
 namespace MapEditor.Editor
@@ -10,15 +11,15 @@ namespace MapEditor.Editor
     public class EditorInput : IInputController
     {
         private readonly MessageHub _messageHub;
-        private readonly Camera _camera;
+        private readonly CameraHandler _cameraHandler;
         private ButtonState _previousMouseState;
         private Rectangle _selectionBox;
         private Point _startPoint;
 
-        public EditorInput(MessageHub messageHub, Camera camera)
+        public EditorInput(MessageHub messageHub, CameraHandler cameraHandler)
         {
             _messageHub = messageHub;
-            _camera = camera;
+            _cameraHandler = cameraHandler;
         }
 
         public void OnKeyboardEvent(KeyPressEventArgs e)
@@ -38,9 +39,9 @@ namespace MapEditor.Editor
 
         public void OnMouseEvent(MouseState e)
         {
-            var direction = _camera.GetMoveDirection(e.Location);
-            if (direction != Camera.CameraMotion.None &&
-                direction != _camera.CurrentMotion)
+            var direction = _cameraHandler.GetMoveDirection(e.Location);
+            if (direction != CameraHandler.CameraMotion.None &&
+                direction != _cameraHandler.CurrentMotion)
             {
                 _messageHub.Post(new MoveCameraCommand
                 {
@@ -69,7 +70,10 @@ namespace MapEditor.Editor
                     break;
                 case ButtonState.LeftReleased:
                     if (_previousMouseState == ButtonState.LeftPressed)
-                        _messageHub.Post(new SelectUnitsCommand { Area = _selectionBox});
+                    {
+                        _messageHub.Post(new RenderSelectionCommand());
+                        _messageHub.Post(new SelectUnitsCommand {Area = _selectionBox});
+                    }
                     break;
                 case ButtonState.RightReleased:
                     break;

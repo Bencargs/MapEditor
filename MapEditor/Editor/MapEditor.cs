@@ -1,9 +1,10 @@
 ﻿using MapEditor.Engine;
+using MapEditor.Handlers;
 using MapEditor.Repository;
 
 namespace MapEditor.Editor
 {
-    public class MapEditor : Map
+    public class MapEditor : MapHandler
     {
         public MapEditor(MessageHub messageHub, ISession session, int width, int height)
             : base(messageHub, session, width, height)

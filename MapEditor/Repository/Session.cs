@@ -19,7 +19,7 @@ namespace MapEditor.Repository
 
         Tile GetTile(Point point);
         Tile[,] GetTiles();
-        IEnumerable<Tile> GetTiles(Rectangle area);
+        Tile[,] GetTiles(Rectangle area);
 
         Entity GetUnit(Guid id);
         List<Entity> GetUnits(Point point);
@@ -35,6 +35,7 @@ namespace MapEditor.Repository
 
         Rectangle GetViewport();
         MapSettings GetMapSettings();
+        UserInterface GetUserInterface();
     }
 
     public class Session : ISession
@@ -48,6 +49,7 @@ namespace MapEditor.Repository
         private Dictionary<Guid, Terrain> Terrains { get; } = new Dictionary<Guid, Terrain>();
         private Dictionary<Guid, List<Entity>> Units { get; } = new Dictionary<Guid, List<Entity>>();
         private Rectangle Viewport { get; set; }
+        private UserInterface UserInterface { get; set; } = new UserInterface();
 
         public Session(MessageHub messageHub)
         {
@@ -58,6 +60,7 @@ namespace MapEditor.Repository
         {
             _messageHub.Subscribe(this, CommandType.CreateMap);
             _messageHub.Subscribe(this, CommandType.CreateCamera);
+            _messageHub.Subscribe(this, CommandType.RenderSelection);
         }
 
         public void Handle(ICommand command)
@@ -78,6 +81,9 @@ namespace MapEditor.Repository
                 case CreateCameraCommand c:
                     Viewport = c.Viewport;
                     break;
+                case RenderSelectionCommand c:
+                    UserInterface.Selection = c.Area;
+                    break;
             }
         }
 
@@ -96,12 +102,12 @@ namespace MapEditor.Repository
             if (tileX == 0)
                 tileX = 1;
             else if (tileX >= Width - 1)
-                tileX = Width - 2;
+                tileX = Width - 1;
 
             if (tileY == 0)
                 tileY = 1;
             else if (tileY >= Height - 1)
-                tileY = Height - 2;
+                tileY = Height - 1;
 
             return new Point(tileX, tileY);
         }
@@ -128,18 +134,27 @@ namespace MapEditor.Repository
             return Tiles;
         }
 
-        public IEnumerable<Tile> GetTiles(Rectangle area)
+        public Tile[,] GetTiles(Rectangle area)
         {
             var topPoint = ScreenToTile(new Point(area.Left, area.Top));
             var endPoint = ScreenToTile(new Point(area.Right, area.Bottom));
 
+            var xRange = endPoint.X - topPoint.X;
+            var yRange = endPoint.Y - topPoint.Y;
+            var retVal = new Tile[xRange, yRange];
+
+            var innerX = 0;
             for (var x = topPoint.X; x < endPoint.X; x++)
             {
+                var innerY = 0;
                 for (var y = topPoint.Y; y < endPoint.Y; y++)
                 {
-                    yield return Tiles[x, y];
+                    retVal[innerX, innerY] = Tiles[x, y];
+                    innerY++;
                 }
+                innerX++;
             }
+            return retVal;
         }
 
         public Entity GetUnit(Guid id)
@@ -168,9 +183,19 @@ namespace MapEditor.Repository
             var tiles = GetTiles(area);
             foreach (var t in tiles)
             {
-                foreach (var u in Units[t.Id])
+                if (t == null)
+                    continue;
+
+                if (Units.TryGetValue(t.Id, out List<Entity> units))
                 {
-                    yield return u;
+                    foreach (var u in units)
+                    {
+                        yield return u;
+                    }
+                }
+                else
+                {
+                    Units[t.Id] = new List<Entity>();
                 }
             }
         }
@@ -210,6 +235,11 @@ namespace MapEditor.Repository
                 ShowGrid = ShowGrid,
                 ShowTerrain = ShowTerrain
             };
+        }
+
+        public UserInterface GetUserInterface()
+        {
+            return UserInterface;
         }
     }
 }

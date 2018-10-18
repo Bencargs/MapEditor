@@ -11,6 +11,6 @@ namespace MapEditor.Commands
 
         public Point Point { get; set; }
         public Terrain Terrain { get; set; }
-        public List<Tile> PreviousTile { get; set; }    //todo: lazy initialize?
+        public Tile[,] PreviousTile { get; set; }    //todo: lazy initialize?
     }
 }

@@ -3,18 +3,19 @@ using System.Collections.Generic;
 using System.Drawing;
 using MapEditor.Commands;
 using MapEditor.Common;
+using MapEditor.Engine;
 using MapEditor.Repository;
 
-namespace MapEditor.Engine
+namespace MapEditor.Handlers
 {
-    public class Map : IHandleCommand, IDisposable
+    public class MapHandler : IHandleCommand, IDisposable
     {
         private readonly MessageHub _messageHub;
         private readonly ISession _session;
         private const int CellSize = 20;
         protected MapSettings Settings { get; private set; } = new MapSettings();
 
-        public Map(MessageHub messageHub, ISession session, int width, int height)
+        public MapHandler(MessageHub messageHub, ISession session, int width, int height)
         {
             _messageHub = messageHub;
             _session = session;
@@ -29,7 +30,7 @@ namespace MapEditor.Engine
             });
         }
 
-        public Map(MessageHub messageHub, ISession session, MapSettings settings)
+        public MapHandler(MessageHub messageHub, ISession session, MapSettings settings)
         {
             _session = session;
             _messageHub = messageHub;
@@ -181,32 +182,39 @@ namespace MapEditor.Engine
                 return;
             }
 
-            var mapTile = _session.GetTile(point);
+            var area = new Rectangle(point.X, point.Y, tile.Image.Width, tile.Image.Height);
+            var tiles = _session.GetTiles(area);
 
-            var image = new Bitmap(tile.Image);
-            for (var i = 0; i < tile.Image.Width / tile.Width; i++)
+            var terrains = _session.GetTerrains();
+            using (var image = new Bitmap(tile.Image))
             {
-                for (var j = 0; j < tile.Image.Height / tile.Height; j++)
+                for (var i = 0; i < tiles.GetLength(0); i++)
                 {
-                    var area = new Rectangle(i * tile.Width, j * tile.Height, tile.Width, tile.Height);
-                    var cropped = image.Clone(area, image.PixelFormat);
-
-                    var terrains = _session.GetTerrains();
-                    var terrain = new Terrain(tile.TerrainType, cropped, tile.Width, tile.Height);
-                    if (!terrains.ContainsKey(terrain.Key))
+                    for (var j = 0; j < tiles.GetLength(1); j++)
                     {
-                        terrains.Add(terrain.Key, terrain);
-                    }
-                    else
-                    {
-                        terrains[terrain.Key] = terrain;
-                    }
+                        var width = i * tile.Width;
+                        var height = j * tile.Height;
+                        if (width + tile.Width > image.Width ||
+                            height + tile.Height > image.Height)
+                        {
+                            continue;
+                        }
 
-                    var tiles = _session.GetTiles();
-                    var offsetX = mapTile.X + i > Settings.Width - 1 ? Settings.Width - 1 : mapTile.X + i;
-                    var offsetY = mapTile.Y + j > Settings.Height - 1 ? Settings.Height - 1 : mapTile.Y + j;
-                    var previous = tiles[offsetX, offsetY];
-                    tiles[offsetX, offsetY] = new Tile(previous.X, previous.Y, terrain.Key);
+                        var tileArea = new Rectangle(width, height, tile.Width, tile.Height);
+                        var cropped = image.Clone(tileArea, image.PixelFormat);
+
+                        var terrain = new Terrain(tile.TerrainType, cropped, tile.Width, tile.Height);
+                        if (!terrains.ContainsKey(terrain.Key))
+                        {
+                            terrains.Add(terrain.Key, terrain);
+                        }
+                        else
+                        {
+                            terrains[terrain.Key] = terrain;
+                        }
+
+                        tiles[i, j].TerrainIndex = terrain.Key;
+                    }
                 }
             }
         }
