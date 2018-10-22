@@ -22,6 +22,7 @@ namespace MapEditor.Handlers
         private readonly ISession _session;
         private const int Buffer = 1000;
         private int _index = 0;
+        private List<Entity> SelectedUnits { get; set; } = new List<Entity>();
 
         public UnitHandler(MessageHub messageHub, ISession session)
         {
@@ -139,12 +140,20 @@ namespace MapEditor.Handlers
 
         public void SelectUnits(Rectangle area)
         {
-            var units = _session.GetUnits(area);
-            var selectionComponent = units.Select(t => t.GetComponent<UnitComponent>());    //todo: replace with get components
-            foreach (var u in selectionComponent)
+            foreach (var unit in SelectedUnits.ToList())
             {
-                u.IsSelected = true;
+                unit.GetComponent<UnitComponent>().IsSelected = false;
+                SelectedUnits.Remove(unit);
             }
+
+            var units = _session.GetUnits(area);
+            foreach (var unit in units)
+            {
+                var selectionComponent = unit.GetComponent<UnitComponent>();    //todo: replace with get components
+                selectionComponent.IsSelected = true;
+                SelectedUnits.Add(unit);
+            }
+            
         }
         
         public void Handle(ICommand command)

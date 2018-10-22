@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
+using MapEditor.Commands;
 using MapEditor.Components;
 using MapEditor.Entities;
 using MapEditor.Repository;
@@ -31,6 +32,8 @@ namespace MapEditor.Engine
 
             // todo: sort by Z value
 
+            Clear();
+
             DrawTiles(tiles);
 
             DrawUnits(units);
@@ -61,6 +64,15 @@ namespace MapEditor.Engine
                 var image = unit.GetComponent<ImageComponent>().Image;
                 var position = unit.GetComponent<PositionComponent>().Position;
                 var area = new Rectangle(position.X, position.Y, image.Width, image.Height);
+
+                var unitComponent = unit.GetComponent<UnitComponent>();
+                if (unitComponent.IsSelected)
+                {
+                    var selectionArea = new Rectangle(position.X + 5, position.Y + 15, unitComponent.SelectionRadius,
+                        unitComponent.SelectionRadius);
+                    _graphics.DrawCircle(Color.FromArgb(255, 0, 190, 0), selectionArea);
+                }
+
                 _graphics.DrawImage(image, area);
             }
         }
@@ -79,6 +91,11 @@ namespace MapEditor.Engine
                     _graphics.DrawImage(terrain.Image, area);
                 }
             }
+        }
+
+        private void Clear()
+        {
+            _graphics.Clear();
         }
     }
 }

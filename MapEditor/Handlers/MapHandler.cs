@@ -4,6 +4,7 @@ using System.Drawing;
 using MapEditor.Commands;
 using MapEditor.Common;
 using MapEditor.Engine;
+using MapEditor.Entities;
 using MapEditor.Repository;
 
 namespace MapEditor.Handlers

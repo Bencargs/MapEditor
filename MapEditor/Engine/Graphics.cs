@@ -23,6 +23,11 @@ namespace MapEditor.Engine
         public int Width { get; }
         public int Height { get; }
 
+        public void Clear()
+        {
+            _window.Refresh();
+        }
+
         public void DrawLines(Color color, Point[] points)
         {
             var pen = new Pen(color, 1);
@@ -49,6 +54,12 @@ namespace MapEditor.Engine
         public void DrawRectangle(Brush brush, Rectangle area)
         {
             _graphics.DrawRectangle(new Pen(brush), area);
+        }
+
+        public void DrawCircle(Color color, Rectangle area)
+        {
+            var pen = new Pen(color, 1);
+            _graphics.DrawEllipse(pen, area);
         }
 
         public void Dispose()

@@ -8,5 +8,6 @@ namespace MapEditor.Commands
         public string Title { get; set; }
         public string Name { get; set; }
         public bool IsSelected { get; set; }
+        public int SelectionRadius { get; set; }
     }
 }

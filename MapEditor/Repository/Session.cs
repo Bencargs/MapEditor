@@ -28,8 +28,6 @@ namespace MapEditor.Repository
 
         IEnumerable<T> GetComponent<T>(Point point)
             where T : IComponent;
-        IEnumerable<T> GetComponent<T>(Rectangle area)
-            where T : IComponent;
         IEnumerable<T> GetComponent<T>(Vector2 path)
             where T : IComponent;
 
@@ -209,11 +207,6 @@ namespace MapEditor.Repository
                 if (component != null)
                     yield return component;
             }
-        }
-
-        public IEnumerable<T> GetComponent<T>(Rectangle area) where T : IComponent
-        {
-            throw new NotImplementedException();
         }
 
         public IEnumerable<T> GetComponent<T>(Vector2 path) where T : IComponent

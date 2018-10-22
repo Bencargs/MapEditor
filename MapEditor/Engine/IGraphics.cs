@@ -8,9 +8,11 @@ namespace MapEditor.Engine
         int Width { get; }
         int Height { get; }
 
+        void Clear();
         void DrawLines(Color color, Point[] points);
         void DrawRectangle(Brush brush, Rectangle area);
         void FillRectangle(Brush brush, Rectangle area);
+        void DrawCircle(Color color, Rectangle area);
         void DrawImage(Image image, Rectangle area);
 
         void Render();
