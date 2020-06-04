@@ -3,7 +3,7 @@ using MapEditor.Entities;
 
 namespace MapEditor.Commands
 {
-    public class AddUnitCommand : ICommand
+    public class AddUnitCommand : IReversableCommand
     {
         public CommandType Id { get; } = CommandType.AddUnit;
 

@@ -1,4 +1,4 @@
-﻿namespace MapEditor.Handlers
+﻿namespace MapEditor.Handlers.CollisionHandler
 {
     public enum ColliderType
     {

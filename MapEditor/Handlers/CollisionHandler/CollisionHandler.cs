@@ -1,16 +1,17 @@
 ﻿using System.Linq;
 using MapEditor.Common;
-using MapEditor.Engine;
+using MapEditor.Components;
+using MapEditor.Repository;
 
 namespace MapEditor.Handlers.CollisionHandler
 {
     public class CollisionHandler
     {
-        private readonly Map _map;
+        private readonly ISession _session;
 
-        public CollisionHandler(Map map)
+        public CollisionHandler(ISession session)
         {
-            _map = map;
+            _session = session;
         }
 
         public ICollider GetCollision(Vector2 line)
@@ -19,18 +20,12 @@ namespace MapEditor.Handlers.CollisionHandler
             // foreach cell from vector start to vector end
             // get collider - check collission - if true return, else keep going
             // return null
-            var tiles = _map.GetTiles(line);
-            foreach (var t in tiles)
-            {
-                //line circle intersection - https://yal.cc/gamemaker-collision-line-point/
-                //https://stackoverflow.com/questions/23016676/line-segment-and-circle-intersection
-                //return t.Colliders.FirstOrDefault();
 
-                var collider = t.GetColliders().FirstOrDefault();
-                if (collider != null)
-                    return collider;
-            }
-            return null;
+            //line circle intersection - https://yal.cc/gamemaker-collision-line-point/
+            //https://stackoverflow.com/questions/23016676/line-segment-and-circle-intersection
+            return _session.GetComponent<CollisionComponent>(line)
+                ?.FirstOrDefault()
+                ?.Collider;
         }
 
         public ICollider GetCollision(ICollider circle)
@@ -38,8 +33,9 @@ namespace MapEditor.Handlers.CollisionHandler
             float oldDistance = 0;
             ICollider collider = null;
 
-            var tile = _map.GetTile(circle.Position);
-            foreach (var c in tile.GetColliders())
+            var colliders = _session.GetComponent<CollisionComponent>(circle.Position)
+                .Select(x => x.Collider);
+            foreach (var c in colliders)
             {
                 if (!c.IsCollided(circle))
                     continue;

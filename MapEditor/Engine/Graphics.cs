@@ -3,6 +3,9 @@ using System.Windows.Forms;
 
 namespace MapEditor.Engine
 {
+    /// <summary>
+    /// todo: rename to renderer?
+    /// </summary>
     public class WinFormGraphics : IGraphics
     {
         private readonly Graphics _graphics;
@@ -11,13 +14,19 @@ namespace MapEditor.Engine
         public WinFormGraphics(Panel window)
         {
             _window = window;
-            _graphics = window.CreateGraphics();
             Width = window.Width;
             Height = window.Height;
+
+            _graphics = window.CreateGraphics();
         }
 
         public int Width { get; }
         public int Height { get; }
+
+        public void Clear()
+        {
+            _window.Refresh();
+        }
 
         public void DrawLines(Color color, Point[] points)
         {
@@ -30,10 +39,27 @@ namespace MapEditor.Engine
             _graphics.DrawImageUnscaled(image, area);
         }
 
+        public void Render()
+        {
+            // todo: have all draw commands add to a back buffer
+            // have render swap buffers
+        }
+
         //Tech debt
         public void FillRectangle(Brush brush, Rectangle area)
         {
             _graphics.FillRectangle(brush, area);
+        }
+
+        public void DrawRectangle(Brush brush, Rectangle area)
+        {
+            _graphics.DrawRectangle(new Pen(brush), area);
+        }
+
+        public void DrawCircle(Color color, Rectangle area)
+        {
+            var pen = new Pen(color, 1);
+            _graphics.DrawEllipse(pen, area);
         }
 
         public void Dispose()

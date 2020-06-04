@@ -1,12 +1,14 @@
 ﻿using System.Drawing;
 using MapEditor.Commands;
 using MapEditor.Common;
+using MapEditor.Engine;
 using MapEditor.Handlers.CollisionHandler;
 
-namespace MapEditor.Engine
+namespace MapEditor.Handlers
 {
-    public class Camera : IHandleCommand
+    public class CameraHandler : IHandleCommand
     {
+        private readonly MessageHub _messageHub;
         private Rectangle _viewport;
         private Rectangle _innerViewport;
         private const int MoveSpeed = 10;   //todo: this should be editable via settings
@@ -24,15 +26,24 @@ namespace MapEditor.Engine
         }
 
         //todo: replace parameter with service locator
-        public Camera(MessageHub messageHub, Point position, int width, int height)
+        public CameraHandler(MessageHub messageHub, Point position, int width, int height)
         {
-            messageHub.Subscribe(this, CommandType.MoveCamera);
+            _messageHub = messageHub;
             var innerViewportOffset = 30;
             _viewport = new Rectangle(position, new Size(width, height));
             _innerViewport = new Rectangle(_viewport.X + innerViewportOffset,
                                            _viewport.Y + innerViewportOffset,
                                            _viewport.Width - innerViewportOffset,
                                            _viewport.Height - innerViewportOffset);
+        }
+
+        public void Init()
+        {
+            _messageHub.Post(new CreateCameraCommand
+            {
+                Viewport = _viewport
+            });
+            _messageHub.Subscribe(this, CommandType.MoveCamera);
         }
 
         public CameraMotion GetMoveDirection(Point point)
@@ -81,7 +92,7 @@ namespace MapEditor.Engine
 
             //-- Game ->
             //var screenScale = GetScreenScale();
-            //var viewMatrix = Camera.GetTransform();
+            //var viewMatrix = CameraHandler.GetTransform();
 
             //_spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied,
             //    null, null, null, null, viewMatrix * Matrix.CreateScale(screenScale));

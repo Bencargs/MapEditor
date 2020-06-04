@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using MapEditor.Commands;
 
 namespace MapEditor.Engine
@@ -21,8 +22,12 @@ namespace MapEditor.Engine
                     if (_index <= 0)
                         return;
 
-                    var current = _commands[_index--];
-                    NotifyUndo(current);
+                    var reversableCommand = _commands.OfType<IReversableCommand>().LastOrDefault();
+                    if (reversableCommand != null)
+                    {
+                        _index = _commands.LastIndexOf(reversableCommand);
+                        NotifyUndo(reversableCommand);
+                    }
                     break;
                 }
                 case CommandType.Redo:

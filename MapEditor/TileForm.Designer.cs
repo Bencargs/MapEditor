@@ -54,6 +54,7 @@
             // 
             // accept
             // 
+            this.accept.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.accept.Location = new System.Drawing.Point(96, 53);
             this.accept.Name = "accept";
             this.accept.Size = new System.Drawing.Size(75, 23);

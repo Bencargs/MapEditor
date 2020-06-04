@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace MapEditor.Engine
 {
-    public struct Terrain : IDisposable
+    public class Terrain : IDisposable
     {
         public Guid Key { get; }
 

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace MapEditor.Engine
+﻿namespace MapEditor.Engine
 {
     public class MapSettings
     {
@@ -9,7 +6,5 @@ namespace MapEditor.Engine
         public int Height { get; set; }
         public bool ShowGrid { get; set; }
         public bool ShowTerrain { get; set; }
-        public Tile[,] Tiles { get; set; }
-        public Dictionary<Guid, Terrain> Terrains { get; set; } = new Dictionary<Guid, Terrain>();
     }
 }

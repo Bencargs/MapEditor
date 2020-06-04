@@ -1,16 +1,18 @@
 ﻿using MapEditor.Engine;
+using MapEditor.Handlers;
+using MapEditor.Repository;
 
 namespace MapEditor.Editor
 {
-    public class MapEditor : Map
+    public class MapEditor : MapHandler
     {
-        public MapEditor(MessageHub messageHub, IGraphics graphics, int width, int height)
-            : base(messageHub, graphics, width, height)
+        public MapEditor(MessageHub messageHub, ISession session, int width, int height)
+            : base(messageHub, session, width, height)
         {
         }
 
-        public MapEditor(MessageHub messageHub, IGraphics graphics, MapSettings settings)
-            : base(messageHub, graphics, settings.Width, settings.Height)
+        public MapEditor(MessageHub messageHub, ISession session, MapSettings settings)
+            : base(messageHub, session, settings)
         {
         }
 

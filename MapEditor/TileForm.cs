@@ -7,6 +7,7 @@ namespace MapEditor
 {
     public partial class TileForm : Form
     {
+        public bool Cancel { get; set; }
         public Terrain Terrain { get; set; }
 
         public TileForm(Terrain terrain)
@@ -23,11 +24,13 @@ namespace MapEditor
 
         private void Close_Click(object sender, EventArgs e)
         {
+            Cancel = true;
             Close();
         }
 
         private void Accept_Click(object sender, EventArgs e)
         {
+            Cancel = false;
             if (terrainCmb?.SelectedItem != null)
             {
                 //todo: _map.SetTerrain
