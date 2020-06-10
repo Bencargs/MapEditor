@@ -8,9 +8,10 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>MapEditor</RootNamespace>
     <AssemblyName>MapEditor</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -71,6 +72,7 @@
     <Compile Include="Common\Vector2.cs" />
     <Compile Include="Common\Vector3.cs" />
     <Compile Include="Engine\GuidComb.cs" />
+    <Compile Include="Engine\IGraphics.cs" />
     <Compile Include="Engine\UserInterface.cs" />
     <Compile Include="Entities\Components\AnimationComponent.cs" />
     <Compile Include="Entities\Components\CollisionComponent.cs" />
@@ -99,7 +101,6 @@
     <Compile Include="Editor\MapEditor.cs" />
     <Compile Include="Engine\Animation.cs" />
     <Compile Include="Handlers\CameraHandler.cs" />
-    <Compile Include="Engine\IGraphics.cs" />
     <Compile Include="Engine\MapSettings.cs" />
     <Compile Include="Engine\MessageHub.cs" />
     <Compile Include="Engine\IInputController.cs" />
@@ -157,6 +158,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{dab6fd98-4873-4712-8294-a847c0c79ead}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
