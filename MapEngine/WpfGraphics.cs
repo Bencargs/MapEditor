@@ -31,11 +31,6 @@ namespace MapEngine
             }
         }
 
-        public void Dispose()
-        {
-            
-        }
-
         public void DrawCircle(Colour colour, Rectangle area)
         {
             throw new NotImplementedException();

@@ -45,9 +45,12 @@
     <Compile Include="IAnimation.cs" />
     <Compile Include="IGraphics.cs" />
     <Compile Include="IImage.cs" />
+    <Compile Include="ITexture.cs" />
     <Compile Include="Point.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Rectangle.cs" />
+    <Compile Include="TerrainType.cs" />
+    <Compile Include="Tile.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

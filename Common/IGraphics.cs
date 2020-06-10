@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace Common
+﻿namespace Common
 {
-    public interface IGraphics : IDisposable
+    public interface IGraphics
     {
         int Width { get; }
         int Height { get; }

@@ -1,41 +1,28 @@
 ﻿using Common;
-using System;
 
 namespace MapEngine
 {
     public class Scene
     {
         private IGraphics _graphics;
+        private readonly ResourceLoader _loader;
+        private Map _map;
 
         public Scene(IGraphics graphics)
         {
             _graphics = graphics;
+            _loader = new ResourceLoader();
         }
 
         public void Initialise()
         {
-            var loader = new ResourceLoader();
-            var animation = (WpfAnimation)loader.LoadAnimation(@"C:\Source\MapEditor\MapEngine\Content\water.gif");
-            _animation = animation;
+            var mapFilename = @"C:\Source\MapEditor\MapEngine\Content\Maps\TestMap1.json";
+
+            _map = _loader.LoadMap(mapFilename);
         }
 
-        private DateTime _previous;
         public void Display()
         {
-            const int MS_PER_UPDATE = 500;
-            _previous = DateTime.Now;
-            var lag = 0.0;
-            var current = DateTime.Now;
-            var elapsed = current - _previous;
-            _previous = current;
-            lag += elapsed.TotalMilliseconds;
-
-            ProcessInput();
-            while (lag >= MS_PER_UPDATE)
-            {
-                Update();
-                lag -= MS_PER_UPDATE;
-            }
             Render();
         }
 
@@ -44,26 +31,28 @@ namespace MapEngine
             
         }
 
-        private IAnimation _animation;
         private void Render()
         {
             _graphics.Clear();
 
-            var image = _animation.Image;
-            var area = new Common.Rectangle(0, 0, 0, 0);
-            _graphics.DrawImage(image, area);
-            area = new Common.Rectangle(252, 0, 0, 0);
-            _graphics.DrawImage(image, area);
-            area = new Common.Rectangle(0, 252, 0, 0);
-            _graphics.DrawImage(image, area);
-            area = new Common.Rectangle(252, 252, 0, 0);
-            _graphics.DrawImage(image, area);
-            area = new Common.Rectangle(504, 0, 0, 0);
-            _graphics.DrawImage(image, area);
-            area = new Common.Rectangle(504, 252, 0, 0);
-            _graphics.DrawImage(image, area);
+            DrawTiles(_map.Tiles);
 
             _graphics.Render();
+        }
+
+        private void DrawTiles(Tile[,] tiles)
+        {
+            foreach (var tile in tiles)
+            {
+                if (tile == null)
+                    continue;
+
+                if (_map.Textures.TryGetValue(tile.TextureId, out var texture))
+                {
+                    var area = new Rectangle(tile.Location.X, tile.Location.Y, texture.Width, texture.Height);
+                    _graphics.DrawImage(texture.Image, area);
+                }
+            }
         }
 
         private void ProcessInput()

@@ -39,7 +39,7 @@ namespace MapEngine
 
             var dispatcherTimer = new DispatcherTimer();
             dispatcherTimer.Tick += Update;
-            dispatcherTimer.Interval = TimeSpan.FromMilliseconds(30);
+            dispatcherTimer.Interval = TimeSpan.FromMilliseconds(20);
             dispatcherTimer.Start();
 
             // Scene...

@@ -11,7 +11,7 @@
 
 void Main()
 {
-	using (var wb = (Bitmap)Bitmap.FromFile(@"C:\Source\MapEditor\MapEngine\Content\water.png"))
+	using (var wb = (Bitmap)Bitmap.FromFile(@"C:\Source\MapEditor\MapEngine\Content\Textures\water.png"))
 	{
 		var water = new Water(wb);
 //		var dc = new DumpContainer(water).Dump();
@@ -77,15 +77,12 @@ public class Water
 		var images = new List<Bitmap>();
 		for (int j = Height; j > 0; j--)
 		{
-			var bitmap = new Bitmap(initial);
+			var bitmap = new Bitmap(initial.Width, initial.Height);
 			using (var gfx = Graphics.FromImage(bitmap))
 			{
-				gfx.DrawImage(initial, 0, 0);
-				gfx.DrawImage(overlay, 0, j);
-
-				var i = Height - j;
-				var a = overlay.Clone(new Rectangle(0, i, Width, j), System.Drawing.Imaging.PixelFormat.DontCare);
-				gfx.DrawImage(a, 0, 0);
+				ShiftImage(gfx, initial, Math.Max(1, j));
+				
+				ShiftImage(gfx, overlay, j*2);
 			}
 //			var bytes = ImageToByte(bitmap);
 //			_imageFrames.Add(bytes);
@@ -93,6 +90,24 @@ public class Water
 			images.Add(bitmap);
 		}
 		CreateGif(@"C:\Source\MapEditor\Sandbox\test.gif", images);
+	}
+	
+	private void ShiftImage(Graphics gfx, Bitmap overlay, int j)
+	{
+		try
+		{
+			if (j > overlay.Height)
+			j = j - overlay.Height;
+			
+			gfx.DrawImage(overlay, 0, j);
+			var i = Height - j;
+			var a = overlay.Clone(new Rectangle(0, i, Width, j), System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+			gfx.DrawImage(a, 0, 0);
+		}
+		catch (Exception e)
+		{
+			
+		}
 	}
 	
 	private void CreateGif(string path, List<Bitmap> images)
