@@ -4,7 +4,6 @@ namespace MapEngine
 {
     public class Texture : ITexture
     {
-        public int Id { get; }
         public int Width { get; }
         public int Height { get; }
         public IImage Image => _image ?? _animation.Image;
@@ -12,23 +11,29 @@ namespace MapEngine
         private readonly IImage _image;
         private readonly IAnimation _animation;
 
-        private Texture(int id, int width, int height)
+        private Texture(int width, int height)
         {
-            Id = id;
             Width = width;
             Height = height;
         }
 
-        public Texture(int id, IImage image)
-            : this(id, image.Width, image.Height)
+        public Texture(IImage image)
+            : this(image.Width, image.Height)
         {
             _image = image;
         }
 
-        public Texture(int id, IAnimation animation)
-            : this (id, animation.Width, animation.Height)
+        public Texture(IAnimation animation)
+            : this (animation.Width, animation.Height)
         {
             _animation = animation;
+        }
+
+        public Rectangle Area(Point point)
+        {
+            var x = point.X + (Width / 2);
+            var y = point.Y + (Height / 2);
+            return new Rectangle(x, y, Width, Height);
         }
     }
 }

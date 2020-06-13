@@ -1,15 +1,8 @@
 {
   "Width": 768,
   "Height": 512,
-  "Heightmap": "textures/heightmap.png",
+  "Heightmap": "WaterHeightmap.png",
   "Description":"Water animation test",
-  "Textures": [
-    {
-      "Id": 0,
-      "Filename": "animations/water.gif",
-	  "Framerate": 100
-    }
-  ],
   "TileWidth":3,
   "TileHeight":2,
   "Tiles": [
@@ -19,7 +12,7 @@
         "X": 0,
         "Y": 0
       },
-      "TextureId": 0,
+      "TextureId": "Waves",
       "Type": 1
     },
     {
@@ -28,7 +21,7 @@
         "X": 253,
         "Y": 0
       },
-      "TextureId": 0,
+      "TextureId": "Waves",
       "Type": 1
     },
     {
@@ -37,7 +30,7 @@
         "X": 0,
         "Y": 253
       },
-      "TextureId": 0,
+      "TextureId": "Waves",
       "Type": 1
     },
     {
@@ -46,7 +39,7 @@
         "X": 253,
         "Y": 253
       },
-      "TextureId": 0,
+      "TextureId": "Waves",
       "Type": 1
     },
     {
@@ -55,7 +48,7 @@
         "X": 506,
         "Y": 0
       },
-      "TextureId": 0,
+      "TextureId": "Waves",
       "Type": 1
     },
     {
@@ -64,7 +57,7 @@
         "X": 506,
         "Y": 253
       },
-      "TextureId": 0,
+      "TextureId": "Waves",
       "Type": 1
     }
   ]
