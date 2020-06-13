@@ -103,7 +103,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="Content\Maps\TestMap1.json" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -118,9 +117,14 @@
       <Project>{DAB6FD98-4873-4712-8294-A847C0C79EAD}</Project>
       <Name>Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SoftEngine\SoftEngine.csproj">
+      <Project>{93E04CC4-0F26-4F7D-BD33-58DAF405BD5D}</Project>
+      <Name>SoftEngine</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Content\Textures\water.png" />
+    <Folder Include="Content\Maps\" />
+    <Folder Include="Content\Textures\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

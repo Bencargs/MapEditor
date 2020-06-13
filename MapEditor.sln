@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapEngine", "MapEngine\MapE
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{DAB6FD98-4873-4712-8294-A847C0C79EAD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoftEngine", "SoftEngine\SoftEngine.csproj", "{93E04CC4-0F26-4F7D-BD33-58DAF405BD5D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{DAB6FD98-4873-4712-8294-A847C0C79EAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DAB6FD98-4873-4712-8294-A847C0C79EAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DAB6FD98-4873-4712-8294-A847C0C79EAD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{93E04CC4-0F26-4F7D-BD33-58DAF405BD5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93E04CC4-0F26-4F7D-BD33-58DAF405BD5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93E04CC4-0F26-4F7D-BD33-58DAF405BD5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93E04CC4-0F26-4F7D-BD33-58DAF405BD5D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
