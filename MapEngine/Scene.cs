@@ -1,6 +1,6 @@
 ﻿using Common;
 using MapEngine.Handlers;
-using SoftEngine;
+using System;
 
 namespace MapEngine
 {
@@ -18,34 +18,28 @@ namespace MapEngine
             var textures = new TextureHandler();
 
             _mapHandler = new MapHandler(textures);
-            _unitHandler = new UnitHandler(textures);
+            _unitHandler = new UnitHandler(textures, new MovementHandler());
         }
 
-        private IImage _render;
         public void Initialise()
         {
             var mapFilename = @"C:\Source\MapEditor\MapEngine\Content\Maps\TestMap1.json";
             _mapHandler.Init(mapFilename);
 
-            var unitFilename = @"C:\Source\MapEditor\MapEngine\Content\Units\Dummy.json";
+            var unitFilename = @"C:\Source\MapEditor\MapEngine\Content\Units\MobileDummy.json";
             _unitHandler.Init(unitFilename);
-
-            var modelFilename = @"C:\Source\MapEditor\MapEngine\Content\Models\monkey.babylon";
-            var textureFilename = @"C:\Source\MapEditor\MapEngine\Content\Textures\Suzanne.png";
-            _render = new WpfImage(_graphics.Width, _graphics.Height);
-            var modelRenderer = new Device(_render);
-            var model = ObjectLoader.LoadJSONFileAsync(modelFilename, textureFilename);
-            modelRenderer.Render(model);
         }
 
         public void Display()
         {
+            Update();
+
             Render();
         }
 
         private void Update()
         {
-            
+            _unitHandler.Update();
         }
 
         private void Render()
@@ -53,9 +47,7 @@ namespace MapEngine
             _graphics.Clear();
 
             _mapHandler.Render(_graphics);
-            //_unitHandler.Render(_graphics);
-            _graphics.DrawImage(_render.Scale(0.99), new Rectangle(0, 0, _graphics.Width, _graphics.Height));
-
+            _unitHandler.Render(_graphics);
 
             _graphics.Render();
         }

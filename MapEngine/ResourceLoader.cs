@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Windows.Media.Imaging;
 
 namespace MapEngine
@@ -40,7 +41,7 @@ namespace MapEngine
             {
                 entity.AddComponent(new LocationComponent
                 {
-                    Location = new Point((int)location.X, (int)location.Y)
+                    Location = new Vector2((int)location.X, (int)location.Y)
                 });
             }
 
@@ -50,6 +51,20 @@ namespace MapEngine
                 entity.AddComponent(new ImageComponent
                 {
                     TextureId = (string)image.TextureId
+                });
+            }
+
+            var movement = unitData.Movement;
+            if (movement != null)
+            {
+                entity.AddComponent(new MovementComponent
+                {
+                    FacingAngle = (int)movement.FacingAngle,
+                    Velocity = new Vector2((int)movement.Velocity.X, (int)movement.Velocity.Y),
+                    Steering = new Vector2((int)movement.Steering.X, (int)movement.Steering.Y),
+                    MaxVelocity = (int)movement.MaxVelocity,
+                    Mass = (int)movement.Mass,
+                    MaxForce = (int)movement.MaxForce
                 });
             }
 
@@ -66,7 +81,7 @@ namespace MapEngine
                 return new Tile
                 {
                     Id = x.Id,
-                    Location = new Common.Point((int)x.Location.X, (int)x.Location.Y),
+                    Location = new Vector2((int)x.Location.X, (int)x.Location.Y),
                     TextureId = x.TextureId,
                     Type = x.Type
                 };

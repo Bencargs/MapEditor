@@ -1,7 +1,10 @@
 ﻿using Common;
 using Common.Entities;
+using MapEngine.Commands;
 using MapEngine.Components;
+using System;
 using System.Collections.Generic;
+using System.Numerics;
 
 namespace MapEngine.Handlers
 {
@@ -9,11 +12,14 @@ namespace MapEngine.Handlers
     {
         private int _unitIndex;
         private readonly TextureHandler _textures;
+        private readonly MovementHandler _movementHandler;
+
         private Dictionary<int, Entity> _units = new Dictionary<int, Entity>();
 
-        public UnitHandler(TextureHandler textures)
+        public UnitHandler(TextureHandler textures, MovementHandler movementHandler)
         {
             _textures = textures;
+            _movementHandler = movementHandler;
         }
 
         public void Init(string filename)
@@ -22,6 +28,21 @@ namespace MapEngine.Handlers
 
             var unit = ResourceLoader.LoadUnit(filename);
             _units.Add(_unitIndex++, unit);
+        }
+
+        public void Update()
+        {
+            foreach (var unit in _units.Values)
+            {
+                var command = new MovementCommand
+                {
+                    Entity = unit,
+                    MovementMode = MovementMode.Seek,
+                    Destination = new Vector2(50, 50)
+                };
+
+                _movementHandler.Handle(command);
+            }
         }
 
         public void Render(IGraphics graphics)

@@ -40,6 +40,10 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -58,17 +62,23 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Commands\MovementCommand.cs" />
     <Compile Include="Components\ImageComponent.cs" />
+    <Compile Include="Components\MovementComponent.cs" />
     <Compile Include="EnumerableEx.cs" />
     <Compile Include="Handlers\MapHandler.cs" />
+    <Compile Include="Handlers\MovementHandler\MovementHandler.cs" />
     <Compile Include="Handlers\TextureHandler.cs" />
     <Compile Include="Handlers\UnitHandler.cs" />
     <Compile Include="ImageEx.cs" />
     <Compile Include="Components\LocationComponent.cs" />
     <Compile Include="Map.cs" />
+    <Compile Include="Mouse.cs" />
+    <Compile Include="Handlers\MovementHandler\MovementMode.cs" />
     <Compile Include="ResourceLoader.cs" />
     <Compile Include="Scene.cs" />
     <Compile Include="Texture.cs" />
+    <Compile Include="VectorEx.cs" />
     <Compile Include="WpfAnimation.cs" />
     <Compile Include="WpfGraphics.cs" />
     <Compile Include="WpfImage.cs" />

@@ -1,5 +1,6 @@
 ﻿using Common;
 using System;
+using System.Numerics;
 
 namespace MapEngine
 {
@@ -58,7 +59,7 @@ namespace MapEngine
             }
         }
 
-        public void DrawLines(Colour colour, Point[] points)
+        public void DrawLines(Colour colour, Vector2[] points)
         {
             throw new NotImplementedException();
         }
