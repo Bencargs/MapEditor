@@ -58,7 +58,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Components\ImageComponent.cs" />
+    <Compile Include="EnumerableEx.cs" />
+    <Compile Include="Handlers\MapHandler.cs" />
+    <Compile Include="Handlers\TextureHandler.cs" />
+    <Compile Include="Handlers\UnitHandler.cs" />
     <Compile Include="ImageEx.cs" />
+    <Compile Include="Components\LocationComponent.cs" />
     <Compile Include="Map.cs" />
     <Compile Include="ResourceLoader.cs" />
     <Compile Include="Scene.cs" />
@@ -114,7 +120,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Content\Animations\water.gif" />
     <Resource Include="Content\Textures\water.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

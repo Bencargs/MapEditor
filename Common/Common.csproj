@@ -42,6 +42,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Colour.cs" />
+    <Compile Include="Entities\ComponentType.cs" />
+    <Compile Include="Entities\Entity.cs" />
+    <Compile Include="Entities\IComponent.cs" />
     <Compile Include="IAnimation.cs" />
     <Compile Include="IGraphics.cs" />
     <Compile Include="IImage.cs" />

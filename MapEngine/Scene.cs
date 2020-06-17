@@ -1,24 +1,32 @@
 ﻿using Common;
+using MapEngine.Handlers;
 
 namespace MapEngine
 {
     public class Scene
     {
-        private IGraphics _graphics;
-        private readonly ResourceLoader _loader;
-        private Map _map;
+        private readonly IGraphics _graphics;
+        private readonly UnitHandler _unitHandler;
+        private readonly MapHandler _mapHandler;
 
         public Scene(IGraphics graphics)
         {
             _graphics = graphics;
-            _loader = new ResourceLoader();
+
+            // replace with injected singleton
+            var textures = new TextureHandler();
+
+            _mapHandler = new MapHandler(textures);
+            _unitHandler = new UnitHandler(textures);
         }
 
         public void Initialise()
         {
             var mapFilename = @"C:\Source\MapEditor\MapEngine\Content\Maps\TestMap1.json";
+            _mapHandler.Init(mapFilename);
 
-            _map = _loader.LoadMap(mapFilename);
+            var unitFilename = @"C:\Source\MapEditor\MapEngine\Content\Units\Dummy.json";
+            _unitHandler.Init(unitFilename);
         }
 
         public void Display()
@@ -35,24 +43,10 @@ namespace MapEngine
         {
             _graphics.Clear();
 
-            DrawTiles(_map.Tiles);
+            _mapHandler.Render(_graphics);
+            _unitHandler.Render(_graphics);
 
             _graphics.Render();
-        }
-
-        private void DrawTiles(Tile[,] tiles)
-        {
-            foreach (var tile in tiles)
-            {
-                if (tile == null)
-                    continue;
-
-                if (_map.Textures.TryGetValue(tile.TextureId, out var texture))
-                {
-                    var area = new Rectangle(tile.Location.X, tile.Location.Y, texture.Width, texture.Height);
-                    _graphics.DrawImage(texture.Image, area);
-                }
-            }
         }
 
         private void ProcessInput()
