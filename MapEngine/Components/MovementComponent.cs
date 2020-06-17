@@ -1,4 +1,6 @@
 ﻿using Common.Entities;
+using MapEngine.Handlers;
+using System.Collections.Generic;
 using System.Numerics;
 
 namespace MapEngine.Components
@@ -14,5 +16,8 @@ namespace MapEngine.Components
         public float MaxVelocity { get; set; }
         public float Mass { get; set; }
         public float MaxForce { get; set; }
+
+        public float StopRadius { get; set; }
+        public Queue<MoveOrder> Destinations = new Queue<MoveOrder>();
     }
 }

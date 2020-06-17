@@ -19,8 +19,17 @@
 			"X":0,
 			"Y":0,
 		},
-		"MaxVelocity":1,
-		"Mass":10000,
-		"MaxForce":2
+		"MaxVelocity":100,
+		"Mass":1000,
+		"MaxForce":100,
+		"StopRadius":10,
+		"Destinations":[{
+			"MovementMode":"Seek",
+			"Destination":{
+					"X":50,
+					"Y":50
+				}
+			}
+		]
 	}
 }

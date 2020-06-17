@@ -1,10 +1,7 @@
 ﻿using Common;
 using Common.Entities;
-using MapEngine.Commands;
 using MapEngine.Components;
-using System;
 using System.Collections.Generic;
-using System.Numerics;
 
 namespace MapEngine.Handlers
 {
@@ -13,8 +10,7 @@ namespace MapEngine.Handlers
         private int _unitIndex;
         private readonly TextureHandler _textures;
         private readonly MovementHandler _movementHandler;
-
-        private Dictionary<int, Entity> _units = new Dictionary<int, Entity>();
+        private readonly Dictionary<int, Entity> _units = new Dictionary<int, Entity>();
 
         public UnitHandler(TextureHandler textures, MovementHandler movementHandler)
         {
@@ -32,17 +28,7 @@ namespace MapEngine.Handlers
 
         public void Update()
         {
-            foreach (var unit in _units.Values)
-            {
-                var command = new MovementCommand
-                {
-                    Entity = unit,
-                    MovementMode = MovementMode.Seek,
-                    Destination = new Vector2(50, 50)
-                };
-
-                _movementHandler.Handle(command);
-            }
+            _movementHandler.Handle(_units[0]);
         }
 
         public void Render(IGraphics graphics)

@@ -1,6 +1,7 @@
 ﻿using Common;
 using Common.Entities;
 using MapEngine.Components;
+using MapEngine.Handlers;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -62,9 +63,15 @@ namespace MapEngine
                     FacingAngle = (int)movement.FacingAngle,
                     Velocity = new Vector2((int)movement.Velocity.X, (int)movement.Velocity.Y),
                     Steering = new Vector2((int)movement.Steering.X, (int)movement.Steering.Y),
-                    MaxVelocity = (int)movement.MaxVelocity,
-                    Mass = (int)movement.Mass,
-                    MaxForce = (int)movement.MaxForce
+                    MaxVelocity = (float)movement.MaxVelocity,
+                    Mass = (float)movement.Mass,
+                    MaxForce = (float)movement.MaxForce,
+                    StopRadius = (float)movement.StopRadius,
+                    Destinations = new Queue<MoveOrder>(((IEnumerable<dynamic>)movement.Destinations).Select(x => new MoveOrder
+                    {
+                        MovementMode = (MovementMode) Enum.Parse(typeof(MovementMode), (string) x.MovementMode),
+                        Destination = new Vector2((int)x.Destination.X, (int)x.Destination.Y)
+                    }))
                 });
             }
 

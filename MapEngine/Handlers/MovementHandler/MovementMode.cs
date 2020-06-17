@@ -1,4 +1,4 @@
-﻿namespace MapEngine
+﻿namespace MapEngine.Handlers
 {
     public enum MovementMode
     {

@@ -14,7 +14,7 @@ namespace MapEngine
         {
             if (source.Length() > max)
             {
-                source.Normalize();
+                source = source.Normalize();
                 source *= max;
             }
             return source;
@@ -24,6 +24,11 @@ namespace MapEngine
         {
             var distance =  Math.Sqrt(source.X * source.X + source.Y * source.Y);
             return new Vector2((float)(source.X / distance), (float)(source.Y / distance));
+        }
+
+        public static float Distance(this Vector2 source, Vector2 destination)
+        {
+            return Vector2.Distance(source, destination);
         }
     }
 }

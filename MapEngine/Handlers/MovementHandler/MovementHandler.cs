@@ -1,47 +1,59 @@
-﻿using Common;
-using Common.Entities;
-using MapEngine.Commands;
+﻿using Common.Entities;
 using MapEngine.Components;
+using System;
+using System.Linq;
 using System.Numerics;
 
 namespace MapEngine.Handlers
 {
     public class MovementHandler
     {
-        public float Friction = 0.98f;//Map friction
-
-        public void Handle(MovementCommand command)
+        public void Handle(Entity entity)
         {
-            var entity = command.Entity;
             var location = entity.GetComponent<LocationComponent>();
-            var target = entity.GetComponent<MovementComponent>();
+            var movement = entity.GetComponent<MovementComponent>();
 
-            if (!Contains(location.Location, command.Destination))
+            if (HasGetTarget(location, movement, out var target))
             {
-                Seek(location, target, command);
+                switch (target.MovementMode)
+                {
+                    case MovementMode.Seek:
+                        Seek(location, movement, target.Destination);
+                        break;
+                }
             }
-
-            target.Velocity *= Friction;
-            location.Location = location.Location + target.Velocity;
+            ApplyFriction(location, movement);
         }
 
-        // replace with extensions or something - adding a region around each point for collision purposes
-        private bool Contains(Vector2 a, Vector2 b)
+        private void ApplyFriction(LocationComponent location, MovementComponent movement)
         {
-            var radius = 10;
-            var areaA = new Rectangle((int)a.X - radius, (int)a.Y - radius, radius * 2, radius * 2);
-            var areaB = new Rectangle((int)b.X - radius, (int)b.Y - radius, radius * 2, radius * 2);
+            const float Friction = 0.95f; // Ideally this would be a property of the map tile
 
-            return areaA.X <= areaB.X + areaB.Width &&
-                   areaB.X <= areaA.X + areaA.Width &&
-                   areaA.Y <= areaB.Y + areaB.Height &&
-                   areaB.Y <= areaA.Y + areaA.Height;
+            movement.Velocity *= Friction;
+            location.Location += movement.Velocity;
         }
 
-        private void Seek(LocationComponent location, MovementComponent target, MovementCommand command)
+        private static bool HasGetTarget(LocationComponent location, MovementComponent movement, out MoveOrder target)
+        {
+            target = movement.Destinations.FirstOrDefault();
+            if (target == null)
+                return false;
+            
+            if (HasArrived(location.Location, target.Destination, movement.StopRadius))
+                movement.Destinations.Dequeue();
+
+            return true;
+        }
+
+        private static bool HasArrived(Vector2 location, Vector2 target, float stopRadius)
+        {
+            return Math.Abs(location.Distance(target)) < stopRadius;
+        }
+
+        private void Seek(LocationComponent location, MovementComponent target, Vector2 destination)
         {
             //subtract the position from the target to get the vector from the vehicles position to the target. 
-            var directionVector = (command.Destination - location.Location)/* / Data.MaxVelocity*/;
+            var directionVector = (destination - location.Location);
 
             //Set the facingAngle (used to draw the image, in radians) to velocity
             target.FacingAngle = target.Velocity.Angle();
