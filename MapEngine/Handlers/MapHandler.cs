@@ -34,7 +34,7 @@ namespace MapEngine.Handlers
 
                 if (_textures.TryGetTexture(tile.TextureId, out var texture))
                 {
-                    var area = new Rectangle(tile.Location.X, tile.Location.Y, texture.Width, texture.Height);
+                    var area = new Rectangle((int)tile.Location.X, (int)tile.Location.Y, texture.Width, texture.Height);
                     graphics.DrawImage(texture.Image, area);
                 }
             }

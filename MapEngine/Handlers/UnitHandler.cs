@@ -9,11 +9,13 @@ namespace MapEngine.Handlers
     {
         private int _unitIndex;
         private readonly TextureHandler _textures;
-        private Dictionary<int, Entity> _units = new Dictionary<int, Entity>();
+        private readonly MovementHandler _movementHandler;
+        private readonly Dictionary<int, Entity> _units = new Dictionary<int, Entity>();
 
-        public UnitHandler(TextureHandler textures)
+        public UnitHandler(TextureHandler textures, MovementHandler movementHandler)
         {
             _textures = textures;
+            _movementHandler = movementHandler;
         }
 
         public void Init(string filename)
@@ -22,6 +24,11 @@ namespace MapEngine.Handlers
 
             var unit = ResourceLoader.LoadUnit(filename);
             _units.Add(_unitIndex++, unit);
+        }
+
+        public void Update()
+        {
+            _movementHandler.Handle(_units[0]);
         }
 
         public void Render(IGraphics graphics)

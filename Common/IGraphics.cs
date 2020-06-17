@@ -1,4 +1,6 @@
-﻿namespace Common
+﻿using System.Numerics;
+
+namespace Common
 {
     public interface IGraphics
     {
@@ -6,7 +8,7 @@
         int Height { get; }
 
         void Clear();
-        void DrawLines(Colour colour, Point[] points);
+        void DrawLines(Colour colour, Vector2[] points);
         void DrawRectangle(Colour colour, Rectangle area);
         void FillRectangle(Colour colour, Rectangle area);
         void DrawCircle(Colour colour, Rectangle area);

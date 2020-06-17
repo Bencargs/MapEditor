@@ -1,11 +1,13 @@
 ﻿using Common;
 using Common.Entities;
 using MapEngine.Components;
+using MapEngine.Handlers;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Windows.Media.Imaging;
 
 namespace MapEngine
@@ -40,7 +42,7 @@ namespace MapEngine
             {
                 entity.AddComponent(new LocationComponent
                 {
-                    Location = new Point((int)location.X, (int)location.Y)
+                    Location = new Vector2((int)location.X, (int)location.Y)
                 });
             }
 
@@ -50,6 +52,26 @@ namespace MapEngine
                 entity.AddComponent(new ImageComponent
                 {
                     TextureId = (string)image.TextureId
+                });
+            }
+
+            var movement = unitData.Movement;
+            if (movement != null)
+            {
+                entity.AddComponent(new MovementComponent
+                {
+                    FacingAngle = (int)movement.FacingAngle,
+                    Velocity = new Vector2((int)movement.Velocity.X, (int)movement.Velocity.Y),
+                    Steering = new Vector2((int)movement.Steering.X, (int)movement.Steering.Y),
+                    MaxVelocity = (float)movement.MaxVelocity,
+                    Mass = (float)movement.Mass,
+                    MaxForce = (float)movement.MaxForce,
+                    StopRadius = (float)movement.StopRadius,
+                    Destinations = new Queue<MoveOrder>(((IEnumerable<dynamic>)movement.Destinations).Select(x => new MoveOrder
+                    {
+                        MovementMode = (MovementMode) Enum.Parse(typeof(MovementMode), (string) x.MovementMode),
+                        Destination = new Vector2((int)x.Destination.X, (int)x.Destination.Y)
+                    }))
                 });
             }
 
@@ -66,7 +88,7 @@ namespace MapEngine
                 return new Tile
                 {
                     Id = x.Id,
-                    Location = new Common.Point((int)x.Location.X, (int)x.Location.Y),
+                    Location = new Vector2((int)x.Location.X, (int)x.Location.Y),
                     TextureId = x.TextureId,
                     Type = x.Type
                 };

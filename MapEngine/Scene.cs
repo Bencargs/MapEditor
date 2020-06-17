@@ -1,5 +1,6 @@
 ﻿using Common;
 using MapEngine.Handlers;
+using System;
 
 namespace MapEngine
 {
@@ -17,7 +18,7 @@ namespace MapEngine
             var textures = new TextureHandler();
 
             _mapHandler = new MapHandler(textures);
-            _unitHandler = new UnitHandler(textures);
+            _unitHandler = new UnitHandler(textures, new MovementHandler());
         }
 
         public void Initialise()
@@ -25,18 +26,20 @@ namespace MapEngine
             var mapFilename = @"C:\Source\MapEditor\MapEngine\Content\Maps\TestMap1.json";
             _mapHandler.Init(mapFilename);
 
-            var unitFilename = @"C:\Source\MapEditor\MapEngine\Content\Units\Dummy.json";
+            var unitFilename = @"C:\Source\MapEditor\MapEngine\Content\Units\MobileDummy.json";
             _unitHandler.Init(unitFilename);
         }
 
         public void Display()
         {
+            Update();
+
             Render();
         }
 
         private void Update()
         {
-            
+            _unitHandler.Update();
         }
 
         private void Render()

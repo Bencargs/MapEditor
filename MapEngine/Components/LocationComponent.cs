@@ -1,11 +1,11 @@
-﻿using Common;
-using Common.Entities;
+﻿using Common.Entities;
+using System.Numerics;
 
 namespace MapEngine.Components
 {
     public class LocationComponent : IComponent
     {
         public ComponentType Type => ComponentType.Location;
-        public Point Location { get; set; }
+        public Vector2 Location { get; set; }
     }
 }

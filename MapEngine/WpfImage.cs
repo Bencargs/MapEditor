@@ -10,7 +10,7 @@ namespace MapEngine
     {
         public int Width { get; }
         public int Height { get; }
-        public WriteableBitmap Bitmap { get; }
+        public WriteableBitmap Bitmap { get; set; }
         private readonly byte[] _buffer;
 
         public WpfImage(WriteableBitmap bitmap)
@@ -29,7 +29,7 @@ namespace MapEngine
                 height,
                 96,
                 96,
-                PixelFormats.Bgr32,
+                PixelFormats.Bgra32,
                 null))
         {
         }

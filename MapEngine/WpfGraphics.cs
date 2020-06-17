@@ -1,5 +1,6 @@
 ﻿using Common;
 using System;
+using System.Numerics;
 
 namespace MapEngine
 {
@@ -45,16 +46,20 @@ namespace MapEngine
                     var offset = Math.Max(0, (area.X * 4) + (area.Y * Width * 4));
                     var i = Math.Min(_backBuffer.Length - 4, x + (y * Width) + offset);
                     var colour = image[x, y];
+                    if (colour.Alpha == 0)
+                    {
+                        continue;
+                    }
 
                     _backBuffer[i] = colour.Red;
-                    _backBuffer[i+1] = colour.Blue;
-                    _backBuffer[i+2] = colour.Green;
-                    _backBuffer[i+3] = colour.Alpha;
+                    _backBuffer[i + 1] = colour.Blue;
+                    _backBuffer[i + 2] = colour.Green;
+                    _backBuffer[i + 3] = colour.Alpha;
                 }
             }
         }
 
-        public void DrawLines(Colour colour, Point[] points)
+        public void DrawLines(Colour colour, Vector2[] points)
         {
             throw new NotImplementedException();
         }
