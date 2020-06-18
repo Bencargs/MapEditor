@@ -62,8 +62,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Components\ImageComponent.cs" />
-    <Compile Include="Components\MovementComponent.cs" />
+    <Compile Include="Entities\Components\UnitComponent.cs" />
+    <Compile Include="Entities\Components\ImageComponent.cs" />
+    <Compile Include="Entities\Components\MovementComponent.cs" />
     <Compile Include="Extensions\EnumerableEx.cs" />
     <Compile Include="Handlers\MapHandler.cs" />
     <Compile Include="Handlers\MovementHandler\MovementHandler.cs" />
@@ -71,11 +72,14 @@
     <Compile Include="Handlers\TextureHandler.cs" />
     <Compile Include="Handlers\UnitHandler.cs" />
     <Compile Include="Extensions\ImageEx.cs" />
-    <Compile Include="Components\LocationComponent.cs" />
+    <Compile Include="Entities\Components\LocationComponent.cs" />
     <Compile Include="Map.cs" />
     <Compile Include="Handlers\MovementHandler\MovementMode.cs" />
-    <Compile Include="ResourceLoader.cs" />
+    <Compile Include="ResourceLoading\MapLoader.cs" />
+    <Compile Include="ResourceLoading\TextureLoader.cs" />
+    <Compile Include="ResourceLoading\UnitLoader.cs" />
     <Compile Include="Scene.cs" />
+    <Compile Include="Team.cs" />
     <Compile Include="Texture.cs" />
     <Compile Include="Extensions\VectorEx.cs" />
     <Compile Include="WpfAnimation.cs" />

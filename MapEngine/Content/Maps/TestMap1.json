@@ -5,6 +5,59 @@
   "Description":"Water animation test",
   "TileWidth":3,
   "TileHeight":2,
+  "Teams": [
+	{
+		"Id":0,
+		"Name":"Player"
+	},
+	{
+		"Id":1,
+		"Name":"AI"
+	}
+  ],
+  "Units": [
+	{
+		"Id":0,
+		"Team":0,
+		"Type":"MobileDummy",
+		"Location":{
+			"X":250,
+			"Y":250
+		},
+		"Movement": {
+			"FacingAngle":0,
+			"Velocity": {
+				"X":0,
+				"Y":0,
+			},
+			"Steering": {
+				"X":0,
+				"Y":0,
+			},
+			"MaxVelocity":100,
+			"Mass":1000,
+			"MaxForce":100,
+			"StopRadius":10,
+			"Destinations":[{
+				"MovementMode":"Seek",
+				"Destination":{
+						"X":50,
+						"Y":50
+					}
+				}
+			]
+		}
+	},
+	{
+		"Id":1,
+		"Team":1,
+		"Type":"Dummy",
+		"Location":{
+			"X":300,
+			"Y":50
+		}
+	}
+  ],
   "Tiles": [
     {
       "Id": 0,

@@ -5,6 +5,7 @@
         None = 0,
         Location,
         Image,
-        Movement
+        Movement,
+        Unit,
     }
 }

@@ -1,9 +1,5 @@
 {
 	"Type":"MobileDummy",
-	"Location": {
-        "X": 250,
-        "Y": 250
-	},
 	"Image": {
 		"Width":24,
 		"Height":24,

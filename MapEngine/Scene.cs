@@ -26,8 +26,8 @@ namespace MapEngine
             var mapFilename = @"C:\Source\MapEditor\MapEngine\Content\Maps\TestMap1.json";
             _mapHandler.Init(mapFilename);
 
-            var unitFilename = @"C:\Source\MapEditor\MapEngine\Content\Units\MobileDummy.json";
-            _unitHandler.Init(unitFilename);
+            var unitsPath = @"C:\Source\MapEditor\MapEngine\Content\Units\";
+            _unitHandler.Init(unitsPath, mapFilename);
         }
 
         public void Display()

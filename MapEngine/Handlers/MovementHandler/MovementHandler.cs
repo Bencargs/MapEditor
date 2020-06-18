@@ -1,5 +1,5 @@
 ﻿using Common.Entities;
-using MapEngine.Components;
+using MapEngine.Entities.Components;
 using System;
 using System.Linq;
 using System.Numerics;
