@@ -38,21 +38,12 @@ namespace MapEngine.ResourceLoading
                 var movement = u.Movement;
                 if (movement != null)
                 {
-                    entity.AddComponent(new MovementComponent
-                    {
-                        FacingAngle = (int)movement.FacingAngle,
-                        Velocity = new Vector2((int)movement.Velocity.X, (int)movement.Velocity.Y),
-                        Steering = new Vector2((int)movement.Steering.X, (int)movement.Steering.Y),
-                        MaxVelocity = (float)movement.MaxVelocity,
-                        Mass = (float)movement.Mass,
-                        MaxForce = (float)movement.MaxForce,
-                        StopRadius = (float)movement.StopRadius,
-                        Destinations = new Queue<MoveOrder>(((IEnumerable<dynamic>)movement.Destinations).Select(x => new MoveOrder
+                    entity.GetComponent<MovementComponent>().Destinations = ((IEnumerable<dynamic>)movement.Destinations)
+                        .Select(x => new MoveOrder
                         {
                             MovementMode = (MovementMode)Enum.Parse(typeof(MovementMode), (string)x.MovementMode),
                             Destination = new Vector2((int)x.Destination.X, (int)x.Destination.Y)
-                        }))
-                    });
+                        }).ToQueue();
                 }
 
                 return entity;
@@ -82,6 +73,21 @@ namespace MapEngine.ResourceLoading
                 entity.AddComponent(new ImageComponent
                 {
                     TextureId = (string)image.TextureId
+                });
+            }
+
+            var movement = unitData.Movement;
+            if (movement != null)
+            {
+                entity.AddComponent(new MovementComponent
+                {
+                    FacingAngle = (int)movement.FacingAngle,
+                    Velocity = new Vector2((int)movement.Velocity.X, (int)movement.Velocity.Y),
+                    Steering = new Vector2((int)movement.Steering.X, (int)movement.Steering.Y),
+                    MaxVelocity = (float)movement.MaxVelocity,
+                    Mass = (float)movement.Mass,
+                    MaxForce = (float)movement.MaxForce,
+                    StopRadius = (float)movement.StopRadius,
                 });
             }
 

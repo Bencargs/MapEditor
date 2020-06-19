@@ -23,9 +23,11 @@ namespace MapEngine.ResourceLoading
                     TextureId = x.TextureId,
                     Type = x.Type
                 };
-            }).ToArray();
-            var tiles = EnumerableEx.Make2DArray(rawTileData, (int)mapData.TileWidth, (int)mapData.TileHeight);
+            }).ToArray();           
+
             var teams = ((IEnumerable<dynamic>)mapData.Teams).Select(x => new Team { Id = x.Id, Name = x.Name }).ToArray();
+
+            var tiles = rawTileData.Make2DArray((int)mapData.TileWidth, (int)mapData.TileHeight);
 
             var map = new Map
             {

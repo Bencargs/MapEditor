@@ -1,4 +1,6 @@
-﻿namespace MapEngine
+﻿using System.Collections.Generic;
+
+namespace MapEngine
 {
     public static class EnumerableEx
     {
@@ -13,6 +15,11 @@
                 }
             }
             return output;
+        }
+
+        public static Queue<T> ToQueue<T>(this IEnumerable<T> source)
+        {
+            return new Queue<T>(source);
         }
     }
 }
