@@ -6,15 +6,6 @@
 		"TextureId": "Dummy"
 	},
 	"Movement": {
-		"FacingAngle":0,
-		"Velocity": {
-			"X":0,
-			"Y":0,
-		},
-		"Steering": {
-			"X":0,
-			"Y":0,
-		},
 		"MaxVelocity":100,
 		"Mass":1000,
 		"MaxForce":100,

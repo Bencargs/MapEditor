@@ -38,7 +38,11 @@ namespace MapEngine.ResourceLoading
                 var movement = u.Movement;
                 if (movement != null)
                 {
-                    entity.GetComponent<MovementComponent>().Destinations = ((IEnumerable<dynamic>)movement.Destinations)
+                    var movementComponent = entity.GetComponent<MovementComponent>();
+                    movementComponent.FacingAngle = (int)movement.FacingAngle;
+                    movementComponent.Velocity = new Vector2((int)movement.Velocity.X, (int)movement.Velocity.Y);
+                    movementComponent.Steering = new Vector2((int)movement.Steering.X, (int)movement.Steering.Y);
+                    movementComponent.Destinations = ((IEnumerable<dynamic>)movement.Destinations)
                         .Select(x => new MoveOrder
                         {
                             MovementMode = (MovementMode)Enum.Parse(typeof(MovementMode), (string)x.MovementMode),
@@ -81,9 +85,9 @@ namespace MapEngine.ResourceLoading
             {
                 entity.AddComponent(new MovementComponent
                 {
-                    FacingAngle = (int)movement.FacingAngle,
-                    Velocity = new Vector2((int)movement.Velocity.X, (int)movement.Velocity.Y),
-                    Steering = new Vector2((int)movement.Steering.X, (int)movement.Steering.Y),
+                    FacingAngle = 0,
+                    Velocity = Vector2.Zero,
+                    Steering = Vector2.Zero,
                     MaxVelocity = (float)movement.MaxVelocity,
                     Mass = (float)movement.Mass,
                     MaxForce = (float)movement.MaxForce,
