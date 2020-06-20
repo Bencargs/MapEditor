@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MapEngine.ResourceLoading;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -13,7 +14,7 @@ namespace MapEngine.Handlers
             foreach (var file in Directory.GetFiles(filepath, "*.gif"))
             {
                 var name = Path.GetFileNameWithoutExtension(file).ToUpper();
-                var animation = ResourceLoader.LoadAnimation(file);
+                var animation = TextureLoader.LoadAnimation(file);
                 var texture = new Texture(animation);
                 _textures.Add(name, texture);
             }
@@ -21,7 +22,7 @@ namespace MapEngine.Handlers
             foreach (var file in Directory.GetFiles(filepath, "*.png"))
             {
                 var name = Path.GetFileNameWithoutExtension(file);
-                var image = ResourceLoader.LoadImage(file);
+                var image = TextureLoader.LoadImage(file);
                 var texture = new Texture(image);
                 _textures.Add(name, texture);
             }

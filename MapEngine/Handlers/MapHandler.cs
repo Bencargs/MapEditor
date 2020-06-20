@@ -1,4 +1,5 @@
 ﻿using Common;
+using MapEngine.ResourceLoading;
 
 namespace MapEngine.Handlers
 {
@@ -17,7 +18,7 @@ namespace MapEngine.Handlers
             // Infuture this would load only relevant map textures
             //_textures.LoadTextures(@"C:\Source\MapEditor\MapEngine\Content\Textures\");
 
-            _map = ResourceLoader.LoadMap(mapFile);
+            _map = MapLoader.LoadMap(mapFile);
         }
 
         public void Render(IGraphics graphics)

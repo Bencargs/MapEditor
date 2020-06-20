@@ -6,12 +6,7 @@ namespace Common.Entities
     public class Entity
     {
         public int Id { get; set; }
-        public List<IComponent> Components { get; set; }
-
-        public Entity()
-        {
-            Components = new List<IComponent>();
-        }
+        public List<IComponent> Components { get; set; } = new List<IComponent>();
 
         public T GetComponent<T>()
             where T : IComponent

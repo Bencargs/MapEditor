@@ -1,9 +1,10 @@
 ﻿using Common.Entities;
 using MapEngine.Handlers;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 
-namespace MapEngine.Components
+namespace MapEngine.Entities.Components
 {
     public class MovementComponent : IComponent
     {
@@ -19,5 +20,20 @@ namespace MapEngine.Components
 
         public float StopRadius { get; set; }
         public Queue<MoveOrder> Destinations = new Queue<MoveOrder>();
+
+        public IComponent Clone()
+        {
+            return new MovementComponent
+            {
+                FacingAngle = FacingAngle,
+                Velocity = Velocity,
+                Steering = Steering,
+                MaxVelocity = MaxVelocity,
+                Mass = Mass,
+                MaxForce = MaxForce,
+                StopRadius = StopRadius,
+                Destinations = new Queue<MoveOrder>(Destinations.Select(x => x.Clone()))
+            };
+        }
     }
 }

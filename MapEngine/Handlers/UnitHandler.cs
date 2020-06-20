@@ -1,7 +1,9 @@
 ﻿using Common;
 using Common.Entities;
-using MapEngine.Components;
+using MapEngine.Entities.Components;
+using MapEngine.ResourceLoading;
 using System.Collections.Generic;
+using System.IO;
 
 namespace MapEngine.Handlers
 {
@@ -18,12 +20,26 @@ namespace MapEngine.Handlers
             _movementHandler = movementHandler;
         }
 
-        public void Init(string filename)
+        public void Init(string unitsFilepath, string mapFilepath)
         {
+            // todo: refactor this to: 
+            // unit = LoadUnitModel(); 
+            // LoadTexture(unit.Texture);
             _textures.LoadTextures(@"C:\Source\MapEditor\MapEngine\Content\Textures");
 
-            var unit = ResourceLoader.LoadUnit(filename);
-            _units.Add(_unitIndex++, unit);
+            var definitions = new Dictionary<string, Entity>();
+            foreach (var file in Directory.GetFiles(unitsFilepath, "*.json"))
+            {
+                var unit = UnitLoader.LoadUnitDefinition(file);
+                var type = unit.GetComponent<UnitComponent>();
+                definitions.Add(type.UnitType, unit);
+            }
+
+            var units = UnitLoader.LoadUnits(mapFilepath, definitions);
+            foreach (var unit in units)
+            {
+                _units.Add(_unitIndex++, unit);
+            }
         }
 
         public void Update()

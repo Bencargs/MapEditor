@@ -1,5 +1,6 @@
 ﻿using Common;
 using System;
+using System.Linq;
 using System.Windows.Media.Imaging;
 
 namespace MapEngine
@@ -19,21 +20,20 @@ namespace MapEngine
                     _index = newFrame;
                 }
 
-                var buffer = _frames[_index];
-                return new WpfImage(buffer);
+                return _frames[_index];
             }
         }
 
         private int _index;
-        private readonly WriteableBitmap[] _frames;
+        private readonly WpfImage[] _frames;
         private readonly int _frameRate;
         private DateTime _previous;
 
         public WpfAnimation(WriteableBitmap[] frames, int frameRate)
         {
-            _frames = frames;
-            Width = _frames[0].PixelWidth;
-            Height = _frames[0].PixelHeight;
+            _frames = frames.Select(x => new WpfImage(x)).ToArray();
+            Width = _frames[0].Width;
+            Height = _frames[0].Height;
 
             _frameRate = frameRate;
             _previous = DateTime.Now;
