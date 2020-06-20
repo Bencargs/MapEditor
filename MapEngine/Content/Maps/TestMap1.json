@@ -5,6 +5,13 @@
   "Description":"Water animation test",
   "TileWidth":3,
   "TileHeight":2,
+  "Camera": {
+	"X": 384,
+	"Y": 256,
+	"Z": 10,
+	"Width": 768,
+	"Height": 512
+  },
   "Teams": [
 	{
 		"Id":0,
@@ -34,7 +41,7 @@
 				"X":0,
 				"Y":0,
 			},
-			"Destinations":[{
+			"Destinations": [{
 				"MovementMode":"Seek",
 				"Destination":{
 						"X":50,

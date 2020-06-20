@@ -1,11 +1,11 @@
-﻿namespace Common
+﻿using Common.Collision;
+
+namespace Common
 {
-    public class Rectangle
+    public class Rectangle : BoundingBox
     {
-        public int X { get; }
-        public int Y { get; }
-        public int Width { get; }
-        public int Height { get; }
+        public int X { get; set; }
+        public int Y { get; set; }
 
         public Rectangle(int x, int y, int width, int height)
         {

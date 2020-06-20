@@ -9,6 +9,7 @@ namespace MapEngine
         private readonly IGraphics _graphics;
         private readonly UnitHandler _unitHandler;
         private readonly MapHandler _mapHandler;
+        private readonly CameraHandler _cameraHandler;
 
         public Scene(IGraphics graphics)
         {
@@ -17,6 +18,7 @@ namespace MapEngine
             // replace with injected singleton
             var textures = new TextureHandler();
 
+            _cameraHandler = new CameraHandler();
             _mapHandler = new MapHandler(textures);
             _unitHandler = new UnitHandler(textures, new MovementHandler());
         }
@@ -24,6 +26,7 @@ namespace MapEngine
         public void Initialise()
         {
             var mapFilename = @"C:\Source\MapEditor\MapEngine\Content\Maps\TestMap1.json";
+            _cameraHandler.Init(mapFilename);
             _mapHandler.Init(mapFilename);
 
             var unitsPath = @"C:\Source\MapEditor\MapEngine\Content\Units\";
@@ -39,6 +42,7 @@ namespace MapEngine
 
         private void Update()
         {
+            _cameraHandler.Update();
             _unitHandler.Update();
         }
 
