@@ -4,9 +4,9 @@ namespace Common
 {
     public class Camera
     {
-        public Vector3 Location { get; set; }
         public Rectangle Viewport { get; set; }
         public Rectangle InnerViewport { get; set; }
-        public Vector2 Target => Vector2.Zero;
+        public Vector3 Location { get; set; }
+        public Vector3 Target => new Vector3(Viewport.X, Viewport.Y, 0);
     }
 }

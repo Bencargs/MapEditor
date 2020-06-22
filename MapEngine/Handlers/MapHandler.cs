@@ -15,18 +15,18 @@ namespace MapEngine.Handlers
 
         public void Init(string mapFile)
         {
-            // Infuture this would load only relevant map textures
+            // In future this would load only relevant map textures
             //_textures.LoadTextures(@"C:\Source\MapEditor\MapEngine\Content\Textures\");
 
             _map = MapLoader.LoadMap(mapFile);
         }
 
-        public void Render(IGraphics graphics)
+        public void Render(Rectangle viewport, IGraphics graphics)
         {
-            DrawTiles(graphics, _map.Tiles);
+            DrawTiles(viewport, graphics, _map.Tiles);
         }
 
-        private void DrawTiles(IGraphics graphics, Tile[,] tiles)
+        private void DrawTiles(Rectangle viewport, IGraphics graphics, Tile[,] tiles)
         {
             foreach (var tile in tiles)
             {
@@ -36,6 +36,7 @@ namespace MapEngine.Handlers
                 if (_textures.TryGetTexture(tile.TextureId, out var texture))
                 {
                     var area = new Rectangle((int)tile.Location.X, (int)tile.Location.Y, texture.Width, texture.Height);
+                    area.Translate(viewport.X, viewport.Y);
                     graphics.DrawImage(texture.Image, area);
                 }
             }

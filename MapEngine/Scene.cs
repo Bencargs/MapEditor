@@ -25,7 +25,7 @@ namespace MapEngine
 
         public void Initialise()
         {
-            var mapFilename = @"C:\Source\MapEditor\MapEngine\Content\Maps\TestMap1.json";
+            var mapFilename = @"C:\Source\MapEditor\MapEngine\Content\Maps\TestMap0.json";
             _cameraHandler.Init(mapFilename);
             _mapHandler.Init(mapFilename);
 
@@ -50,8 +50,9 @@ namespace MapEngine
         {
             _graphics.Clear();
 
-            _mapHandler.Render(_graphics);
-            _unitHandler.Render(_graphics);
+            var viewport = _cameraHandler.GetViewport();
+            _mapHandler.Render(viewport, _graphics);
+            _unitHandler.Render(viewport, _graphics);
 
             _graphics.Render();
         }

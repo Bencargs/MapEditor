@@ -20,11 +20,8 @@ namespace MapEngine.ResourceLoading
 
             var camera = new Camera
             {
-                Location = new Vector3(x, y, z),
-                Viewport = new Rectangle(x - (width / 2),
-                                         y - (height / 2),
-                                         width,
-                                         height)
+                Location = new Vector3((width / 2) + x, (height / 2) + y, z),
+                Viewport = new Rectangle(x, y, width, height)
             };
             return camera;
         }

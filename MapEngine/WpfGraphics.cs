@@ -39,10 +39,16 @@ namespace MapEngine
 
         public void DrawImage(IImage image, Rectangle area)
         {
+            var maxWidth = Width * 4 - area.X * 4;
+            var maxHeight = Height * 4 - area.X * 4;
+            
             for (int y = 0; y < image.Height * 4; y+=4)
             {
                 for (int x = 0; x < image.Width * 4; x += 4)
                 {
+                    if (x > maxWidth || y > maxHeight)
+                        continue;
+
                     var offset = Math.Max(0, (area.X * 4) + (area.Y * Width * 4));
                     var i = Math.Min(_backBuffer.Length - 4, x + (y * Width) + offset);
                     var colour = image[x, y];

@@ -1,0 +1,47 @@
+{
+  "Width": 768,
+  "Height": 512,
+  "Heightmap": "WaterHeightmap.png",
+  "Description":"Water animation test",
+  "TileWidth":1,
+  "TileHeight":1,
+  "Camera": {
+	"X": 0,
+	"Y": 0,
+	"Z": 10,
+	"Width": 768,
+	"Height": 512
+  },
+  "Teams": [
+	{
+		"Id":0,
+		"Name":"Player"
+	},
+	{
+		"Id":1,
+		"Name":"AI"
+	}
+  ],
+  "Units": [
+	{
+		"Id":1,
+		"Team":1,
+		"Type":"Dummy",
+		"Location":{
+			"X":50,
+			"Y":50
+		}
+	}
+  ],
+  "Tiles": [
+    {
+      "Id": 0,
+      "Location": {
+        "X": 0,
+        "Y": 0
+      },
+      "TextureId": "Waves",
+      "Type": 1
+    },
+  ]
+}

@@ -4,9 +4,10 @@ namespace Common.Collision
 {
     public interface ICollider
     {
-        Vector2 Position { get; set; }
+        Vector2 Location { get; set; }
 
-        bool Contains(ICollider collider);
-        bool Contains(Vector2 point);
+        bool HasCollided(ICollider collider);
+
+        ICollider Clone();
     }
 }

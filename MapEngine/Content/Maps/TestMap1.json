@@ -6,8 +6,8 @@
   "TileWidth":3,
   "TileHeight":2,
   "Camera": {
-	"X": 384,
-	"Y": 256,
+	"X": 0,
+	"Y": 0,
 	"Z": 10,
 	"Width": 768,
 	"Height": 512

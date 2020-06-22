@@ -6,9 +6,9 @@ namespace Common.Collision
     {
         public int Width { get; set; }
         public int Height { get; set; }
-        public Vector2 Position { get; set; }
+        public Vector2 Location { get; set; }
 
-        public bool Contains(ICollider collider)
+        public bool HasCollided(ICollider collider)
         {
             if (collider is BoundingCircle circle)
                 return CollisionEx.Contains(this, circle);
@@ -19,9 +19,14 @@ namespace Common.Collision
             return false;
         }
 
-        public bool Contains(Vector2 point)
+        public ICollider Clone()
         {
-            return CollisionEx.Contains(this, point);
+            return new BoundingBox
+            {
+                Width = Width,
+                Height = Height,
+                Location = new Vector2(Location.X, Location.Y)
+            };
         }
     }
 }

@@ -5,9 +5,9 @@ namespace Common.Collision
     public class BoundingCircle : ICollider
     {
         public int Radius { get; set; }
-        public Vector2 Position { get; set; }
+        public Vector2 Location { get; set; }
 
-        public bool Contains(ICollider collider)
+        public bool HasCollided(ICollider collider)
         {
             if (collider is BoundingCircle circle)
                 return CollisionEx.Contains(this, circle);
@@ -18,9 +18,13 @@ namespace Common.Collision
             return false;
         }
 
-        public bool Contains(Vector2 point)
+        public ICollider Clone()
         {
-            return CollisionEx.Contains(this, point);
+            return new BoundingCircle
+            {
+                Radius = Radius,
+                Location = new Vector2(Location.X, Location.Y)
+            };
         }
     }
 }
