@@ -1,11 +1,14 @@
-﻿namespace Common
+﻿using Common.Collision;
+using System.Numerics;
+
+namespace Common
 {
     public class Rectangle
     {
-        public int X { get; }
-        public int Y { get; }
-        public int Width { get; }
-        public int Height { get; }
+        public int X { get; set; }
+        public int Y { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
 
         public Rectangle(int x, int y, int width, int height)
         {
@@ -13,6 +16,20 @@
             Y = y;
             Width = width;
             Height = height;
+        }
+
+        public bool Contains(Vector2 point)
+        {
+            return X <= point.X &&
+                   point.X < X + Width &&
+                   Y <= point.Y &&
+                   point.Y < Y + Height;
+        }
+
+        public void Translate(int x, int y)
+        {
+            X += x;
+            Y += y;
         }
     }
 }

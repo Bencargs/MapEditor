@@ -1,4 +1,4 @@
-﻿namespace MapEngine
+﻿namespace Common
 {
     public class Team
     {

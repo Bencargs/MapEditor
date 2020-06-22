@@ -47,7 +47,7 @@ namespace MapEngine.Handlers
             _movementHandler.Handle(_units[0]);
         }
 
-        public void Render(IGraphics graphics)
+        public void Render(Rectangle viewport, IGraphics graphics)
         {
             foreach (var unit in _units.Values)
             {
@@ -56,6 +56,7 @@ namespace MapEngine.Handlers
                 if (_textures.TryGetTexture(textureId, out var texture))
                 {
                     var area = texture.Area(location);
+                    area.Translate(viewport.X, viewport.Y);
                     graphics.DrawImage(texture.Image, area);
                 }
             }

@@ -12,8 +12,10 @@ namespace MapEngine.Handlers
         {
             var location = entity.GetComponent<LocationComponent>();
             var movement = entity.GetComponent<MovementComponent>();
+            if (location == null || movement == null)
+                return;
 
-            if (HasGetTarget(location, movement, out var target))
+            if (TryGetTarget(location, movement, out var target))
             {
                 switch (target.MovementMode)
                 {
@@ -33,7 +35,7 @@ namespace MapEngine.Handlers
             location.Location += movement.Velocity;
         }
 
-        private static bool HasGetTarget(LocationComponent location, MovementComponent movement, out MoveOrder target)
+        private static bool TryGetTarget(LocationComponent location, MovementComponent movement, out MoveOrder target)
         {
             target = movement.Destinations.FirstOrDefault();
             if (target == null)
