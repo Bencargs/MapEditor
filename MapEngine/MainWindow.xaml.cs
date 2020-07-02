@@ -1,4 +1,5 @@
 ﻿using Common;
+using MapEngine.Commands;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -29,6 +30,10 @@ namespace MapEngine
         public MainWindow()
         {
             InitializeComponent();
+
+            var container = RegistrationModule.Init();
+            var messageHub = new MessageHub(container);
+            messageHub.Initialise();
 
             var image = new WpfImage(640, 480);
             frontBuffer.Source = image.Bitmap;

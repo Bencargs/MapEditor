@@ -39,12 +39,12 @@ namespace MapEngine
 
         public void DrawImage(IImage image, Rectangle area)
         {
-            var maxWidth = Width * 4 - area.X * 4;
+            var maxWidth = Width * 4 - area.X * 4 - 1; // Why -1? god only knows..
             var maxHeight = Height * 4 - area.Y * 4;
             
             for (int y = 0; y < image.Height * 4; y+=4)
             {
-                for (int x = 0; x < image.Width * 4; x += 4)
+                for (int x = 0; x < image.Width * 4; x+=4)
                 {
                     if (x > maxWidth || y > maxHeight)
                         continue; // Dont draw outside the bounds
