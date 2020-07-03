@@ -1,6 +1,5 @@
 ﻿using Common;
 using MapEngine.Handlers;
-using System;
 
 namespace MapEngine
 {
@@ -11,16 +10,12 @@ namespace MapEngine
         private readonly MapHandler _mapHandler;
         private readonly CameraHandler _cameraHandler;
 
-        public Scene(IGraphics graphics)
+        public Scene(IGraphics graphics, CameraHandler cameraHandler, MapHandler mapHandler, UnitHandler unitHandler)
         {
             _graphics = graphics;
-
-            // replace with injected singleton
-            var textures = new TextureHandler();
-
-            _cameraHandler = new CameraHandler();
-            _mapHandler = new MapHandler(textures);
-            _unitHandler = new UnitHandler(textures, new MovementHandler());
+            _cameraHandler = cameraHandler;
+            _mapHandler = mapHandler;
+            _unitHandler = unitHandler;
         }
 
         public void Initialise()
