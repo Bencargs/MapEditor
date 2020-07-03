@@ -10,7 +10,7 @@ namespace MapEngine.Commands
     {
         private IContainer _container;
         private Dictionary<Type, List<(object, MethodInfo)>> _handlers;
-        private List<ICommand> _messages = new List<ICommand>();
+        private Queue<ICommand> _messages = new Queue<ICommand>();
 
         public MessageHub(IContainer container)
         {
@@ -29,12 +29,12 @@ namespace MapEngine.Commands
 
         public void Post(ICommand command)
         {
-            _messages.Add(command);
+            _messages.Enqueue(command);
         }
 
         public void Notify()
         {
-            foreach (var message in _messages)
+            while (_messages.TryDequeue(out var message))
             {
                 var handlers = _handlers[message.GetType()];
                 foreach (var (handler, method) in handlers)

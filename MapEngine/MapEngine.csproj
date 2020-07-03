@@ -75,6 +75,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Commands\CreateEntityCommand.cs" />
     <Compile Include="Commands\ICommand.cs" />
     <Compile Include="Commands\IHandleCommand.cs" />
     <Compile Include="Commands\MessageHub.cs" />

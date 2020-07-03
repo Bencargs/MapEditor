@@ -1,5 +1,6 @@
 ﻿using Common;
 using Common.Entities;
+using MapEngine.Commands;
 using MapEngine.Entities.Components;
 using MapEngine.ResourceLoading;
 using System.Collections.Generic;
@@ -7,12 +8,14 @@ using System.IO;
 
 namespace MapEngine.Handlers
 {
-    public class UnitHandler
+    public class UnitHandler 
+        : IHandleCommand<CreateEntityCommand>
     {
         private int _unitIndex;
         private readonly TextureHandler _textures;
         private readonly MovementHandler _movementHandler;
         private readonly Dictionary<int, Entity> _units = new Dictionary<int, Entity>();
+        private readonly Dictionary<string, Entity> _prototypes = new Dictionary<string, Entity>();
 
         public UnitHandler(TextureHandler textures, MovementHandler movementHandler)
         {
@@ -20,22 +23,21 @@ namespace MapEngine.Handlers
             _movementHandler = movementHandler;
         }
 
-        public void Init(string unitsFilepath, string mapFilepath)
+        public void Initialise(string unitsFilepath, string mapFilename)
         {
             // todo: refactor this to: 
             // unit = LoadUnitModel(); 
             // LoadTexture(unit.Texture);
             _textures.LoadTextures(@"C:\Source\MapEditor\MapEngine\Content\Textures");
 
-            var definitions = new Dictionary<string, Entity>();
             foreach (var file in Directory.GetFiles(unitsFilepath, "*.json"))
             {
                 var unit = UnitLoader.LoadUnitDefinition(file);
                 var type = unit.GetComponent<UnitComponent>();
-                definitions.Add(type.UnitType, unit);
+                _prototypes.Add(type.UnitType, unit);
             }
 
-            var units = UnitLoader.LoadUnits(mapFilepath, definitions);
+            var units = UnitLoader.LoadUnits(mapFilename, _prototypes);
             foreach (var unit in units)
             {
                 _units.Add(_unitIndex++, unit);
@@ -44,7 +46,10 @@ namespace MapEngine.Handlers
 
         public void Update()
         {
-            _movementHandler.Handle(_units[0]);
+            foreach (var (_, unit) in _units)
+            {
+                _movementHandler.Handle(unit);
+            }
         }
 
         public void Render(Rectangle viewport, IGraphics graphics)
@@ -60,6 +65,15 @@ namespace MapEngine.Handlers
                     graphics.DrawImage(texture.Image, area);
                 }
             }
+        }
+
+        public void Handle(CreateEntityCommand command)
+        {
+            var unit = command.Entity.GetComponent<UnitComponent>();
+            if (unit == null)
+                return;
+
+            _units.Add(_unitIndex++, command.Entity);
         }
     }
 }
