@@ -1,5 +1,7 @@
-﻿using Common;
+﻿using Autofac;
+using Common;
 using MapEngine.Commands;
+using MapEngine.Handlers;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -31,35 +33,24 @@ namespace MapEngine
         {
             InitializeComponent();
 
-            var container = RegistrationModule.Init();
+            var container = RegistrationModule.Initialise();
+
             var messageHub = new MessageHub(container);
             messageHub.Initialise();
 
-            var image = new WpfImage(640, 480);
-            frontBuffer.Source = image.Bitmap;
-
-            var graphics = new WpfGraphics(image);
-            _scene = new Scene(graphics);
+            var graphics = container.Resolve<WpfGraphics>();
+            _scene = new Scene(graphics, 
+                container.Resolve<CameraHandler>(), 
+                container.Resolve<MapHandler>(), 
+                container.Resolve<UnitHandler>());
             _scene.Initialise();
+
+            frontBuffer.Source = graphics.Bitmap;
 
             var dispatcherTimer = new DispatcherTimer();
             dispatcherTimer.Tick += Update;
             dispatcherTimer.Interval = TimeSpan.FromMilliseconds(20);
             dispatcherTimer.Start();
-
-            // Scene...
-            //_graphics.Clear();
-
-            //_graphics.Render();
-
-            // graphics
-            // scene
-            // unit
-            // camera
-            // mouse (input handler)
-
-            // load things
-
         }
 
         private void Update(object sender, EventArgs e)

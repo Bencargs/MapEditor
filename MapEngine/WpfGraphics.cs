@@ -1,6 +1,7 @@
 ﻿using Common;
 using System;
 using System.Numerics;
+using System.Windows.Media.Imaging;
 
 namespace MapEngine
 {
@@ -8,11 +9,12 @@ namespace MapEngine
     {
         public int Width { get; }
         public int Height { get; }
+        public WriteableBitmap Bitmap => _window.Bitmap;
         
-        private readonly IImage _window;
+        private readonly WpfImage _window;
         private byte[] _backBuffer;
 
-        public WpfGraphics(IImage image)
+        public WpfGraphics(WpfImage image)
         {
             Width = image.Width;
             Height = image.Height;
