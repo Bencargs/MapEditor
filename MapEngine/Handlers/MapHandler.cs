@@ -13,7 +13,7 @@ namespace MapEngine.Handlers
             _textures = textures;
         }
 
-        public void Init(string mapFile)
+        public void Initialise(string mapFile)
         {
             // In future this would load only relevant map textures
             //_textures.LoadTextures(@"C:\Source\MapEditor\MapEngine\Content\Textures\");

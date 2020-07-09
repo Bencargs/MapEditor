@@ -27,7 +27,7 @@ namespace MapEngine
     /// </summary>
     public partial class MainWindow : Window
     {
-        private Scene _scene;
+        private readonly Scene _scene;
 
         public MainWindow()
         {
@@ -36,13 +36,14 @@ namespace MapEngine
             var container = RegistrationModule.Initialise();
 
             var messageHub = new MessageHub(container);
-            messageHub.Initialise();
 
             var graphics = container.Resolve<WpfGraphics>();
-            _scene = new Scene(graphics, 
-                container.Resolve<CameraHandler>(), 
-                container.Resolve<MapHandler>(), 
-                container.Resolve<UnitHandler>());
+            _scene = new Scene(graphics, messageHub,
+                container.Resolve<MapHandler>(),
+                container.Resolve<UnitHandler>(),
+                container.Resolve<CameraHandler>());
+
+            messageHub.Initialise();
             _scene.Initialise();
 
             frontBuffer.Source = graphics.Bitmap;

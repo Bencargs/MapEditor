@@ -3,6 +3,6 @@
     public interface IHandleCommand<T>
         where T : ICommand
     {
-        void Handle(T Command);
+        void Handle(T command);
     }
 }

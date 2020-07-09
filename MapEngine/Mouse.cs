@@ -11,7 +11,7 @@ namespace MapEngine
             get
             {
                 // Temporary for testing
-                return new Vector2(767, 511);
+                return new Vector2(100, 100);
             }
         }
     }

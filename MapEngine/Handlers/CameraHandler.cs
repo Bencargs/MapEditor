@@ -9,7 +9,7 @@ namespace MapEngine.Handlers
         private const int _viewportOffset = 30; //todo: camera settings?
         private const int _moveSpeed = 2;
 
-        public void Init(string mapFilename)
+        public void Initialise(string mapFilename)
         {
             _camera = CameraLoader.LoadCamera(mapFilename);
             _camera.InnerViewport = new Rectangle(_camera.Viewport.X + _viewportOffset,

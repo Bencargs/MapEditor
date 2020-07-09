@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace MapEngine
 {
@@ -20,6 +21,23 @@ namespace MapEngine
         public static Queue<T> ToQueue<T>(this IEnumerable<T> source)
         {
             return new Queue<T>(source);
+        }
+
+        public static bool TryDequeue<T>(this Queue<T> source, out T result)
+        {
+            result = default;
+            if (source.Any())
+            {
+                result = source.Dequeue();
+                return true;
+            }
+            return false;
+        }
+
+        public static void Deconstruct<T1, T2>(this KeyValuePair<T1, T2> tuple, out T1 key, out T2 value)
+        {
+            key = tuple.Key;
+            value = tuple.Value;
         }
     }
 }
