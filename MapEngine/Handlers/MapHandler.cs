@@ -1,4 +1,5 @@
 ﻿using Common;
+using MapEngine.Factories;
 using MapEngine.ResourceLoading;
 
 namespace MapEngine.Handlers
@@ -6,12 +7,6 @@ namespace MapEngine.Handlers
     public class MapHandler
     {
         private Map _map;
-        private TextureHandler _textures = new TextureHandler();
-
-        public MapHandler(TextureHandler textures)
-        {
-            _textures = textures;
-        }
 
         public void Initialise(string mapFile)
         {
@@ -33,7 +28,7 @@ namespace MapEngine.Handlers
                 if (tile == null)
                     continue;
 
-                if (_textures.TryGetTexture(tile.TextureId, out var texture))
+                if (TextureFactory.TryGetTexture(tile.TextureId, out var texture))
                 {
                     var area = new Rectangle((int)tile.Location.X, (int)tile.Location.Y, texture.Width, texture.Height);
                     area.Translate(viewport.X, viewport.Y);

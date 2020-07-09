@@ -4,5 +4,11 @@
 		"Width":24,
 		"Height":24,
 		"TextureId": "Dummy",
+	},
+	"Area": {
+		"BoundingBox": {
+			"Width":24,
+			"Height":24,
+		}
 	}
 }

@@ -7,5 +7,7 @@
         Image,
         Movement,
         Unit,
+        Weapon,
+        Collision
     }
 }

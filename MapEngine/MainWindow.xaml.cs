@@ -35,15 +35,14 @@ namespace MapEngine
 
             var container = RegistrationModule.Initialise();
 
-            var messageHub = new MessageHub(container);
-
+            var messageHub = container.Resolve<MessageHub>();
             var graphics = container.Resolve<WpfGraphics>();
             _scene = new Scene(graphics, messageHub,
                 container.Resolve<MapHandler>(),
                 container.Resolve<UnitHandler>(),
                 container.Resolve<CameraHandler>());
 
-            messageHub.Initialise();
+            messageHub.Initialise(container);
             _scene.Initialise();
 
             frontBuffer.Source = graphics.Bitmap;

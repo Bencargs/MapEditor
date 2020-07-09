@@ -1,4 +1,5 @@
 ﻿using Common;
+using Common.Collision;
 using Common.Entities;
 using MapEngine.Commands;
 using MapEngine.Entities.Components;
@@ -60,7 +61,8 @@ namespace MapEngine
                         Components = new List<IComponent>
                         {
                             new LocationComponent { Location = new Vector2(300, 300) },
-                            new UnitComponent { UnitType = "projectile", TeamId = 1 },
+                            //new DamageComponent { },
+                            new CollisionComponent (new BoundingCircle { Radius = 10 } ),
                             new ImageComponent { TextureId = "projectile" },
                             new MovementComponent
                             {
@@ -74,7 +76,7 @@ namespace MapEngine
                                 {
                                     new MoveOrder
                                     {
-                                        Destination = new Vector2(300, 50),
+                                        Destination = new Vector2(320, 50),
                                         MovementMode = MovementMode.Seek,
                                     }
                                 })

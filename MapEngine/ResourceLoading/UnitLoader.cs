@@ -1,4 +1,5 @@
-﻿using Common.Entities;
+﻿using Common.Collision;
+using Common.Entities;
 using MapEngine.Entities.Components;
 using MapEngine.Handlers;
 using Newtonsoft.Json;
@@ -92,7 +93,23 @@ namespace MapEngine.ResourceLoading
                     Mass = (float)movement.Mass,
                     MaxForce = (float)movement.MaxForce,
                     StopRadius = (float)movement.StopRadius,
+                    BrakeForce = (float)movement.BrakeForce
                 });
+            }
+
+            var area = unitData.Area;
+            if (area != null)
+            {
+                ICollider collider = null;
+                if (area.BoundingBox != null)
+                {
+                    collider = new BoundingBox
+                    {
+                        Width = (int)area.BoundingBox.Width,
+                        Height = (int)area.BoundingBox.Height
+                    };
+                }
+                entity.AddComponent(new CollisionComponent(collider));
             }
 
             return entity;
