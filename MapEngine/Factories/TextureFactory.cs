@@ -5,7 +5,7 @@ using System.IO;
 
 namespace MapEngine.Factories
 {
-    public static class TextureFactory
+    public class TextureFactory
     {
         public static Dictionary<string, Texture> _textures = new Dictionary<string, Texture>(StringComparer.OrdinalIgnoreCase);
 

@@ -8,6 +8,9 @@ using System.Numerics;
 
 namespace MapEngine.Handlers
 {
+    /// <summary>
+    /// Responsible for determining if collisions occur for collider entities
+    /// </summary>
     public class CollisionHandler 
         : IHandleCommand<CreateEntityCommand>
         , IHandleCommand<DestroyEntityCommand>
@@ -43,7 +46,7 @@ namespace MapEngine.Handlers
             return impactForce;
         }
 
-        private IEnumerable<(Entity entity, float distance)> GetCollisions(ICollider source)
+        public IEnumerable<(Entity entity, float distance)> GetCollisions(ICollider source)
         {
             foreach (var c in _entities)
             {

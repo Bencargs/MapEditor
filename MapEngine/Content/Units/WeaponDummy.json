@@ -1,0 +1,18 @@
+{
+	"Type":"WeaponDummy",
+	"Image": {
+		"Width":24,
+		"Height":24,
+		"TextureId": "Dummy"
+	},
+	"Movement": {
+		"MaxVelocity":100,
+		"Mass":1000,
+		"MaxForce":100,
+		"StopRadius":10,
+		"BrakeForce":0.05
+	},
+	"Weapons": [
+		"Cannon",
+	]
+}

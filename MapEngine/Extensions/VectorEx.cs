@@ -10,6 +10,23 @@ namespace MapEngine
             return (float)(Math.Atan2(source.Y, source.X) + Math.PI / 2);
         }
 
+        /// <summary>
+        /// A
+        /// | \
+        /// |   \
+        /// |___( B
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        public static float Angle(this Vector2 source, Vector2 target)
+        {
+            double sin = source.X * target.Y - target.X * source.Y;
+            double cos = source.X * target.X + source.Y * target.Y;
+
+            return (float)(Math.Atan2(sin, cos) * (180 / Math.PI));
+        }
+
         public static Vector2 Truncate(this Vector2 source, float max)
         {
             if (source.Length() > max)

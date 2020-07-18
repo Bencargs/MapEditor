@@ -1,6 +1,7 @@
 ﻿using Common.Collision;
 using Common.Entities;
 using MapEngine.Entities.Components;
+using MapEngine.Factories;
 using MapEngine.Handlers;
 using Newtonsoft.Json;
 using System;
@@ -13,7 +14,7 @@ namespace MapEngine.ResourceLoading
 {
     public static class UnitLoader
     {
-        public static Entity[] LoadUnits(string mapFile, Dictionary<string, Entity> definitions)
+        public static Entity[] LoadUnits(string mapFile)
         {
             var json = File.ReadAllText(mapFile);
             dynamic mapData = JsonConvert.DeserializeObject(json);
@@ -21,8 +22,8 @@ namespace MapEngine.ResourceLoading
             var units = ((IEnumerable<dynamic>)mapData.Units).Select(u =>
             {
                 //Eg. flyweight pattern
-                var entity = Clone(definitions[(string)u.Type]);
-                entity.Id = (int)u.Id;
+                UnitFactory.TryGetUnit((string)u.Type, out var prototype);
+                var entity = Clone((int)u.Id, prototype);
 
                 var location = u.Location;
                 if (location != null)
@@ -112,16 +113,32 @@ namespace MapEngine.ResourceLoading
                 entity.AddComponent(new CollisionComponent(collider));
             }
 
+            var weapons = unitData.Weapons;
+            if (weapons != null)
+            {
+                foreach (string weaponId in (IEnumerable<dynamic>) weapons)
+                {
+                    if (!WeaponFactory.TryGetWeapon(weaponId, out var weapon))
+                        continue;
+
+                    entity.AddComponent(weapon);
+                }
+            }
+
             return entity;
         }
 
-        private static Entity Clone(Entity entity)
+
+        // todo: move this to an entity extension class?
+        // or put it on entity class?
+        private static Entity Clone(int id, Entity entity)
         {
             var clone = new Entity();
             foreach (var component in entity.Components)
             {
                 clone.Components.Add(component.Clone());
             }
+            clone.Id = id;
             return clone;
         }
     }

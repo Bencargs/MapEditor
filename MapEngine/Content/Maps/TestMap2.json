@@ -1,0 +1,120 @@
+{
+  "Width": 768,
+  "Height": 512,
+  "Heightmap": "WaterHeightmap.png",
+  "Description":"Water animation test",
+  "TileWidth":3,
+  "TileHeight":2,
+  "Camera": {
+	"X": 0,
+	"Y": 0,
+	"Z": 10,
+	"Width": 768,
+	"Height": 512
+  },
+  "Teams": [
+	{
+		"Id":0,
+		"Name":"Player"
+	},
+	{
+		"Id":1,
+		"Name":"AI"
+	}
+  ],
+  "Units": [
+	{
+		"Id":0,
+		"Team":0,
+		"Type":"WeaponDummy",
+		"Location":{
+			"X":250,
+			"Y":250
+		},
+		"Movement": {
+			"FacingAngle":0,
+			"Velocity": {
+				"X":0,
+				"Y":0,
+			},
+			"Steering": {
+				"X":0,
+				"Y":0,
+			},
+			"Destinations": [{
+				"MovementMode":"Seek",
+				"Destination":{
+						"X":50,
+						"Y":50
+					}
+				}
+			]
+		}
+	},
+	{
+		"Id":1,
+		"Team":1,
+		"Type":"Dummy",
+		"Location":{
+			"X":300,
+			"Y":50
+		}
+	}
+  ],
+  "Tiles": [
+    {
+      "Id": 0,
+      "Location": {
+        "X": 0,
+        "Y": 0
+      },
+      "TextureId": "Waves",
+      "Type": 1
+    },
+    {
+      "Id": 1,
+      "Location": {
+        "X": 253,
+        "Y": 0
+      },
+      "TextureId": "Waves",
+      "Type": 1
+    },
+    {
+      "Id": 2,
+      "Location": {
+        "X": 0,
+        "Y": 253
+      },
+      "TextureId": "Waves",
+      "Type": 1
+    },
+    {
+      "Id": 3,
+      "Location": {
+        "X": 253,
+        "Y": 253
+      },
+      "TextureId": "Waves",
+      "Type": 1
+    },
+    {
+      "Id": 4,
+      "Location": {
+        "X": 506,
+        "Y": 0
+      },
+      "TextureId": "Waves",
+      "Type": 1
+    },
+    {
+      "Id": 5,
+      "Location": {
+        "X": 506,
+        "Y": 253
+      },
+      "TextureId": "Waves",
+      "Type": 1
+    }
+  ]
+}

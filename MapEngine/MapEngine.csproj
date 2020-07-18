@@ -86,16 +86,18 @@
     <Compile Include="Entities\Components\MovementComponent.cs" />
     <Compile Include="Entities\Components\WeaponComponent.cs" />
     <Compile Include="Extensions\EnumerableEx.cs" />
+    <Compile Include="Factories\UnitFactory.cs" />
     <Compile Include="Handlers\CameraHandler.cs" />
     <Compile Include="Handlers\CollisionHandler.cs" />
     <Compile Include="Handlers\MapHandler.cs" />
     <Compile Include="Handlers\MovementHandler\MovementHandler.cs" />
     <Compile Include="Handlers\MovementHandler\MoveOrder.cs" />
     <Compile Include="Factories\TextureFactory.cs" />
-    <Compile Include="Handlers\UnitHandler.cs" />
+    <Compile Include="Handlers\EntityHandler.cs" />
     <Compile Include="Extensions\ImageEx.cs" />
     <Compile Include="Entities\Components\LocationComponent.cs" />
     <Compile Include="Factories\WeaponFactory.cs" />
+    <Compile Include="Handlers\WeaponHandler.cs" />
     <Compile Include="Map.cs" />
     <Compile Include="Handlers\MovementHandler\MovementMode.cs" />
     <Compile Include="Mouse.cs" />
@@ -161,9 +163,6 @@
       <Name>SoftEngine</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Content\Maps\" />
-    <Folder Include="Content\Textures\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

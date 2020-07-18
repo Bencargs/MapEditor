@@ -41,12 +41,15 @@ namespace MapEngine.Handlers
             {
                 switch (target.MovementMode)
                 {
+                    case MovementMode.Direct:
+                        location.Location += movement.Velocity;
+                        break;
                     case MovementMode.Seek:
                         Seek(location, movement, target.Destination);
+                        ApplyFriction(location, movement);
                         break;
                 }
             }
-            ApplyFriction(location, movement);
             HandleCollisions(entity);
         }
 
@@ -62,8 +65,8 @@ namespace MapEngine.Handlers
                 if (impactForce > collider.MaxImpactForce)
                 {
                     // todo: explosions!
-                    //var explosion = ExplosionFactory.Create(entity);
-                    //_messageHub.Post(new CreateEntityCommand{ Entity = explosion });
+                    //var explosion = ParticleFactory.Create(entity);
+                    //_messageHub.Post(new CreateEffectCommand { Entity = explosion });
                     _messageHub.Post(new DestroyEntityCommand { Entity = entity });
                 }
             }
@@ -74,7 +77,6 @@ namespace MapEngine.Handlers
             const float Friction = 0.95f; // Ideally this would be a property of the map tile
 
             movement.Velocity *= Friction;
-            location.Location += movement.Velocity;
         }
 
         private static void ApplyBrakeForce(MovementComponent movement)

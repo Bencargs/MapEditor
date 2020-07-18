@@ -5,59 +5,54 @@ using MapEngine.Entities.Components;
 using MapEngine.Factories;
 using MapEngine.ResourceLoading;
 using System.Collections.Generic;
-using System.IO;
 
 namespace MapEngine.Handlers
 {
-    public class UnitHandler 
+    /// <summary>
+    /// Responsible for corrdinating component handlers
+    /// to represent update of entity state
+    /// </summary>
+    public class EntityHandler
         : IHandleCommand<CreateEntityCommand>
         , IHandleCommand<DestroyEntityCommand>
     {
         private readonly MessageHub _messageHub;
+        private readonly WeaponHandler _weaponHandler;
         private readonly MovementHandler _movementHandler;
-        private readonly Dictionary<int, Entity> _entities = new Dictionary<int, Entity>();
-        private readonly Dictionary<string, Entity> _prototypes = new Dictionary<string, Entity>();
+        private readonly List<Entity> _entities = new List<Entity>();
 
-        public UnitHandler(MessageHub messageHub, MovementHandler movementHandler)
+        public EntityHandler(MessageHub messageHub, MovementHandler movementHandler, WeaponHandler weaponHandler)
         {
             _messageHub = messageHub;
+            _weaponHandler = weaponHandler;
             _movementHandler = movementHandler;
         }
 
-        public void Initialise(string unitsFilepath, string mapFilename)
+        public void Initialise(string unitsFilepath, string mapFilename, string weaponFilepath)
         {
             // todo: refactor this to: 
             // unit = LoadUnitModel(); 
             // LoadTexture(unit.Texture);
             TextureFactory.LoadTextures(@"C:\Source\MapEditor\MapEngine\Content\Textures");
+            WeaponFactory.LoadWeapons(weaponFilepath); // todo: code stink - requires factories to be initialised in an order
+            UnitFactory.LoadUnits(unitsFilepath);
 
-            foreach (var file in Directory.GetFiles(unitsFilepath, "*.json"))
-            {
-                var unit = UnitLoader.LoadUnitDefinition(file);
-                var type = unit.GetComponent<UnitComponent>();
-                _prototypes.Add(type.UnitType, unit);
-            }
-
-            var units = UnitLoader.LoadUnits(mapFilename, _prototypes);
+            var units = UnitLoader.LoadUnits(mapFilename);
             foreach (var unit in units)
             {
                 _messageHub.Post(new CreateEntityCommand { Entity = unit });
             }
         }
 
-        public void Handle(CreateEntityCommand command)
-        {
-            _entities.Add(command.Entity.Id, command.Entity);
-        }
-
         public void Update()
         {
             _movementHandler.Update();
+            _weaponHandler.Update();
         }
 
         public void Render(Rectangle viewport, IGraphics graphics)
         {
-            foreach (var unit in _entities.Values)
+            foreach (var unit in _entities)
             {
                 var location = unit.GetComponent<LocationComponent>().Location;
                 var textureId = unit.GetComponent<ImageComponent>().TextureId;
@@ -70,12 +65,14 @@ namespace MapEngine.Handlers
             }
         }
 
+        public void Handle(CreateEntityCommand command)
+        {
+            _entities.Add(command.Entity);
+        }
+
         public void Handle(DestroyEntityCommand command)
         {
-            if (_entities.ContainsKey(command.Entity.Id))
-            {
-                _entities.Remove(command.Entity.Id);
-            }
+            _entities.Remove(command.Entity);
         }
     }
 }

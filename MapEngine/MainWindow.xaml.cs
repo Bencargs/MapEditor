@@ -39,7 +39,7 @@ namespace MapEngine
             var graphics = container.Resolve<WpfGraphics>();
             _scene = new Scene(graphics, messageHub,
                 container.Resolve<MapHandler>(),
-                container.Resolve<UnitHandler>(),
+                container.Resolve<EntityHandler>(),
                 container.Resolve<CameraHandler>());
 
             messageHub.Initialise(container);

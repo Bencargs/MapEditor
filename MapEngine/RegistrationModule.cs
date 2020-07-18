@@ -1,8 +1,6 @@
 ﻿using Autofac;
 using MapEngine.Commands;
 using MapEngine.Handlers;
-using System.Linq;
-using System.Reflection;
 
 namespace MapEngine
 {
@@ -36,11 +34,13 @@ namespace MapEngine
         private static void RegisterHandlers(ContainerBuilder builder, MessageHub messageHub)
         {
             var collisionHandler = new CollisionHandler();
+            var weaponHandler = new WeaponHandler(messageHub, collisionHandler);
             var movementHandler = new MovementHandler(messageHub, collisionHandler);
-            var unitHandler = new UnitHandler(messageHub, movementHandler);
+            var unitHandler = new EntityHandler(messageHub, movementHandler, weaponHandler);
             
             builder.RegisterInstance(collisionHandler).SingleInstance();
             builder.RegisterInstance(movementHandler).SingleInstance();
+            builder.RegisterInstance(weaponHandler).SingleInstance();
             builder.RegisterInstance(unitHandler).SingleInstance();
             builder.RegisterType<CameraHandler>().SingleInstance();
             builder.RegisterType<MapHandler>().SingleInstance();

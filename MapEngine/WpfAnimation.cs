@@ -43,8 +43,8 @@ namespace MapEngine
         {
             nextFrame = _index;
 
-            var delta = (now - _previous).TotalMilliseconds;
-            var drawFrames = (int) delta / _frameRate;
+            var elapsed = (now - _previous).TotalMilliseconds;
+            var drawFrames = (int)elapsed / _frameRate;
             if (drawFrames > 0)
             {
                 nextFrame = (_index + drawFrames) % Width;
