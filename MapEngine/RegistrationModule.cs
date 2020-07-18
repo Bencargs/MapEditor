@@ -1,6 +1,6 @@
 ﻿using Autofac;
-using System.Linq;
-using System.Reflection;
+using MapEngine.Commands;
+using MapEngine.Handlers;
 
 namespace MapEngine
 {
@@ -10,11 +10,19 @@ namespace MapEngine
         {
             var builder = new ContainerBuilder();
 
+            var messageHub = RegisterMessageHub(builder);
+            RegisterHandlers(builder, messageHub);
             RegisterServices(builder);
-            RegisterHandlers(builder);
 
             var container = builder.Build();
             return container;
+        }
+
+        private static MessageHub RegisterMessageHub(ContainerBuilder builder)
+        {
+            var messageHub = new MessageHub();
+            builder.RegisterInstance(messageHub);
+            return messageHub;
         }
 
         private static void RegisterServices(ContainerBuilder builder)
@@ -23,11 +31,19 @@ namespace MapEngine
             builder.RegisterInstance(new WpfGraphics(image)).SingleInstance();
         }
 
-        private static void RegisterHandlers(ContainerBuilder builder)
+        private static void RegisterHandlers(ContainerBuilder builder, MessageHub messageHub)
         {
-            builder.RegisterAssemblyTypes(Assembly.GetExecutingAssembly())
-                .Where(x => x.Name.EndsWith("Handler")) // there must be a better way..
-                .SingleInstance();
+            var collisionHandler = new CollisionHandler();
+            var weaponHandler = new WeaponHandler(messageHub, collisionHandler);
+            var movementHandler = new MovementHandler(messageHub, collisionHandler);
+            var unitHandler = new EntityHandler(messageHub, movementHandler, weaponHandler);
+            
+            builder.RegisterInstance(collisionHandler).SingleInstance();
+            builder.RegisterInstance(movementHandler).SingleInstance();
+            builder.RegisterInstance(weaponHandler).SingleInstance();
+            builder.RegisterInstance(unitHandler).SingleInstance();
+            builder.RegisterType<CameraHandler>().SingleInstance();
+            builder.RegisterType<MapHandler>().SingleInstance();
         }
     }
 }

@@ -11,15 +11,21 @@ namespace Common.Entities
         public T GetComponent<T>()
             where T : IComponent
         {
-            var component = Components.OfType<T>().LastOrDefault();
+            var component = GetComponents<T>().LastOrDefault();
             return component;
+        }
+
+        public T[] GetComponents<T>()
+            where T : IComponent
+        {
+            var components = Components.OfType<T>().ToArray();
+            return components;
         }
 
         public void AddComponent<T>(T component)
             where T : IComponent
         {
-            if (!Components.Any(x => x is T))
-                Components.Add(component);
+            Components.Add(component);
         }
     }
 }

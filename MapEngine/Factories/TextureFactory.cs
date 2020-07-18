@@ -3,13 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace MapEngine.Handlers
+namespace MapEngine.Factories
 {
-    public class TextureHandler
+    public class TextureFactory
     {
-        public Dictionary<string, Texture> _textures = new Dictionary<string, Texture>(StringComparer.OrdinalIgnoreCase);
+        public static Dictionary<string, Texture> _textures = new Dictionary<string, Texture>(StringComparer.OrdinalIgnoreCase);
 
-        public void LoadTextures(string filepath)
+        public static void LoadTextures(string filepath)
         {
             foreach (var file in Directory.GetFiles(filepath, "*.gif"))
             {
@@ -28,7 +28,7 @@ namespace MapEngine.Handlers
             }
         }
 
-        public bool TryGetTexture(string textureId, out Texture texture)
+        public static bool TryGetTexture(string textureId, out Texture texture)
         {
             return _textures.TryGetValue(textureId, out texture);
         }

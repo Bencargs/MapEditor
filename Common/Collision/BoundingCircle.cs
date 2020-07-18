@@ -4,7 +4,7 @@ namespace Common.Collision
 {
     public class BoundingCircle : ICollider
     {
-        public int Radius { get; set; }
+        public float Radius { get; set; }
         public Vector2 Location { get; set; }
 
         public bool HasCollided(ICollider collider)

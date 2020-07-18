@@ -1,5 +1,5 @@
 {
-	"Type":"MobileDummy",
+	"Type":"WeaponDummy",
 	"Image": {
 		"Width":24,
 		"Height":24,
@@ -11,5 +11,8 @@
 		"MaxForce":100,
 		"StopRadius":10,
 		"BrakeForce":0.05
-	}
+	},
+	"Weapons": [
+		"Cannon",
+	]
 }

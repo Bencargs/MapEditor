@@ -3,6 +3,7 @@
     public enum MovementMode
     {
         None = 0,
-        Seek,
+        Direct, // straight line movement
+        Seek,   // steer towards target
     }
 }

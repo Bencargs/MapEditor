@@ -13,6 +13,7 @@ namespace MapEngine.Entities.Components
         public float FacingAngle { get; set; }
         public Vector2 Velocity { get; set; }
         public Vector2 Steering { get; set; }
+        public float BrakeForce { get; set; }
 
         public float MaxVelocity { get; set; }
         public float Mass { get; set; }
@@ -32,6 +33,7 @@ namespace MapEngine.Entities.Components
                 Mass = Mass,
                 MaxForce = MaxForce,
                 StopRadius = StopRadius,
+                BrakeForce = BrakeForce,
                 Destinations = new Queue<MoveOrder>(Destinations.Select(x => x.Clone()))
             };
         }

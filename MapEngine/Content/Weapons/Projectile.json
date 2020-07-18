@@ -1,0 +1,9 @@
+{
+	"Type":"Cannon",
+	"Range":200,
+	"Speed":5,
+	"ReloadTime":1000,
+	"Damage":10,
+	"MaxImpactForce":0,
+	"TextureId":"Projectile"
+}

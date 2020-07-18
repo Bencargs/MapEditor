@@ -8,20 +8,14 @@ namespace MapEngine.Commands
 {
     public class MessageHub
     {
-        private IContainer _container;
         private Dictionary<Type, List<(object, MethodInfo)>> _handlers;
         private Queue<ICommand> _messages = new Queue<ICommand>();
 
-        public MessageHub(IContainer container)
-        {
-            _container = container;
-        }
-
-        public void Initialise()
+        public void Initialise(IContainer container)
         {
             _handlers = (from t in AssemblyClasses()
                          from messageType in GetCommandHandlers(t)
-                         let handler = _container.Resolve(t)
+                         let handler = container.Resolve(t)
                          select (messageType, handler))
                          .GroupBy(x => x.messageType)
                          .ToDictionary(k => k.Key, v => GetHandleMethods(v));
@@ -44,15 +38,15 @@ namespace MapEngine.Commands
             }
         }
 
-        private IEnumerable<Type> AssemblyClasses() => Assembly.GetExecutingAssembly().GetTypes().Where(x => !x.IsAbstract);
+        private static IEnumerable<Type> AssemblyClasses() => Assembly.GetExecutingAssembly().GetTypes().Where(x => !x.IsAbstract);
 
-        private IEnumerable<Type> GetCommandHandlers(Type t) =>
+        private static IEnumerable<Type> GetCommandHandlers(Type t) =>
             t.GetInterfaces()
             .Where(x => x.IsGenericType)
             .Where(x => x.GetGenericTypeDefinition() == typeof(IHandleCommand<>))
             .SelectMany(i => i.GenericTypeArguments);
 
-        private List<(object handler, MethodInfo method)> GetHandleMethods(IGrouping<Type, (Type, object handler)> v) =>
+        private static List<(object handler, MethodInfo method)> GetHandleMethods(IGrouping<Type, (Type, object handler)> v) =>
                 v.Select(x =>
                 {
                     var method = x.handler.GetType().GetMethod("Handle", new[] { v.Key });
