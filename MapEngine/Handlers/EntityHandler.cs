@@ -54,13 +54,19 @@ namespace MapEngine.Handlers
         {
             foreach (var unit in _entities)
             {
-                var location = unit.GetComponent<LocationComponent>().Location;
+                var location = unit.GetComponent<LocationComponent>();
                 var textureId = unit.GetComponent<ImageComponent>().TextureId;
                 if (TextureFactory.TryGetTexture(textureId, out var texture))
                 {
-                    var area = texture.Area(location);
+                    // Translate against camera movement
+                    var area = texture.Area(location.Location);
                     area.Translate(viewport.X, viewport.Y);
-                    graphics.DrawImage(texture.Image, area);
+
+                    // Rotate image to movement / facing angle
+                    // todo: rotate around centre point
+                    var rotated = texture.Image.Rotate(location.FacingAngle);
+
+                    graphics.DrawImage(rotated, area);
                 }
             }
         }

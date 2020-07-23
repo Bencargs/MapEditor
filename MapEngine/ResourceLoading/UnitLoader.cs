@@ -28,7 +28,9 @@ namespace MapEngine.ResourceLoading
                 var location = u.Location;
                 if (location != null)
                 {
-                    entity.GetComponent<LocationComponent>().Location = new Vector2((int)location.X, (int)location.Y);
+                    var locationComponent = entity.GetComponent<LocationComponent>();
+                    locationComponent.Location = new Vector2((int)location.X, (int)location.Y);
+                    locationComponent.FacingAngle = (float)(location.FacingAngle ?? 0);
                 }
 
                 var team = u.Team;
@@ -41,7 +43,6 @@ namespace MapEngine.ResourceLoading
                 if (movement != null)
                 {
                     var movementComponent = entity.GetComponent<MovementComponent>();
-                    movementComponent.FacingAngle = (int)movement.FacingAngle;
                     movementComponent.Velocity = new Vector2((int)movement.Velocity.X, (int)movement.Velocity.Y);
                     movementComponent.Steering = new Vector2((int)movement.Steering.X, (int)movement.Steering.Y);
                     movementComponent.Destinations = ((IEnumerable<dynamic>)movement.Destinations)
@@ -65,8 +66,10 @@ namespace MapEngine.ResourceLoading
 
             var entity = new Entity();
 
-            // every unit should have a physical location I think
-            entity.AddComponent(new LocationComponent());
+            entity.AddComponent(new LocationComponent
+            {
+                FacingAngle = (float)(unitData.FacingAngle ?? 0)
+            });
 
             entity.AddComponent(new UnitComponent
             {
@@ -87,11 +90,10 @@ namespace MapEngine.ResourceLoading
             {
                 entity.AddComponent(new MovementComponent
                 {
-                    FacingAngle = 0,
                     Velocity = Vector2.Zero,
                     Steering = Vector2.Zero,
                     MaxVelocity = (float)movement.MaxVelocity,
-                    Mass = (float)movement.Mass,
+                    Mass = (float)(movement.Mass ?? 1),
                     MaxForce = (float)movement.MaxForce,
                     StopRadius = (float)movement.StopRadius,
                     BrakeForce = (float)movement.BrakeForce

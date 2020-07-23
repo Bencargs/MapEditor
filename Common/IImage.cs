@@ -11,5 +11,8 @@
             get;
             set;
         }
+
+        IImage Scale(float scale);
+        IImage Rotate(float angle);
     }
 }

@@ -1,5 +1,4 @@
-﻿using Common;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -7,15 +6,6 @@ namespace MapEngine
 {
     public static class ImageEx
     {
-        public static IImage Scale(this IImage image, double scale)
-        {
-            var img = ((WpfImage)image).Bitmap;
-
-            var target = Scale(img, scale);
-
-            return new WpfImage(target);
-        }
-
         public static WriteableBitmap Scale(this WriteableBitmap image, double scale)
         {
             var s = new ScaleTransform(scale, scale);

@@ -3,7 +3,7 @@
 	"Image": {
 		"Width":24,
 		"Height":24,
-		"TextureId": "Dummy"
+		"TextureId": "MobileDummy"
 	},
 	"Movement": {
 		"MaxVelocity":100,

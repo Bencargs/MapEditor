@@ -10,7 +10,6 @@ namespace MapEngine.Entities.Components
     {
         public ComponentType Type => ComponentType.Movement;
         
-        public float FacingAngle { get; set; }
         public Vector2 Velocity { get; set; }
         public Vector2 Steering { get; set; }
         public float BrakeForce { get; set; }
@@ -26,7 +25,6 @@ namespace MapEngine.Entities.Components
         {
             return new MovementComponent
             {
-                FacingAngle = FacingAngle,
                 Velocity = Velocity,
                 Steering = Steering,
                 MaxVelocity = MaxVelocity,
