@@ -7,7 +7,7 @@ namespace MapEngine
     {
         public static float Angle(this Vector2 source)
         {
-            return (float)(Math.Atan2(source.Y, source.X) + Math.PI / 2);
+            return (float)(Math.Atan2(source.Y, source.X) * 360.0 / (2 * Math.PI));
         }
 
         /// <summary>

@@ -1,5 +1,6 @@
 ﻿using Common;
 using System;
+using System.Numerics;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -38,6 +39,20 @@ namespace MapEngine
         {
             var area = new Int32Rect(0, 0, Width, Height);
             Bitmap.WritePixels(area, buffer, Width * 4, 0);
+        }
+
+        public IImage Rotate(float angle)
+        {
+            var rotated = Bitmap.RotateFree(180 - angle, false);
+            return new WpfImage(rotated);
+        }
+
+        public IImage Scale(float scale)
+        {
+            var width = (int)scale * Width;
+            var height = (int)scale * Height;
+            var scaled = Bitmap.Resize(width, height, WriteableBitmapExtensions.Interpolation.NearestNeighbor);
+            return new WpfImage(scaled);
         }
 
         public Colour this[int x, int y] 

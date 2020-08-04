@@ -86,13 +86,11 @@ namespace MapEngine.Handlers
 
         private bool TryGetAim(Entity self, Entity target, out Vector2 aimPoint)
         {
+            aimPoint = Vector2.Zero;
             var weapon = self.GetComponent<WeaponComponent>();
             var targetLocation = target.GetComponent<LocationComponent>().Location;
             var targetVelocity = target.GetComponent<MovementComponent>()?.Velocity ?? Vector2.Zero;
             var selfLocation = self.GetComponent<LocationComponent>().Location;
-            var selfVelocity = self.GetComponent<MovementComponent>().Velocity;
-
-            aimPoint = (targetLocation - selfLocation).Truncate(weapon.Speed);
 
             // calculate target and projectiles location at each step in the future
             // return the leading aim location on the first possible intercept
@@ -100,7 +98,6 @@ namespace MapEngine.Handlers
             for (var t = 0; t < maxTime; t++)
             {
                 targetLocation += targetVelocity;
-                selfLocation += selfVelocity;
                 var distance = Vector2.Distance(selfLocation, targetLocation);
                 if (distance > weapon.Range)
                     continue; // target outside of maximum weapon range
@@ -109,6 +106,7 @@ namespace MapEngine.Handlers
                 if (traveledDistance < distance)
                     continue; // projectile cannot reach target in time
 
+                aimPoint = (targetLocation - selfLocation).Truncate(weapon.Speed);
                 return true;
             }
             return false;

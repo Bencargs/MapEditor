@@ -109,9 +109,6 @@ namespace MapEngine.Handlers
             //subtract the position from the target to get the vector from the vehicles position to the target. 
             var directionVector = (destination - location.Location);
 
-            //Set the facingAngle (used to draw the image, in radians) to velocity
-            target.FacingAngle = target.Velocity.Angle();
-
             //Normalize it then multiply by max speed to get the maximum velocity from your position to the target.
             var desiredVelocity = directionVector.Truncate(target.MaxVelocity);
 
@@ -123,6 +120,9 @@ namespace MapEngine.Handlers
 
             //then add it to velocity to get the new velocity
             target.Velocity = (target.Velocity + target.Steering).Truncate(target.MaxVelocity);
+
+            //Set the facingAngle (used to draw the image, in radians) to velocity
+            location.FacingAngle = target.Velocity.Angle();
 
             location.Location += target.Velocity;
         }
