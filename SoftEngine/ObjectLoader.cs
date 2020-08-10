@@ -108,7 +108,7 @@ namespace SoftEngine
                     // Texture
                     //var meshTextureID = jsonObject.meshes[meshIndex].materialId.Value;
                     //var meshTextureName = materials[meshTextureID].DiffuseTextureName;
-                    mesh.Texture = new Texture(textureFilename, 512, 512);
+                    mesh.Texture = new Texture(textureFilename, 1024, 1024);
                 }
 
                 mesh.ComputeFacesNormals();

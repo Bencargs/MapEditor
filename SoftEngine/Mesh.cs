@@ -10,7 +10,6 @@ namespace SoftEngine
         public Face[] Faces { get; set; }
         public Vector3 Position { get; set; }
         public Vector3 Rotation { get; set; }
-
         public Texture Texture { get; set; }
 
         public Mesh(string name, int verticiesCount, int faceCount)
@@ -18,6 +17,16 @@ namespace SoftEngine
             Vertices = new Vertex[verticiesCount];
             Faces = new Face[faceCount];
             Name = name;
+        }
+
+        public void Rotate(float x, float y, float z)
+        {
+            Rotation = new Vector3(x, y, z);
+        }
+
+        public void Translate(float x, float y, float z)
+        {
+            Position = new Vector3(x, y, z);
         }
 
         public void ComputeFacesNormals()

@@ -11,13 +11,14 @@ namespace SoftEngine
         private readonly object[] _lockBuffer;
         private readonly byte[] _backBuffer;
         private readonly float[] _depthBuffer;
-        private readonly IImage _bmp;
         private readonly int _width;
         private readonly int _height;
 
+        // Light position 
+        private Vector3 _lightPos = new Vector3(0, 0, 200);
+
         public Device(IImage bmp)
         {
-            _bmp = bmp;
             _width = bmp.Width;
             _height = bmp.Height;
             var size = _width * _height;
@@ -112,12 +113,6 @@ namespace SoftEngine
             lightDirection.Normalize();
 
             return Math.Max(0, Vector3.Dot(normal, lightDirection));
-        }
-
-        // Once everything is ready, we can swap buffers 
-        private void Flush()
-        {
-            _bmp.Draw(_backBuffer);
         }
 
         // DrawPoint calls PutPixel but does the clipping operation before
@@ -236,14 +231,11 @@ namespace SoftEngine
             Vector3 p2 = v2.Coordinates;
             Vector3 p3 = v3.Coordinates;
 
-            // Light position 
-            Vector3 lightPos = new Vector3(0, 10, 10);
-
             // computing the cos of the angle between the light vector and the normal vector
             // it will return a value between 0 and 1 that will be used as the intensity of the colour
-            float nl1 = ComputeNDotL(v1.WorldCoordinates, v1.Normal, lightPos);
-            float nl2 = ComputeNDotL(v2.WorldCoordinates, v2.Normal, lightPos);
-            float nl3 = ComputeNDotL(v3.WorldCoordinates, v3.Normal, lightPos);
+            float nl1 = ComputeNDotL(v1.WorldCoordinates, v1.Normal, _lightPos);
+            float nl2 = ComputeNDotL(v2.WorldCoordinates, v2.Normal, _lightPos);
+            float nl3 = ComputeNDotL(v3.WorldCoordinates, v3.Normal, _lightPos);
 
             // computing lines' directions
             // http://en.wikipedia.org/wiki/Slope
@@ -388,11 +380,11 @@ namespace SoftEngine
 
         // The main method of the engine that re-compute each vertex projection
         // during each frame
-        public void Render(/*Camera camera, */params Mesh[] meshes)
+        public byte[] Render(/*Camera camera, */params Mesh[] meshes)
         {
             var camera = new Camera
             {
-                Position = new Vector3(0, 0, 50),
+                Position = new Vector3(0, 0, 100),
                 Target = Vector3.Zero
             };
 
@@ -436,7 +428,7 @@ namespace SoftEngine
                 });
             }
 
-            Flush();
+            return _backBuffer;
         }
     }
 }
