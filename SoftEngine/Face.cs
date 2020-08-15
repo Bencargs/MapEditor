@@ -4,9 +4,9 @@ namespace SoftEngine
 {
     public struct Face
     {
-        public int A;
-        public int B;
-        public int C;
+        public int VertexA;
+        public int VertexB;
+        public int VertexC;
 
         public Vector3 Normal;
     }

@@ -1,14 +1,12 @@
 ﻿using Common;
 using SharpDX;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace SoftEngine
 {
     public class Device
     {
-        private readonly object[] _lockBuffer;
         private readonly byte[] _backBuffer;
         private readonly float[] _depthBuffer;
         private readonly int _width;
@@ -19,21 +17,22 @@ namespace SoftEngine
 
         public Device(IImage bmp)
         {
+            // todo: this is uneccessary and dumb
+            // instead we should calculate the area of the mesh, and only render an image of that size
             _width = bmp.Width;
             _height = bmp.Height;
+
             var size = _width * _height;
 
             // the back buffer size is equal to the number of pixels to draw
             // on screen (width*height) * 4 (R,G,B & Alpha values). 
             _backBuffer = new byte[size * 4];
             _depthBuffer = new float[size];
-            _lockBuffer = Enumerable.Repeat(new object(), size).ToArray();
         }
 
         // This method is called to clear the back buffer with a specific colour
         private void Clear(byte r, byte g, byte b, byte a)
         {
-            //Array.Clear(_backBuffer, 0, _backBuffer.Length);
             // Clearing Back Buffer
             for (var index = 0; index < _backBuffer.Length; index += 4)
             {
@@ -60,20 +59,17 @@ namespace SoftEngine
             var index = (x + y * _width);
             var index4 = index * 4;
 
-            lock (_lockBuffer[index])
+            if (_depthBuffer[index] < z)
             {
-                if (_depthBuffer[index] < z)
-                {
-                    return; // Discard
-                }
-
-                _depthBuffer[index] = z;
-
-                _backBuffer[index4] = (byte)(colour.Blue * 255);
-                _backBuffer[index4 + 1] = (byte)(colour.Green * 255);
-                _backBuffer[index4 + 2] = (byte)(colour.Red * 255);
-                _backBuffer[index4 + 3] = (byte)(colour.Alpha * 255);
+                return; // Discard
             }
+
+            _depthBuffer[index] = z;
+
+            _backBuffer[index4] = (byte)(colour.Blue * 255);
+            _backBuffer[index4 + 1] = (byte)(colour.Green * 255);
+            _backBuffer[index4 + 2] = (byte)(colour.Red * 255);
+            _backBuffer[index4 + 3] = (byte)(colour.Alpha * 255);
         }
 
         // Project takes some 3D coordinates and transform them
@@ -187,12 +183,9 @@ namespace SoftEngine
                 var u = Interpolate(su, eu, gradient);
                 var v = Interpolate(sv, ev, gradient);
 
-                Color4 textureColour;
-
-                if (texture != null)
-                    textureColour = texture.Map(u, v);
-                else
-                    textureColour = new Color4(1, 1, 1, 1);
+                Color4 textureColour = texture != null
+                    ? textureColour = texture.Map(u, v)
+                    : textureColour = new Color4(1, 1, 1, 1);
 
                 // changing the native colour value using the cosine of the angle
                 // between the light vector and the normal vector
@@ -380,55 +373,53 @@ namespace SoftEngine
 
         // The main method of the engine that re-compute each vertex projection
         // during each frame
-        public byte[] Render(/*Camera camera, */params Mesh[] meshes)
+        public IImage Render(/*Camera camera, */IModel model, ITexture texture)
         {
+            var mesh = new Model(model, texture);
             var camera = new Camera
             {
                 Position = new Vector3(0, 0, 100),
                 Target = Vector3.Zero
             };
 
-            Clear(255, 255, 255, 0);
-
             var viewMatrix = Matrix.LookAtLH(camera.Position, camera.Target, Vector3.UnitY);
             var projectionMatrix = Matrix.PerspectiveFovLH(0.78f,
                                                            (float)_width / _height,
                                                            0.01f, 1.0f);
 
-            foreach (var mesh in meshes)
+            // Beware to apply rotation before translation 
+            var worldMatrix = Matrix.RotationYawPitchRoll(model.Rotation.Y, model.Rotation.X, model.Rotation.Z) *
+                                Matrix.Translation(model.Location.X, model.Location.Y, model.Location.Z);
+
+            var worldView = worldMatrix * viewMatrix;
+            var transformMatrix = worldMatrix * viewMatrix * projectionMatrix;
+
+            // todo - here we'd calculate the size of canvas we need to render the model
+            Clear(255, 255, 255, 0);
+            Parallel.For(0, mesh.Faces.Length, faceIndex =>
             {
-                // Beware to apply rotation before translation 
-                var worldMatrix = Matrix.RotationYawPitchRoll(mesh.Rotation.Y, mesh.Rotation.X, mesh.Rotation.Z) *
-                                  Matrix.Translation(mesh.Position);
+                var face = mesh.Faces[faceIndex];
 
-                var worldView = worldMatrix * viewMatrix;
-                var transformMatrix = worldMatrix * viewMatrix * projectionMatrix;
+                //// Face-back culling - !!! this is buggy (uses isometric not persepctive)
+                //var transformedNormal = Vector3.TransformNormal(face.Normal.ToVector(), worldView);
+                //if (transformedNormal.Z >= 0)
+                //{
+                //    return;
+                //}
 
-                Parallel.For(0, mesh.Faces.Length, faceIndex =>
-                {
-                    var face = mesh.Faces[faceIndex];
+                var vertexA = mesh.Vertices[face.VertexA];
+                var vertexB = mesh.Vertices[face.VertexB];
+                var vertexC = mesh.Vertices[face.VertexC];
 
-                    // Face-back culling - !!! this is buggy (uses isometric not persepctive)
-                    var transformedNormal = Vector3.TransformNormal(face.Normal, worldView);
-                    if (transformedNormal.Z >= 0)
-                    {
-                        return;
-                    }
+                var pixelA = Project(vertexA, transformMatrix, worldMatrix);
+                var pixelB = Project(vertexB, transformMatrix, worldMatrix);
+                var pixelC = Project(vertexC, transformMatrix, worldMatrix);
 
-                    var vertexA = mesh.Vertices[face.A];
-                    var vertexB = mesh.Vertices[face.B];
-                    var vertexC = mesh.Vertices[face.C];
+                var colour = 1.0f;
+                DrawTriangle(pixelA, pixelB, pixelC, new Color4(colour, colour, colour, 1), mesh.Texture);
+            });
 
-                    var pixelA = Project(vertexA, transformMatrix, worldMatrix);
-                    var pixelB = Project(vertexB, transformMatrix, worldMatrix);
-                    var pixelC = Project(vertexC, transformMatrix, worldMatrix);
-
-                    var colour = 1.0f;
-                    DrawTriangle(pixelA, pixelB, pixelC, new Color4(colour, colour, colour, 1), mesh.Texture);
-                });
-            }
-
-            return _backBuffer;
+            return new Texture(_width, _height, _backBuffer);
         }
     }
 }

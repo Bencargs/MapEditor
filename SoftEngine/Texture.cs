@@ -1,29 +1,25 @@
-﻿using SharpDX;
+﻿using Common;
+using SharpDX;
 using System;
-using System.Windows.Media.Imaging;
 
 namespace SoftEngine
 {
-    public class Texture
+    public class Texture : IImage
     {
-        private byte[] _internalBuffer;
-        private readonly int _width;
-        private readonly int _height;
+        public byte[] Buffer { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
 
-        // Working with a fix sized texture (512x512, 1024x1024, etc.).
-        public Texture(string filename, int width, int height)
+        public Texture(int width, int height, byte[] buffer)
         {
-            _width = width;
-            _height = height;
-            Load(filename);
+            Width = width;
+            Height = height;
+            Buffer = buffer;
         }
 
-        private void Load(string filename)
+        public Texture(ITexture texture)
+            : this(texture.Width, texture.Height, texture.Image.Buffer)
         {
-            var uri = new Uri(filename, UriKind.Relative);
-            var bitmapImage = new BitmapImage(uri);
-            _internalBuffer = new byte[_width * _height * 4];
-            bitmapImage.CopyPixels(_internalBuffer, _width * 4, 0);
         }
 
         // Takes the U & V coordinates exported by Blender
@@ -31,21 +27,42 @@ namespace SoftEngine
         public Color4 Map(float tu, float tv)
         {
             // Image is not loaded yet
-            if (_internalBuffer == null)
+            if (Buffer == null)
             {
                 return Color4.White;
             }
             // using a % operator to cycle/repeat the texture if needed
-            int u = Math.Abs((int)(tu * _width) % _width);
-            int v = Math.Abs((int)(tv * _height) % _height);
+            int u = Math.Abs((int)(tu * Width) % Width);
+            int v = Math.Abs((int)(tv * Height) % Height);
 
-            int pos = (u + v * _width) * 4;
-            byte b = _internalBuffer[pos];
-            byte g = _internalBuffer[pos + 1];
-            byte r = _internalBuffer[pos + 2];
-            byte a = _internalBuffer[pos + 3];
+            int pos = (u + v * Width) * 4;
+            byte b = Buffer[pos];
+            byte g = Buffer[pos + 1];
+            byte r = Buffer[pos + 2];
+            byte a = Buffer[pos + 3];
 
             return new Color4(r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f);
+        }
+
+        public Colour this[int x, int y] 
+        { 
+            get => throw new NotImplementedException(); 
+            set => throw new NotImplementedException(); 
+        }
+
+        public void Draw(byte[] buffer)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IImage Scale(float scale)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IImage Rotate(float angle)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -13,13 +13,14 @@ namespace MapEngine.ResourceLoading
 
             var weapon = new WeaponComponent
             {
+                TextureId = weaponData.TextureId,
                 WeaponType = weaponData.Type,
                 Range = weaponData.Range,
                 Speed = weaponData.Speed,
                 ReloadTime = weaponData.ReloadTime,
                 MaxImpactForce = weaponData.MaxImpactForce,
                 Damage = weaponData.Damage,
-                TextureId = weaponData.TextureId
+                CollisionRadius = weaponData.CollisionRadius
             };
 
             return weapon;

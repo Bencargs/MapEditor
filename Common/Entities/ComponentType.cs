@@ -8,6 +8,7 @@
         Movement,
         Unit,
         Weapon,
-        Collision
+        Collision,
+        Model
     }
 }

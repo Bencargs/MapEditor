@@ -13,7 +13,7 @@ namespace Common
         void FillRectangle(Colour colour, Rectangle area);
         void DrawCircle(Colour colour, Rectangle area);
         void DrawImage(IImage image, Rectangle area);
-        void DrawBytes(byte[] buffer);
+        void DrawBytes(byte[] buffer, Rectangle area);
 
         void Render();
     }

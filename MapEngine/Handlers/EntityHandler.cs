@@ -4,7 +4,12 @@ using MapEngine.Commands;
 using MapEngine.Entities.Components;
 using MapEngine.Factories;
 using MapEngine.ResourceLoading;
+using SoftEngine;
+using System;
 using System.Collections.Generic;
+using System.Numerics;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace MapEngine.Handlers
 {
@@ -16,6 +21,9 @@ namespace MapEngine.Handlers
         : IHandleCommand<CreateEntityCommand>
         , IHandleCommand<DestroyEntityCommand>
     {
+        // todo.. seperate handler..?
+        private readonly Device _3dEngine = new Device(new WpfImage(640, 480));
+
         private readonly MessageHub _messageHub;
         private readonly WeaponHandler _weaponHandler;
         private readonly MovementHandler _movementHandler;
@@ -28,14 +36,16 @@ namespace MapEngine.Handlers
             _movementHandler = movementHandler;
         }
 
-        public void Initialise(string unitsFilepath, string mapFilename, string weaponFilepath)
+        public void Initialise(string unitsFilepath, string mapFilename, string weaponFilepath, string modelFilepath)
         {
             // todo: refactor this to: 
             // unit = LoadUnitModel(); 
             // LoadTexture(unit.Texture);
+            // factories.Initialise..?
             TextureFactory.LoadTextures(@"C:\Source\MapEditor\MapEngine\Content\Textures");
             WeaponFactory.LoadWeapons(weaponFilepath); // todo: code stink - requires factories to be initialised in an order
             UnitFactory.LoadUnits(unitsFilepath);
+            ModelFactory.LoadModel(modelFilepath);
 
             var units = UnitLoader.LoadUnits(mapFilename);
             foreach (var unit in units)
@@ -56,9 +66,29 @@ namespace MapEngine.Handlers
             {
                 var location = unit.GetComponent<LocationComponent>();
                 var textureId = unit.GetComponent<ImageComponent>().TextureId;
-                if (TextureFactory.TryGetTexture(textureId, out var texture))
+                if (!TextureFactory.TryGetTexture(textureId, out var texture))
+                    continue;
+
+                // 3d rendering
+                var modelComponent = unit.GetComponent<ModelComponent>();
+                if (modelComponent != null && ModelFactory.TryGetModel(modelComponent.ModelId, out var model))
                 {
-                    // Translate against camera movement
+                    model.Rotation = new Vector3(model.Rotation.X + 0.02f, model.Rotation.Y + 0.09f, model.Rotation.Z);
+                    model.Location = new Vector3(0, 0, 2);
+
+                    //var area = texture.Area(location.Location);
+                    //area.Translate(viewport.X, viewport.Y);
+
+                    var render = _3dEngine.Render(model, texture);
+                    var tex = new Texture(render);
+                    var area = tex.Area(location.Location);
+                    area.Translate(viewport.X, viewport.Y);
+
+                    graphics.DrawBytes(render.Buffer, area);
+                }
+                else // 2d rendering
+                {
+                    //Translate against camera movement
                     var area = texture.Area(location.Location);
                     area.Translate(viewport.X, viewport.Y);
 

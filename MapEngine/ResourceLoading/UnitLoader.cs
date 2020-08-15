@@ -66,10 +66,7 @@ namespace MapEngine.ResourceLoading
 
             var entity = new Entity();
 
-            entity.AddComponent(new LocationComponent
-            {
-                FacingAngle = (float)(unitData.FacingAngle ?? 0)
-            });
+            entity.AddComponent(new LocationComponent());
 
             entity.AddComponent(new UnitComponent
             {
@@ -82,6 +79,15 @@ namespace MapEngine.ResourceLoading
                 entity.AddComponent(new ImageComponent
                 {
                     TextureId = (string)image.TextureId
+                });
+            }
+
+            var model = unitData.Model;
+            if (model != null)
+            {
+                entity.AddComponent(new ModelComponent
+                {
+                    ModelId = (string)model.ModelId
                 });
             }
 

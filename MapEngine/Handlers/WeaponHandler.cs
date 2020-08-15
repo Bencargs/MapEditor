@@ -37,7 +37,7 @@ namespace MapEngine.Handlers
 
                 var location = e.GetComponent<LocationComponent>(); // todo: replace these with entity extension methods?
                 var collider = new BoundingCircle { Radius = weaponComponent.Range, Location = location.Location };
-                var collisions = _collisionHandler.GetCollisions(collider);
+                var collisions = _collisionHandler.GetCollisions(collider).Where(x => x.entity.Id != e.Id);
                 if (!collisions.Any())
                     continue;
 
@@ -61,7 +61,7 @@ namespace MapEngine.Handlers
                 Components = new List<IComponent>
                 {
                     location.Clone(),
-                    new CollisionComponent (new BoundingCircle { Radius = 10 } ), // should this be definable?
+                    new CollisionComponent (new BoundingCircle { Radius = weaponComponent.CollisionRadius } ), // should this be definable?
                     new ImageComponent { TextureId = weaponComponent.TextureId },
                     new MovementComponent
                     {

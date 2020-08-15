@@ -1,40 +1,37 @@
 ﻿using Newtonsoft.Json;
-using SharpDX;
-using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
+using System.Numerics;
 
-namespace SoftEngine
+namespace MapEngine.ResourceLoading
 {
-    public static class ObjectLoader
+    public static class ModelLoader
     {
-        // Loading the JSON file in an asynchronous manner
-        public static /*async Task<*/Mesh[]/*>*/ LoadJSONFileAsync(string modelfileName, string textureFilename)
+        public static Model LoadModel(string modelFilename)
         {
-            var meshes = new List<Mesh>();
-            var materials = new Dictionary<string, Material>();
             var data = "";
-            using (var reader = File.OpenText(modelfileName))
+            using (var reader = File.OpenText(modelFilename))
             {
-                //data = await reader.ReadToEndAsync();
                 data = reader.ReadToEnd();
             }
             dynamic jsonObject = JsonConvert.DeserializeObject(data);
 
-            for (var materialIndex = 0; materialIndex < jsonObject.materials.Count; materialIndex++)
-            {
-                var material = new Material
-                {
-                    Name = jsonObject.materials[materialIndex].name.Value,
-                    ID = jsonObject.materials[materialIndex].id.Value
-                };
-                if (jsonObject.materials[materialIndex].diffuseTexture != null)
-                    material.DiffuseTextureName = jsonObject.materials[materialIndex].diffuseTexture.name.Value;
+            //var materials = new Dictionary<string, Material>();
+            //for (var materialIndex = 0; materialIndex < jsonObject.materials.Count; materialIndex++)
+            //{
+            //    var material = new Material
+            //    {
+            //        Name = jsonObject.materials[materialIndex].name.Value,
+            //        ID = jsonObject.materials[materialIndex].id.Value
+            //    };
+            //    if (jsonObject.materials[materialIndex].diffuseTexture != null)
+            //        material.DiffuseTextureName = jsonObject.materials[materialIndex].diffuseTexture.name.Value;
 
-                materials.Add(material.ID, material);
-            }
+            //    materials.Add(material.ID, material);
+            //}
 
-            for (var meshIndex = 0; meshIndex < jsonObject.meshes.Count; meshIndex++)
+            Model model;
+            //for (var meshIndex = 0; meshIndex < jsonObject.meshes.Count; meshIndex++)
+            var meshIndex = 0;
             {
                 var verticesArray = jsonObject.meshes[meshIndex].vertices;
                 // Faces
@@ -62,7 +59,7 @@ namespace SoftEngine
                 var verticesCount = verticesArray.Count / verticesStep;
                 // number of faces is logically the size of the array divided by 3 (A, B, C)
                 var facesCount = indicesArray.Count / 3;
-                var mesh = new Mesh(jsonObject.meshes[meshIndex].name.Value, verticesCount, facesCount);
+                model = new Model(jsonObject.meshes[meshIndex].name.Value, verticesCount, facesCount);
 
                 // Filling the Vertices array of our mesh first
                 for (var index = 0; index < verticesCount; index++)
@@ -75,7 +72,7 @@ namespace SoftEngine
                     var ny = (float)verticesArray[index * verticesStep + 4].Value;
                     var nz = (float)verticesArray[index * verticesStep + 5].Value;
 
-                    mesh.Vertices[index] = new Vertex
+                    model.Vertices[index] = new Vertex
                     {
                         Coordinates = new Vector3(x, y, z),
                         Normal = new Vector3(nx, ny, nz)
@@ -86,7 +83,7 @@ namespace SoftEngine
                         // Loading the texture coordinates
                         float u = (float)verticesArray[index * verticesStep + 6].Value;
                         float v = (float)verticesArray[index * verticesStep + 7].Value;
-                        mesh.Vertices[index].TextureCoordinates = new Vector2(u, v);
+                        model.Vertices[index].TextureCoordinates = new Vector2(u, v);
                     }
                 }
 
@@ -96,32 +93,29 @@ namespace SoftEngine
                     var a = (int)indicesArray[index * 3].Value;
                     var b = (int)indicesArray[index * 3 + 1].Value;
                     var c = (int)indicesArray[index * 3 + 2].Value;
-                    mesh.Faces[index] = new Face { A = a, B = b, C = c };
+                    model.Faces[index] = new Face { VertexA = a, VertexB = b, VertexC = c };
                 }
 
                 // Getting the position you've set in Blender
                 var position = jsonObject.meshes[meshIndex].position;
-                mesh.Position = new Vector3((float)position[0].Value, (float)position[1].Value, (float)position[2].Value);
+                model.Location = new Vector3((float)position[0].Value, (float)position[1].Value, (float)position[2].Value);
 
-                if (uvCount > 0)
-                {
-                    // Texture
-                    //var meshTextureID = jsonObject.meshes[meshIndex].materialId.Value;
-                    //var meshTextureName = materials[meshTextureID].DiffuseTextureName;
-                    mesh.Texture = new Texture(textureFilename, 1024, 1024);
-                }
+                //if (uvCount > 0)
+                //{
+                //    // Texture
+                //    //var meshTextureID = jsonObject.meshes[meshIndex].materialId.Value;
+                //    //var meshTextureName = materials[meshTextureID].DiffuseTextureName;
+                //}
 
-                mesh.ComputeFacesNormals();
-
-                meshes.Add(mesh);
+                model.ComputeFaceNormals();
             }
 
             // Todo - bug? seems to load objects in facing away from camera
-            foreach (var mesh in meshes)
+            //foreach (var mesh in meshes)
             {
-                mesh.Rotation = new Vector3(mesh.Rotation.X, mesh.Rotation.Y + 9.5f, mesh.Rotation.Z);
+                model.Rotation = new Vector3(model.Rotation.X, model.Rotation.Y, model.Rotation.Z);
             }
-            return meshes.ToArray();
+            return model;
         }
     }
 }
