@@ -65,6 +65,25 @@ namespace MapEngine
             }
         }
 
+        public void DrawBytes(byte[] buffer, Rectangle area)
+        {
+            var length = buffer.Length;
+            for (int i = 0; i < length; i += 4)
+            {
+                if (buffer[i + 3] == 0)
+                    continue;
+
+                var k = i + (area.X * 4) + (area.Y * 4 * area.Width);
+                if (k > _backBuffer.Length || k < 0)
+                    continue;
+
+                _backBuffer[k] = buffer[i];
+                _backBuffer[k + 1] = buffer[i + 1];
+                _backBuffer[k + 2] = buffer[i + 2];
+                _backBuffer[k + 3] = buffer[i + 3];
+            }
+        }
+
         public void DrawLines(Colour colour, Vector2[] points)
         {
             throw new NotImplementedException();

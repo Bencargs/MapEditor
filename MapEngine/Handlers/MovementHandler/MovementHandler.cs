@@ -55,6 +55,10 @@ namespace MapEngine.Handlers
 
         private void HandleCollisions(Entity entity)
         {
+            // todo - ?? seems like units are colliding with their own projectiles, and exploding?
+            if (entity.Id != 72)
+                return;
+
             var collider = entity.GetComponent<CollisionComponent>();
             if (collider == null)
                 return;

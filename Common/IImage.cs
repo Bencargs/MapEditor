@@ -2,9 +2,9 @@
 {
     public interface IImage
     {
-        void Draw(byte[] buffer);
         int Width { get; }
         int Height { get; }
+        byte[] Buffer { get; }
 
         Colour this[int x, int y]
         {
@@ -12,6 +12,7 @@
             set;
         }
 
+        void Draw(byte[] buffer);
         IImage Scale(float scale);
         IImage Rotate(float angle);
     }

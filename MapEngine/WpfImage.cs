@@ -1,6 +1,5 @@
 ﻿using Common;
 using System;
-using System.Numerics;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -12,7 +11,7 @@ namespace MapEngine
         public int Width { get; }
         public int Height { get; }
         public WriteableBitmap Bitmap { get; set; }
-        private readonly byte[] _buffer;
+        public byte[] Buffer { get; set; }
 
         public WpfImage(WriteableBitmap bitmap)
         {
@@ -20,8 +19,8 @@ namespace MapEngine
             Height = bitmap.PixelHeight;
             Bitmap = bitmap;
 
-            _buffer = new byte[Width * Height * 4];
-            Bitmap.CopyPixels(_buffer, Width * 4, 0);
+            Buffer = new byte[Width * Height * 4];
+            Bitmap.CopyPixels(Buffer, Width * 4, 0);
         }
 
         public WpfImage(int width, int height)
@@ -61,10 +60,10 @@ namespace MapEngine
             {
                 var index = x + (y * Width);
                 var colour = new Colour(
-                    _buffer[index],
-                    _buffer[index + 1],
-                    _buffer[index + 2],
-                    _buffer[index + 3]);
+                    Buffer[index],
+                    Buffer[index + 1],
+                    Buffer[index + 2],
+                    Buffer[index + 3]);
                 return colour;
             }
             set => throw new NotImplementedException(); 

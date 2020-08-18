@@ -12,8 +12,10 @@ namespace MapEngine.Entities.Components
         private ICollider _collider { get; set; }
         public ICollider GetCollider(Vector2 location)
         {
-            _collider.Location = location;
-            return _collider;
+            // todo - whats going on here?
+            var c = _collider.Clone();
+            c.Location = location;
+            return c;
         }
 
         public CollisionComponent(ICollider collider)

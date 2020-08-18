@@ -7,6 +7,7 @@ namespace MapEngine.Entities.Components
     {
         public ComponentType Type => ComponentType.Weapon;
 
+        public string TextureId { get; set; }
         public string WeaponType { get; set; }
         public float Range { get; set; } //todo: replace with a collider? (eg a cone)
         public float Speed { get; set; }
@@ -14,19 +15,20 @@ namespace MapEngine.Entities.Components
         public int MaxImpactForce { get; set; }
         public float ReloadTime { get; set; }
         public DateTime LastFiredTime { get; set; }
-        public string TextureId { get; set; }
+        public int CollisionRadius { get; set; }
 
         public IComponent Clone()
         {
             return new WeaponComponent
             {
+                TextureId = TextureId,
                 WeaponType = WeaponType,
                 Range = Range,
                 Speed = Speed,
                 Damage = Damage,
                 MaxImpactForce = MaxImpactForce,
                 ReloadTime = ReloadTime,
-                TextureId = TextureId
+                CollisionRadius = CollisionRadius
             };
         }
     }

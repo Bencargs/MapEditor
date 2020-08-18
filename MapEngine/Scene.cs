@@ -1,11 +1,6 @@
 ﻿using Common;
-using Common.Collision;
-using Common.Entities;
 using MapEngine.Commands;
-using MapEngine.Entities.Components;
 using MapEngine.Handlers;
-using System.Collections.Generic;
-using System.Numerics;
 
 namespace MapEngine
 {
@@ -20,7 +15,7 @@ namespace MapEngine
         public Scene(
             IGraphics graphics,
             MessageHub messageHub,
-            MapHandler mapHandler, //todo - replace with a handler provider as this grows unweildy?
+            MapHandler mapHandler,
             EntityHandler unitHandler,
             CameraHandler cameraHandler)
         {
@@ -33,13 +28,14 @@ namespace MapEngine
 
         public void Initialise()
         {
-            var mapFilename = @"C:\Source\MapEditor\MapEngine\Content\Maps\TestMap2.json";
+            var mapFilename = @"C:\Source\MapEditor\MapEngine\Content\Maps\TestMap3.json";
             _cameraHandler.Initialise(mapFilename);
             _mapHandler.Initialise(mapFilename);
 
             var weaponsPath = @"C:\Source\MapEditor\MapEngine\Content\Weapons\";
             var unitsPath = @"C:\Source\MapEditor\MapEngine\Content\Units\";
-            _unitHandler.Initialise(unitsPath, mapFilename, weaponsPath);
+            var modelsPath = @"C:\Source\MapEditor\MapEngine\Content\Models";
+            _unitHandler.Initialise(unitsPath, mapFilename, weaponsPath, modelsPath);
         }
 
         public void Display()

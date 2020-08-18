@@ -1,0 +1,25 @@
+{
+	"Type":"ModelDummy",
+	"Image": {
+		"TextureId": "Cube"
+	},
+	"Model": {
+		"ModelId": "Cube"
+	},
+	"Movement": {
+		"MaxVelocity":100,
+		"Mass":1000,
+		"MaxForce":100,
+		"StopRadius":10,
+		"BrakeForce":0.05
+	},
+	"Area": {
+		"BoundingBox": {
+			"Width":24,
+			"Height":24,
+		}
+	},
+	"Weapons": [
+		"Cannon",
+	]
+}
