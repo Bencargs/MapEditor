@@ -1,4 +1,5 @@
 ﻿using Common;
+using MapEngine.Services.Map;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
@@ -42,12 +43,13 @@ namespace MapEngine.ResourceLoading
                 return new Tile
                 {
                     Id = x.Id,
+                    Size = x.Size,
                     Location = new Vector2((int)x.Location.X, (int)x.Location.Y),
                     TextureId = x.TextureId,
                     Type = x.Type
                 };
             }).ToArray();
-            var tiles = rawTileData.Make2DArray((int)mapData.TileWidth, (int)mapData.TileHeight);
+            var tiles = rawTileData.To2DArray((int)mapData.TileWidth, (int)mapData.TileHeight);
             return tiles;
         }
     }

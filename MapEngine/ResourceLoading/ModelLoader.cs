@@ -111,10 +111,9 @@ namespace MapEngine.ResourceLoading
             }
 
             // Todo - bug? seems to load objects in facing away from camera
-            //foreach (var mesh in meshes)
-            {
-                model.Rotation = new Vector3(model.Rotation.X, model.Rotation.Y, model.Rotation.Z);
-            }
+            // equivilent of rotating by 1 radian
+            model.Rotation = new Vector3(4.7f, 6.3f, 0);
+
             return model;
         }
     }

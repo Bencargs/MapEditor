@@ -1,4 +1,5 @@
-﻿using Common.Collision;
+﻿using Common;
+using Common.Collision;
 using Common.Entities;
 using MapEngine.Entities.Components;
 using MapEngine.Factories;
@@ -45,12 +46,13 @@ namespace MapEngine.ResourceLoading
                     var movementComponent = entity.GetComponent<MovementComponent>();
                     movementComponent.Velocity = new Vector2((int)movement.Velocity.X, (int)movement.Velocity.Y);
                     movementComponent.Steering = new Vector2((int)movement.Steering.X, (int)movement.Steering.Y);
-                    movementComponent.Destinations = ((IEnumerable<dynamic>)movement.Destinations)
-                        .Select(x => new MoveOrder
+                    movementComponent.Destinations = (movement.Destinations != null) 
+                        ? ((IEnumerable<dynamic>)movement.Destinations).Select(x => new MoveOrder
                         {
                             MovementMode = (MovementMode)Enum.Parse(typeof(MovementMode), (string)x.MovementMode),
                             Destination = new Vector2((int)x.Destination.X, (int)x.Destination.Y)
-                        }).ToQueue();
+                        }).ToQueue()
+                        : new Queue<MoveOrder>();
                 }
 
                 return entity;
@@ -102,7 +104,15 @@ namespace MapEngine.ResourceLoading
                     Mass = (float)(movement.Mass ?? 1),
                     MaxForce = (float)movement.MaxForce,
                     StopRadius = (float)movement.StopRadius,
-                    BrakeForce = (float)movement.BrakeForce
+                    BrakeForce = (float)movement.BrakeForce,
+                    Terrains = movement.Terrains != null 
+                        ? ((IEnumerable<dynamic>)movement.Terrains).Select(x => (TerrainType)x).ToArray()
+                        : DefaultTerrain,
+                    MovementMask = movement.MovementMask != null
+                        ? ((IEnumerable<dynamic>)unitData.Movement.MovementMask).Select(x =>
+                            ((IEnumerable<dynamic>)x).Select(y => ((int)y.Item1, (int)y.Item2)))
+                            .To2DArray()
+                        : DefaultMask
                 });
             }
 
@@ -136,6 +146,14 @@ namespace MapEngine.ResourceLoading
             return entity;
         }
 
+        private static readonly (int, int)[,] DefaultMask = new (int X, int Y)[,]
+        {
+			{ (-1, -1), (0, -1), (1, -1) },
+            { (-1,  0), (0,  0), (1,  0) },
+            { (-1,  1), (0,  1), (1,  1) }
+        };
+
+        private static readonly TerrainType[] DefaultTerrain = new[] { TerrainType.Land };
 
         // todo: move this to an entity extension class?
         // or put it on entity class?

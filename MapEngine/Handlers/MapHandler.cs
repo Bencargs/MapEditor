@@ -1,31 +1,38 @@
 ﻿using Common;
 using MapEngine.Factories;
 using MapEngine.ResourceLoading;
+using MapEngine.Services.Map;
 
 namespace MapEngine.Handlers
 {
     public class MapHandler
     {
-        private Map _map;
+        private readonly MapService _mapService;
+
+        public MapHandler(MapService mapService)
+        {
+            _mapService = mapService;
+        }
 
         public void Initialise(string mapFile)
         {
             // In future this would load only relevant map textures
             //_textures.LoadTextures(@"C:\Source\MapEditor\MapEngine\Content\Textures\");
 
-            _map = MapLoader.LoadMap(mapFile);
+            var map = MapLoader.LoadMap(mapFile);
+            _mapService.Initialise(map);
         }
 
         public void Render(Rectangle viewport, IGraphics graphics)
         {
-            DrawTiles(viewport, graphics, _map.Tiles);
+            DrawTiles(viewport, graphics, _mapService.Tiles);
         }
 
         private void DrawTiles(Rectangle viewport, IGraphics graphics, Tile[,] tiles)
         {
             foreach (var tile in tiles)
             {
-                if (tile == null)
+                if (!viewport.Contains(tile.Location))
                     continue;
 
                 if (TextureFactory.TryGetTexture(tile.TextureId, out var texture))
