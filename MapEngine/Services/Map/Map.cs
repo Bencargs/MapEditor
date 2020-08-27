@@ -1,6 +1,6 @@
 ﻿using Common;
 
-namespace MapEngine
+namespace MapEngine.Services.Map
 {
     public class Map
     {

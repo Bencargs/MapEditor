@@ -5,11 +5,9 @@ using MapEngine.Entities.Components;
 using MapEngine.Factories;
 using MapEngine.ResourceLoading;
 using SoftEngine;
-using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 namespace MapEngine.Handlers
 {
@@ -21,13 +19,13 @@ namespace MapEngine.Handlers
         : IHandleCommand<CreateEntityCommand>
         , IHandleCommand<DestroyEntityCommand>
     {
-        // todo.. seperate handler..?
+        // todo.. seperate service..?
         private readonly Device _3dEngine = new Device(new WpfImage(640, 480));
 
         private readonly MessageHub _messageHub;
         private readonly WeaponHandler _weaponHandler;
         private readonly MovementHandler _movementHandler;
-        private readonly List<Entity> _entities = new List<Entity>();
+        private readonly Dictionary<int, Entity> _entities = new Dictionary<int, Entity>();
 
         public EntityHandler(MessageHub messageHub, MovementHandler movementHandler, WeaponHandler weaponHandler)
         {
@@ -52,6 +50,15 @@ namespace MapEngine.Handlers
             {
                 _messageHub.Post(new CreateEntityCommand { Entity = unit });
             }
+
+            // todo: temp - remove this
+            _messageHub.Post(new MoveCommand
+            {
+                Entity = units[0],
+                Queue = false,
+                MovementMode = MovementMode.Seek,
+                Destination = new Vector2(400, 400)
+            });
         }
 
         public void Update()
@@ -62,7 +69,7 @@ namespace MapEngine.Handlers
 
         public void Render(Rectangle viewport, IGraphics graphics)
         {
-            foreach (var unit in _entities)
+            foreach (var unit in _entities.Values)
             {
                 var location = unit.GetComponent<LocationComponent>();
                 var textureId = unit.GetComponent<ImageComponent>().TextureId;
@@ -73,11 +80,11 @@ namespace MapEngine.Handlers
                 var modelComponent = unit.GetComponent<ModelComponent>();
                 if (modelComponent != null && ModelFactory.TryGetModel(modelComponent.ModelId, out var model))
                 {
-                    model.Rotation = new Vector3(model.Rotation.X + 0.02f, model.Rotation.Y + 0.09f, model.Rotation.Z);
                     model.Location = new Vector3(0, 0, 2);
 
-                    //var area = texture.Area(location.Location);
-                    //area.Translate(viewport.X, viewport.Y);
+                    // todo: buggy, weird rotation here
+                    //var radians = (Math.PI / 180) * location.FacingAngle;
+                    //model.Rotation = new Vector3((float)Math.Cos(radians), (float)Math.Cos(radians), model.Rotation.Z);
 
                     var render = _3dEngine.Render(model, texture);
                     var tex = new Texture(render);
@@ -103,12 +110,12 @@ namespace MapEngine.Handlers
 
         public void Handle(CreateEntityCommand command)
         {
-            _entities.Add(command.Entity);
+            _entities[command.Entity.Id] = command.Entity;
         }
 
         public void Handle(DestroyEntityCommand command)
         {
-            _entities.Remove(command.Entity);
+            _entities.Remove(command.Entity.Id);
         }
     }
 }

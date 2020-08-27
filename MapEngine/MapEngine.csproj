@@ -83,6 +83,7 @@
     <Compile Include="Commands\ICommand.cs" />
     <Compile Include="Commands\IHandleCommand.cs" />
     <Compile Include="Commands\MessageHub.cs" />
+    <Compile Include="Commands\MoveCommand.cs" />
     <Compile Include="Entities\Components\CollisionComponent.cs" />
     <Compile Include="Entities\Components\ModelComponent.cs" />
     <Compile Include="Entities\Components\UnitComponent.cs" />
@@ -102,8 +103,12 @@
     <Compile Include="Extensions\ImageEx.cs" />
     <Compile Include="Entities\Components\LocationComponent.cs" />
     <Compile Include="Factories\WeaponFactory.cs" />
+    <Compile Include="Services\Map\MapService.cs" />
+    <Compile Include="Services\Navigation\NavigationService.cs" />
+    <Compile Include="Services\Navigation\Node.cs" />
+    <Compile Include="Services\Navigation\NodeQueue.cs" />
     <Compile Include="Handlers\WeaponHandler.cs" />
-    <Compile Include="Map.cs" />
+    <Compile Include="Services\Map\Map.cs" />
     <Compile Include="Handlers\MovementHandler\MovementMode.cs" />
     <Compile Include="Model.cs" />
     <Compile Include="Mouse.cs" />

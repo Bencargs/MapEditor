@@ -1,4 +1,5 @@
-﻿using Common.Entities;
+﻿using Common;
+using Common.Entities;
 using MapEngine.Handlers;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,9 +18,11 @@ namespace MapEngine.Entities.Components
         public float MaxVelocity { get; set; }
         public float Mass { get; set; }
         public float MaxForce { get; set; }
-
         public float StopRadius { get; set; }
+
         public Queue<MoveOrder> Destinations = new Queue<MoveOrder>();
+        public (int X, int Y)[,] MovementMask { get; set; }
+        public TerrainType[] Terrains { get; set; }
 
         public IComponent Clone()
         {
@@ -32,6 +35,8 @@ namespace MapEngine.Entities.Components
                 MaxForce = MaxForce,
                 StopRadius = StopRadius,
                 BrakeForce = BrakeForce,
+                MovementMask = MovementMask,
+                Terrains = Terrains,
                 Destinations = new Queue<MoveOrder>(Destinations.Select(x => x.Clone()))
             };
         }

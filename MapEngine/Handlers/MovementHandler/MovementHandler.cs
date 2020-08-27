@@ -1,6 +1,8 @@
-﻿using Common.Entities;
+﻿using Common;
+using Common.Entities;
 using MapEngine.Commands;
 using MapEngine.Entities.Components;
+using MapEngine.Services.Navigation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,14 +13,20 @@ namespace MapEngine.Handlers
     public class MovementHandler 
         : IHandleCommand<CreateEntityCommand>
         , IHandleCommand<DestroyEntityCommand>
+        , IHandleCommand<MoveCommand>
     {
+        private readonly NavigationService _navigator;
         private readonly MessageHub _messageHub;
         private readonly CollisionHandler _collisionHandler;
         private readonly List<Entity> _entities = new List<Entity>();
 
-        public MovementHandler(MessageHub messageHub, CollisionHandler collisionHandler)
+        public MovementHandler(
+            MessageHub messageHub, 
+            CollisionHandler collisionHandler,
+            NavigationService navigationService)
         {
             _messageHub = messageHub;
+            _navigator = navigationService;
             _collisionHandler = collisionHandler;
         }
 
@@ -46,7 +54,7 @@ namespace MapEngine.Handlers
                         break;
                     case MovementMode.Seek:
                         Seek(location, movement, target.Destination);
-                        ApplyFriction(location, movement);
+                        ApplyFriction(movement);
                         break;
                 }
             }
@@ -56,8 +64,8 @@ namespace MapEngine.Handlers
         private void HandleCollisions(Entity entity)
         {
             // todo - ?? seems like units are colliding with their own projectiles, and exploding?
-            if (entity.Id != 72)
-                return;
+            //if (entity.Id != 72)
+            //    return;
 
             var collider = entity.GetComponent<CollisionComponent>();
             if (collider == null)
@@ -76,7 +84,7 @@ namespace MapEngine.Handlers
             }
         }
 
-        private static void ApplyFriction(LocationComponent location, MovementComponent movement)
+        private static void ApplyFriction(MovementComponent movement)
         {
             const float Friction = 0.95f; // Ideally this would be a property of the map tile
 
@@ -144,5 +152,30 @@ namespace MapEngine.Handlers
         {
             _entities.Remove(command.Entity);
         }
+
+        public void Handle(MoveCommand command)
+        {
+            var movementComponent = command.Entity.GetComponent<MovementComponent>();
+
+            var path = _navigator.GetPath(command.Entity, command.Destination);
+            var orders = ToMoveOrders(path, command.MovementMode);
+
+            if (!command.Queue)
+                movementComponent.Destinations.Clear();
+
+            movementComponent.Destinations.Enqueue(orders);
+        }
+
+        private IEnumerable<MoveOrder> ToMoveOrders(Tile[] path, MovementMode movementMode) =>
+            path.Select(x =>
+            {
+                var centerX = x.Size / 2;
+                var centerY = x.Size / 2;
+                return new MoveOrder
+                {
+                    MovementMode = movementMode,
+                    Destination = new Vector2(x.Location.X + centerX, x.Location.Y + centerY)
+                };
+            });
     }
 }
