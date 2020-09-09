@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using MapEngine.Commands;
 using MapEngine.Handlers;
+using MapEngine.Services.Effects;
 using MapEngine.Services.Map;
 using MapEngine.Services.Navigation;
 
@@ -31,6 +32,7 @@ namespace MapEngine
             var image = new WpfImage(640, 480);
             builder.RegisterInstance(new WpfGraphics(image)).SingleInstance();
             builder.RegisterType<MapService>().SingleInstance();
+            builder.RegisterType<WaveEffectService>().SingleInstance();
             builder.RegisterType<NavigationService>().SingleInstance();
         }
 
@@ -41,6 +43,7 @@ namespace MapEngine
             builder.RegisterType<WeaponHandler>().SingleInstance();
             builder.RegisterType<EntityHandler>().SingleInstance();
             builder.RegisterType<CameraHandler>().SingleInstance();
+            builder.RegisterType<EffectsHandler>().SingleInstance();
             builder.RegisterType<MapHandler>().SingleInstance();
         }
     }

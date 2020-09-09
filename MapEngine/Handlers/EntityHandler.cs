@@ -50,15 +50,6 @@ namespace MapEngine.Handlers
             {
                 _messageHub.Post(new CreateEntityCommand { Entity = unit });
             }
-
-            // todo: temp - remove this
-            _messageHub.Post(new MoveCommand
-            {
-                Entity = units[0],
-                Queue = false,
-                MovementMode = MovementMode.Seek,
-                Destination = new Vector2(400, 400)
-            });
         }
 
         public void Update()

@@ -58,7 +58,7 @@ namespace MapEngine
                         continue; // Dont draw something that's entirely transperant
 
                     var offset = Math.Max(0, (area.X * 4) + (area.Y * Width * 4));
-                    var i = Math.Min(_backBuffer.Length - 1, x + (y * Width) + offset);
+                    var i = Math.Min(_backBuffer.Length - 4, x + (y * Width) + offset);
 
                     _backBuffer[i] = colour.Red;
                     _backBuffer[i + 1] = colour.Blue;
@@ -77,13 +77,32 @@ namespace MapEngine
                     continue;
 
                 var k = i + (area.X * 4) + (area.Y * 4 * area.Width);
-                if (k > _backBuffer.Length || k < 0)
+                if (k + 4 > _backBuffer.Length || k < 0)
                     continue;
 
                 _backBuffer[k] = buffer[i];
                 _backBuffer[k + 1] = buffer[i + 1];
                 _backBuffer[k + 2] = buffer[i + 2];
                 _backBuffer[k + 3] = buffer[i + 3];
+            }
+        }
+
+        public void Apply(byte[] buffer)
+        {
+            for (int i = 0; i < buffer.Length; i++)
+            {
+                var value = buffer[i];
+                if (value == 0)
+                    continue;
+
+                var j = i * 4;
+                if (j > _backBuffer.Length)
+                    continue;
+
+                _backBuffer[j] = (byte)Math.Min(255, _backBuffer[j] + value);
+                _backBuffer[j + 1] = (byte)Math.Min(255, _backBuffer[j + 1] + value);
+                _backBuffer[j + 2] = (byte)Math.Min(255, _backBuffer[j + 2] + value);
+                _backBuffer[j + 3] = (byte)Math.Min(255, _backBuffer[j + 3] + value);
             }
         }
 

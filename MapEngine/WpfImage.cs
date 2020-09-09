@@ -10,7 +10,7 @@ namespace MapEngine
     {
         public int Width { get; }
         public int Height { get; }
-        public WriteableBitmap Bitmap { get; set; }
+        public WriteableBitmap Bitmap { get; set; } // todo: ToBitmap?
         public byte[] Buffer { get; set; }
 
         public WpfImage(WriteableBitmap bitmap)
