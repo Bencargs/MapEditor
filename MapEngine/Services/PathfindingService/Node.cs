@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace MapEngine.Services.Navigation
+namespace MapEngine.Services.PathfindingService
 {
     public class Node<T>
     {

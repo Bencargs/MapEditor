@@ -28,7 +28,7 @@ namespace MapEngine
 
         public void Initialise()
         {
-            var mapFilename = @"C:\Source\MapEditor\MapEngine\Content\Maps\TestMap4.json";
+            var mapFilename = @"C:\Source\MapEditor\MapEngine\Content\Maps\TestMap5.json";
             _cameraHandler.Initialise(mapFilename);
             _mapHandler.Initialise(mapFilename);
 

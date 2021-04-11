@@ -1,18 +1,19 @@
-﻿using Common;
-using Common.Entities;
-using MapEngine.Entities.Components;
-using MapEngine.Services.Map;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using Common;
+using Common.Entities;
+using MapEngine.Entities.Components;
+using MapEngine.Services.Map;
 
-namespace MapEngine.Services.Navigation
+namespace MapEngine.Services.PathfindingService
 {
-    public class NavigationService
+    public class PathfindingService
     {
         private readonly MapService _map;
 
-        public NavigationService(MapService mapService)
+        public PathfindingService(MapService mapService)
         {
             _map = mapService;
         }
@@ -23,15 +24,15 @@ namespace MapEngine.Services.Navigation
             var movement = entity.GetComponent<MovementComponent>();
 
             var visited = new Dictionary<int, Node<Tile>>();
-            var potentials = new NodeQueue<int, float, Tile>(x => x.Value);
+            var potentials = new NodeQueue<float, Tile>(x => x.Value);
 
             var destination = _map.GetTile(target);
             var currentTile = _map.GetTile(location);
             var initialNode = CreateNode(currentTile, destination, null);
             potentials.Push(initialNode);
 
-            var found = false;
-            Node<Tile> current = null;
+            bool found;
+            Node<Tile> current;
             do
             {
                 current = potentials.Pop();
@@ -53,7 +54,9 @@ namespace MapEngine.Services.Navigation
             if (!found)
             {
                 // If there is no direct path, get the closest path to destination
-                current = visited.OrderBy(x => x.Value.Value).FirstOrDefault().Value;
+                current = visited.Any()
+                    ? visited.OrderBy(x => x.Value.Value).FirstOrDefault().Value
+                    : current;
             }
 
             return Prune(current).ToArray();
@@ -73,11 +76,11 @@ namespace MapEngine.Services.Navigation
             };
         }
 
-        private Node<Tile> Prune(Node<Tile> tail)
+        private static Node<Tile> Prune(Node<Tile> tail)
         {
             var current = tail;
 
-            while (current.Previous != null && current.Previous.Previous != null)
+            while (current?.Previous?.Previous != null)
             {
                 var temp = current.Previous.Previous;
 
@@ -86,7 +89,7 @@ namespace MapEngine.Services.Navigation
                 var previousSlope = (temp.Item.Location.Y - current.Previous.Item.Location.Y) / (temp.Item.Location.X - current.Previous.Item.Location.X);
 
                 // if all three points exist on the same line, remove the middle point
-                if (currentSlope == previousSlope)
+                if (Math.Abs(currentSlope - previousSlope) < 0.1)
                     current.Previous = temp;
                 else
                     current = current.Previous;
@@ -100,14 +103,14 @@ namespace MapEngine.Services.Navigation
             var (currentX, currentY) = _map.GetCoordinates(current);
 
             var results = new List<Tile>();
-            foreach (var (X, Y) in movementComponent.MovementMask)
+            foreach (var (x, y) in movementComponent.MovementMask)
             {
-                if (currentX < 0 || currentY < 0 ||
-                    currentX > tiles.GetLength(0) - 1 ||
-                    currentY > tiles.GetLength(1) - 1)
+                if (currentX + x < 0 || currentY + y < 0 ||
+                    currentX + x > tiles.GetLength(0) - 1 ||
+                    currentY + y > tiles.GetLength(1) - 1)
                     continue;
 
-                var tile = tiles[currentX + X, currentY + Y];
+                var tile = tiles[currentX + x, currentY + y];
                 if (movementComponent.Terrains.Contains(tile.Type))
                     results.Add(tile);
             }

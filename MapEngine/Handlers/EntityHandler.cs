@@ -12,7 +12,7 @@ using System.Numerics;
 namespace MapEngine.Handlers
 {
     /// <summary>
-    /// Responsible for corrdinating component handlers
+    /// Responsible for coordinating component handlers
     /// to represent update of entity state
     /// </summary>
     public class EntityHandler
@@ -25,11 +25,17 @@ namespace MapEngine.Handlers
         private readonly MessageHub _messageHub;
         private readonly WeaponHandler _weaponHandler;
         private readonly MovementHandler _movementHandler;
+        private readonly SensorHandler _sensorHandler;
         private readonly Dictionary<int, Entity> _entities = new Dictionary<int, Entity>();
 
-        public EntityHandler(MessageHub messageHub, MovementHandler movementHandler, WeaponHandler weaponHandler)
+        public EntityHandler(
+            MessageHub messageHub, 
+            MovementHandler movementHandler, 
+            SensorHandler sensorHandler,
+            WeaponHandler weaponHandler)
         {
             _messageHub = messageHub;
+            _sensorHandler = sensorHandler;
             _weaponHandler = weaponHandler;
             _movementHandler = movementHandler;
         }
@@ -50,25 +56,20 @@ namespace MapEngine.Handlers
             {
                 _messageHub.Post(new CreateEntityCommand { Entity = unit });
             }
-
-            // todo: temp - remove this
-            _messageHub.Post(new MoveCommand
-            {
-                Entity = units[0],
-                Queue = false,
-                MovementMode = MovementMode.Seek,
-                Destination = new Vector2(400, 400)
-            });
         }
 
         public void Update()
         {
             _movementHandler.Update();
+            _sensorHandler.Update();
             _weaponHandler.Update();
         }
 
         public void Render(Rectangle viewport, IGraphics graphics)
         {
+            var playerTeam = 0;
+            // todo - really need some extensions around all this component handling
+            
             foreach (var unit in _entities.Values)
             {
                 var location = unit.GetComponent<LocationComponent>();
@@ -76,34 +77,49 @@ namespace MapEngine.Handlers
                 if (!TextureFactory.TryGetTexture(textureId, out var texture))
                     continue;
 
-                // 3d rendering
-                var modelComponent = unit.GetComponent<ModelComponent>();
-                if (modelComponent != null && ModelFactory.TryGetModel(modelComponent.ModelId, out var model))
+                var team = unit.GetComponent<UnitComponent>().TeamId;
+                var sensors = unit.GetComponents<SensorComponent>();
+                if (team == playerTeam)
                 {
-                    model.Location = new Vector3(0, 0, 2);
-
-                    // todo: buggy, weird rotation here
-                    //var radians = (Math.PI / 180) * location.FacingAngle;
-                    //model.Rotation = new Vector3((float)Math.Cos(radians), (float)Math.Cos(radians), model.Rotation.Z);
-
-                    var render = _3dEngine.Render(model, texture);
-                    var tex = new Texture(render);
-                    var area = tex.Area(location.Location);
-                    area.Translate(viewport.X, viewport.Y);
-
-                    graphics.DrawBytes(render.Buffer, area);
+                    // todo - seperate concerns of individual component rendering
+                    foreach (var s in sensors)
+                    {
+                        var radius = new Rectangle(location.Location, (int) s.Radius, (int) s.Radius);
+                        graphics.DrawCircle(new Colour(0, 0, 255, 255), radius);
+                    }
                 }
-                else // 2d rendering
+
+                // 3d rendering
+                if (team == playerTeam || _sensorHandler.IsDetected(playerTeam, unit)) // todo - needs to reconsider this perspective based rendering
                 {
-                    //Translate against camera movement
-                    var area = texture.Area(location.Location);
-                    area.Translate(viewport.X, viewport.Y);
+                    var modelComponent = unit.GetComponent<ModelComponent>();
+                    if (modelComponent != null && ModelFactory.TryGetModel(modelComponent.ModelId, out var model))
+                    {
+                        model.Location = new Vector3(0, 0, 2);
 
-                    // Rotate image to movement / facing angle
-                    // todo: rotate around centre point
-                    var rotated = texture.Image.Rotate(location.FacingAngle);
+                        // todo: buggy, weird rotation here
+                        //var radians = (Math.PI / 180) * location.FacingAngle;
+                        //model.Rotation = new Vector3((float)Math.Cos(radians), (float)Math.Cos(radians), model.Rotation.Z);
 
-                    graphics.DrawImage(rotated, area);
+                        var render = _3dEngine.Render(model, texture);
+                        var tex = new Texture(render);
+                        var area = tex.Area(location.Location);
+                        area.Translate(viewport.X, viewport.Y);
+
+                        graphics.DrawBytes(render.Buffer, area);
+                    }
+                    else // 2d rendering
+                    {
+                        //Translate against camera movement
+                        var area = texture.Area(location.Location);
+                        area.Translate(viewport.X, viewport.Y);
+
+                        // Rotate image to movement / facing angle
+                        // todo: rotate around centre point
+                        var rotated = texture.Image.Rotate(location.FacingAngle);
+
+                        graphics.DrawImage(rotated, area);
+                    }
                 }
             }
         }

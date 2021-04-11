@@ -9,6 +9,7 @@
         Unit,
         Weapon,
         Collision,
-        Model
+        Model,
+        Sensor
     }
 }

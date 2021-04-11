@@ -9,7 +9,7 @@ namespace MapEngine.Entities.Components
 {
     public class MovementComponent : IComponent
     {
-        public ComponentType Type => ComponentType.Movement;
+        public ComponentType Type { get; } = ComponentType.Movement;
         
         public Vector2 Velocity { get; set; }
         public Vector2 Steering { get; set; }

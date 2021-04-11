@@ -42,7 +42,7 @@ namespace MapEngine.Handlers
             if (movementComponent == null)
                 return 0d;
 
-             var impactForce = 0.5 * movementComponent.Mass * movementComponent.Velocity.LengthSquared();
+            var impactForce = 0.5 * movementComponent.Mass * movementComponent.Velocity.LengthSquared();
             return impactForce;
         }
 

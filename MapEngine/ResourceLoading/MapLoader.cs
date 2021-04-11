@@ -38,16 +38,12 @@ namespace MapEngine.ResourceLoading
 
         private static Tile[,] LoadTiles(dynamic mapData)
         {
-            var rawTileData = ((IEnumerable<dynamic>)mapData.Tiles).Select(x =>
+            var rawTileData = ((IEnumerable<dynamic>)mapData.Tiles).Select(x => new Tile
             {
-                return new Tile
-                {
-                    Id = x.Id,
-                    Size = x.Size,
-                    Location = new Vector2((int)x.Location.X, (int)x.Location.Y),
-                    TextureId = x.TextureId,
-                    Type = x.Type
-                };
+                Id = x.Id,
+                Location = new Vector2((int)x.Location.X, (int)x.Location.Y),
+                TextureId = x.TextureId,
+                Type = x.Type
             }).ToArray();
             var tiles = rawTileData.To2DArray((int)mapData.TileWidth, (int)mapData.TileHeight);
             return tiles;
