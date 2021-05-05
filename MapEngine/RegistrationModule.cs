@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using MapEngine.Commands;
 using MapEngine.Handlers;
+using MapEngine.Rendering;
 using MapEngine.Services.Map;
 using MapEngine.Services.PathfindingService;
 
@@ -14,6 +15,7 @@ namespace MapEngine
 
             RegisterMessageHub(builder);
             RegisterServices(builder);
+            RegisterRenderers(builder);
             RegisterHandlers(builder);
 
             var container = builder.Build();
@@ -43,6 +45,13 @@ namespace MapEngine
             builder.RegisterType<CameraHandler>().SingleInstance();
             builder.RegisterType<MapHandler>().SingleInstance();
             builder.RegisterType<SensorHandler>().SingleInstance();
+        }
+
+        private static void RegisterRenderers(ContainerBuilder builder)
+        {
+            builder.RegisterType<Renderer2d>().SingleInstance();
+            builder.RegisterType<Renderer3d>().SingleInstance();
+            builder.RegisterType<SensorRenderer>().SingleInstance();
         }
     }
 }
