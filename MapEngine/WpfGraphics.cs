@@ -36,7 +36,21 @@ namespace MapEngine
 
         public void DrawCircle(Colour colour, Rectangle area)
         {
-            throw new NotImplementedException();
+            var radius = Math.Min(area.Height, area.Width);
+            var centerX = area.X;
+            var centerY = area.Y;
+            for (var x = 0; x < Width; x++)
+            {
+                for (var y = 0; y < Height; y++)
+                {
+                    var point = (int) (Math.Pow(x - centerX, 2) + Math.Pow(y - centerY, 2));
+                    var perimeter = (int) Math.Sqrt(point);
+                    if (radius == perimeter)
+                    {
+                        SetPixel(x, y, colour);
+                    }
+                }
+            }
         }
 
         public void DrawImage(IImage image, Rectangle area)
@@ -60,6 +74,9 @@ namespace MapEngine
                     var offset = Math.Max(0, (area.X * 4) + (area.Y * Width * 4));
                     var i = Math.Min(_backBuffer.Length - 1, x + (y * Width) + offset);
 
+                    if (i + 3 > _backBuffer.Length - 1)
+                        continue;
+                    
                     _backBuffer[i] = colour.Red;
                     _backBuffer[i + 1] = colour.Blue;
                     _backBuffer[i + 2] = colour.Green;
@@ -85,6 +102,16 @@ namespace MapEngine
                 _backBuffer[k + 2] = buffer[i + 2];
                 _backBuffer[k + 3] = buffer[i + 3];
             }
+        }
+
+        private void SetPixel(int x, int y, Colour colour)
+        {
+            var index = (x * 4) + (y * 4 * Width);
+            
+            _backBuffer[index] = colour.Blue;
+            _backBuffer[index + 1] = colour.Green;
+            _backBuffer[index + 2] = colour.Red;
+            _backBuffer[index + 3] = colour.Alpha;
         }
 
         public void DrawLines(Colour colour, Vector2[] points)

@@ -55,6 +55,17 @@ namespace MapEngine.ResourceLoading
                         : new Queue<MoveOrder>();
                 }
 
+                var sensors = (IEnumerable<dynamic>) u.Sensors;
+                if (sensors != null)
+                {
+                    // todo: bug here - what if these collections don't match?
+                    var sensorComponents = entity.GetComponents<SensorComponent>();
+                    for (int i = 0; i < sensorComponents.Length; i++)
+                    {
+                        sensorComponents[i].Radius = (float)(sensors.ElementAt(i)?.Radius ?? 0);
+                    }
+                }
+
                 return entity;
             }).ToArray();
 
@@ -114,6 +125,18 @@ namespace MapEngine.ResourceLoading
                             .To2DArray()
                         : DefaultMask
                 });
+            }
+
+            var sensors = (IEnumerable<dynamic>)unitData.Sensors;
+            if (sensors != null)
+            {
+                foreach (var s in sensors)
+                {
+                    entity.AddComponent(new SensorComponent
+                    {
+                        Radius = s.Radius
+                    });
+                }
             }
 
             var area = unitData.Area;

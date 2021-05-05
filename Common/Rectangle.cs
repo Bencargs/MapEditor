@@ -1,5 +1,4 @@
-﻿using Common.Collision;
-using System.Numerics;
+﻿using System.Numerics;
 
 namespace Common
 {
@@ -14,6 +13,14 @@ namespace Common
         {
             X = x;
             Y = y;
+            Width = width;
+            Height = height;
+        }
+
+        public Rectangle(Vector2 point, int width, int height)
+        {
+            X = (int) point.X;
+            Y = (int) point.Y;
             Width = width;
             Height = height;
         }

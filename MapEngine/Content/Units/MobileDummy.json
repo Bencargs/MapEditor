@@ -19,5 +19,17 @@
 			[{"Item1":-1,"Item2":0},{"Item1":0,"Item2":0},{"Item1":1,"Item2":0}],
 			[{"Item1":-1,"Item2":1},{"Item1":0,"Item2":1},{"Item1":1,"Item2":1}]
 		]
-	}
+	},
+	"Area": {
+		"BoundingBox": {
+			"Width":24,
+			"Height":24,
+		}
+	},
+	"Sensors": [
+		{
+			"Type": "Radar",
+			"Radius": 200
+		}
+	  ],
 }

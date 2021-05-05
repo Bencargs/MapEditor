@@ -14,6 +14,7 @@ namespace MapEngine.Handlers
     /// </summary>
     public class WeaponHandler
         : IHandleCommand<CreateEntityCommand>
+        , IHandleCommand<DestroyEntityCommand>
     {
         private readonly MessageHub _messageHub;
         private readonly CollisionHandler _collisionHandler;
@@ -119,6 +120,11 @@ namespace MapEngine.Handlers
                 return;
 
             _entities.Add(entity);
+        }
+
+        public void Handle(DestroyEntityCommand command)
+        {
+            _entities.Remove(command.Entity);
         }
     }
 }

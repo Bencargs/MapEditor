@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MapEngine.Services.Navigation
+namespace MapEngine.Services.PathfindingService
 {
-    public class NodeQueue<TKey, TValue, TItem>
+    public class NodeQueue<TValue, TItem>
         where TValue : IComparable
     {
-        private Func<Node<TItem>, TValue> _valueSelector;
-        private SortedList<TValue, Node<TItem>> _items;
+        private readonly Func<Node<TItem>, TValue> _valueSelector;
+        private readonly SortedList<TValue, Node<TItem>> _items;
 
         public class KeyComparer : IComparer<TValue>
         {
@@ -16,10 +16,7 @@ namespace MapEngine.Services.Navigation
             {
                 var result = x.CompareTo(y);
 
-                if (result == 0)
-                    return 1;
-                else
-                    return result;
+                return result == 0 ? 1 : result;
             }
         }
 

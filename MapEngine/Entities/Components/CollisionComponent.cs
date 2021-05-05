@@ -8,8 +8,8 @@ namespace MapEngine.Entities.Components
     {
         public ComponentType Type => ComponentType.Collision;
         public float MaxImpactForce { get; set; }
-        
-        private ICollider _collider { get; set; }
+
+        private readonly ICollider _collider;
         public ICollider GetCollider(Vector2 location)
         {
             // todo - whats going on here?

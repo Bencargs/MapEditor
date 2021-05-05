@@ -2,11 +2,11 @@
 using Common.Entities;
 using MapEngine.Commands;
 using MapEngine.Entities.Components;
-using MapEngine.Services.Navigation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using MapEngine.Services.PathfindingService;
 
 namespace MapEngine.Handlers
 {
@@ -15,7 +15,7 @@ namespace MapEngine.Handlers
         , IHandleCommand<DestroyEntityCommand>
         , IHandleCommand<MoveCommand>
     {
-        private readonly NavigationService _navigator;
+        private readonly PathfindingService _pathfinding;
         private readonly MessageHub _messageHub;
         private readonly CollisionHandler _collisionHandler;
         private readonly List<Entity> _entities = new List<Entity>();
@@ -23,10 +23,10 @@ namespace MapEngine.Handlers
         public MovementHandler(
             MessageHub messageHub, 
             CollisionHandler collisionHandler,
-            NavigationService navigationService)
+            PathfindingService pathfindingService)
         {
             _messageHub = messageHub;
-            _navigator = navigationService;
+            _pathfinding = pathfindingService;
             _collisionHandler = collisionHandler;
         }
 
@@ -157,7 +157,7 @@ namespace MapEngine.Handlers
         {
             var movementComponent = command.Entity.GetComponent<MovementComponent>();
 
-            var path = _navigator.GetPath(command.Entity, command.Destination);
+            var path = _pathfinding.GetPath(command.Entity, command.Destination);
             var orders = ToMoveOrders(path, command.MovementMode);
 
             if (!command.Queue)
@@ -167,15 +167,10 @@ namespace MapEngine.Handlers
         }
 
         private IEnumerable<MoveOrder> ToMoveOrders(Tile[] path, MovementMode movementMode) =>
-            path.Select(x =>
+            path.Select(x => new MoveOrder
             {
-                var centerX = x.Size / 2;
-                var centerY = x.Size / 2;
-                return new MoveOrder
-                {
-                    MovementMode = movementMode,
-                    Destination = new Vector2(x.Location.X + centerX, x.Location.Y + centerY)
-                };
+                MovementMode = movementMode,
+                Destination = new Vector2(x.Location.X, x.Location.Y)
             });
     }
 }

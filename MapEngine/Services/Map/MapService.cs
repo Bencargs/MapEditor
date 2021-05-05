@@ -19,8 +19,8 @@ namespace MapEngine.Services.Map
 
         public Tile GetTile(Vector2 location)
         {
-            var x = (int)((location.X / _map.Width) * _map.Tiles.GetLength(0));
-            var y = (int)((location.Y / _map.Height) * _map.Tiles.GetLength(1));
+            var x = (int)((location.X / Width) * _map.Tiles.GetLength(0));
+            var y = (int)((location.Y / Height) * _map.Tiles.GetLength(1));
             x = Math.Max(0, Math.Min(x, _map.Tiles.GetLength(0) - 1));
             y = Math.Max(0, Math.Min(y, _map.Tiles.GetLength(1) - 1));
             return _map.Tiles[x, y];
