@@ -53,6 +53,10 @@ namespace MapEngine.Handlers
                         location.Location += movement.Velocity;
                         break;
                     case MovementMode.Seek:
+                        //todo: would a better way be:
+                        // 1. Update rotation
+                        // 2. Update Speed
+                        // 3. Update Position?
                         Seek(location, movement, target.Destination);
                         ApplyFriction(movement);
                         break;
@@ -77,9 +81,13 @@ namespace MapEngine.Handlers
                 if (impactForce > collider.MaxImpactForce)
                 {
                     // todo: explosions!
+                    
+                    // todo: entity lifetime should be handled by entity handler - not here
+                    // raise a collisionEvent, let the entity handle it?
+                    
                     //var explosion = ParticleFactory.Create(entity);
                     //_messageHub.Post(new CreateEffectCommand { Entity = explosion });
-                    _messageHub.Post(new DestroyEntityCommand { Entity = entity });
+                    //_messageHub.Post(new DestroyEntityCommand { Entity = entity });
                 }
             }
         }
@@ -128,7 +136,7 @@ namespace MapEngine.Handlers
             target.Steering = desiredVelocity - target.Velocity;
 
             //divide the steeringForce by the mass(which makes it the acceleration), 
-            target.Steering = (target.Steering.Truncate(target.MaxForce)) / target.Mass;
+            target.Steering = target.Steering.Truncate(target.MaxForce) / target.Mass;
 
             //then add it to velocity to get the new velocity
             target.Velocity = (target.Velocity + target.Steering).Truncate(target.MaxVelocity);
@@ -166,7 +174,7 @@ namespace MapEngine.Handlers
             movementComponent.Destinations.Enqueue(orders);
         }
 
-        private IEnumerable<MoveOrder> ToMoveOrders(Tile[] path, MovementMode movementMode) =>
+        private static IEnumerable<MoveOrder> ToMoveOrders(Tile[] path, MovementMode movementMode) =>
             path.Select(x => new MoveOrder
             {
                 MovementMode = movementMode,

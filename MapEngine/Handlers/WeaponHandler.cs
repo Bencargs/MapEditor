@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using MapEngine.Entities;
 
 namespace MapEngine.Handlers
 {
@@ -85,13 +86,13 @@ namespace MapEngine.Handlers
             return projectile;
         }
 
-        private bool TryGetAim(Entity self, Entity target, out Vector2 aimPoint)
+        private static bool TryGetAim(Entity self, Entity target, out Vector2 aimPoint)
         {
             aimPoint = Vector2.Zero;
             var weapon = self.GetComponent<WeaponComponent>();
-            var targetLocation = target.GetComponent<LocationComponent>().Location;
+            var selfLocation = self.Location();
+            var targetLocation = target.Location();
             var targetVelocity = target.GetComponent<MovementComponent>()?.Velocity ?? Vector2.Zero;
-            var selfLocation = self.GetComponent<LocationComponent>().Location;
 
             // calculate target and projectiles location at each step in the future
             // return the leading aim location on the first possible intercept

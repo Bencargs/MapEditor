@@ -29,12 +29,5 @@ namespace MapEngine
         {
             _animation = animation;
         }
-
-        public Rectangle Area(Vector2 point)
-        {
-            var x = point.X - (Width / 2);
-            var y = point.Y - (Height / 2);
-            return new Rectangle((int)x, (int)y, Width, Height);
-        }
     }
 }

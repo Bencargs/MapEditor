@@ -4,6 +4,7 @@ using System.Linq;
 using System.Numerics;
 using Common;
 using Common.Entities;
+using MapEngine.Entities;
 using MapEngine.Entities.Components;
 using MapEngine.Services.Map;
 
@@ -20,7 +21,7 @@ namespace MapEngine.Services.PathfindingService
 
         public Tile[] GetPath(Entity entity, Vector2 target)
         {
-            var location = entity.GetComponent<LocationComponent>().Location;
+            var location = entity.Location();
             var movement = entity.GetComponent<MovementComponent>();
 
             var visited = new Dictionary<int, Node<Tile>>();

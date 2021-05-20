@@ -2,7 +2,7 @@
   "Width": 768,
   "Height": 512,
   "Heightmap": "WaterHeightmap.png",
-  "Description":"Water animation test",
+  "Description":"3d animation test",
   "TileWidth":3,
   "TileHeight":2,
   "Camera": {
@@ -53,13 +53,27 @@
 						"X":50,
 						"Y":50
 					}
+				},
+				{
+				"MovementMode":"Seek",
+				"Destination":{
+						"X":450,
+						"Y":275
+					}
+				},
+				{
+				"MovementMode":"Seek",
+				"Destination":{
+						"X":25,
+						"Y":10
+					}
 				}
 			]
 		}
 	},
 	{
 		"Id":1,
-		"Team":1,
+		"Team":0,
 		"Type":"ModelDummy",
 		"Location":{
 			"X":300,

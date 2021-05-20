@@ -2,7 +2,7 @@
   "Width": 768,
   "Height": 512,
   "Heightmap": "WaterHeightmap.png",
-  "Description":"Water animation test",
+  "Description":"Projectile test",
   "TileWidth":3,
   "TileHeight":2,
   "Camera": {

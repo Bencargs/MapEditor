@@ -378,20 +378,21 @@ namespace SoftEngine
             var mesh = new Model(model, texture);
             var camera = new Camera
             {
-                Position = new Vector3(0, 0, 100),
+                Position = new Vector3(0f, 0f, 100f),
                 Target = Vector3.Zero
             };
 
-            var viewMatrix = Matrix.LookAtLH(camera.Position, camera.Target, Vector3.UnitY);
+            var viewMatrix = Matrix.LookAtLH(camera.Position, camera.Target, Vector3.UnitX);
             var projectionMatrix = Matrix.PerspectiveFovLH(0.78f,
                                                            (float)_width / _height,
                                                            0.01f, 1.0f);
 
+            // todo: bug in here?
             // Beware to apply rotation before translation 
             var worldMatrix = Matrix.RotationYawPitchRoll(model.Rotation.Y, model.Rotation.X, model.Rotation.Z) *
-                                Matrix.Translation(model.Location.X, model.Location.Y, model.Location.Z);
-
-            var worldView = worldMatrix * viewMatrix;
+                              Matrix.Translation(model.Location.X, model.Location.Y, model.Location.Z); // distance to camera
+            
+            //var worldView = worldMatrix * viewMatrix;
             var transformMatrix = worldMatrix * viewMatrix * projectionMatrix;
 
             // todo - here we'd calculate the size of canvas we need to render the model

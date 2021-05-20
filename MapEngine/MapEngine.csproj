@@ -92,6 +92,7 @@
     <Compile Include="Entities\Components\ImageComponent.cs" />
     <Compile Include="Entities\Components\MovementComponent.cs" />
     <Compile Include="Entities\Components\WeaponComponent.cs" />
+    <Compile Include="Entities\EntityEx.cs" />
     <Compile Include="Extensions\EnumerableEx.cs" />
     <Compile Include="Factories\ModelFactory.cs" />
     <Compile Include="Factories\UnitFactory.cs" />
@@ -176,6 +177,10 @@
     <ProjectReference Include="..\Common\Common.csproj">
       <Project>{DAB6FD98-4873-4712-8294-A847C0C79EAD}</Project>
       <Name>Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MapEditor\MapEditor.csproj">
+      <Project>{CBE49CF2-97D9-4E9F-8784-773268327F6E}</Project>
+      <Name>MapEditor</Name>
     </ProjectReference>
     <ProjectReference Include="..\SoftEngine\SoftEngine.csproj">
       <Project>{93E04CC4-0F26-4F7D-BD33-58DAF405BD5D}</Project>

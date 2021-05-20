@@ -55,40 +55,29 @@ namespace MapEngine
 
         public void DrawImage(IImage image, Rectangle area)
         {
-            var maxWidth = Width * 4 - 1;
-            var maxHeight = Height * 4 - 1;
-            for (var x = 0; x < image.Width * 4; x += 4)
-            {
-                for (int y = 0; y < image.Height * 4; y += 4)
-                {
-                    var xIndex = x + area.X;
-                    var yIndex = y + area.Y;
-                    if (xIndex + 4 > maxWidth  || xIndex < 0 ||
-                        yIndex + 4 > maxHeight || yIndex < 0)
-                        continue; // Dont draw outside bounds
+            // restrict drawing to map bounds
+            var minX = Math.Max(0, 0 - area.X);
+            var minY = Math.Max(0, 0 - area.Y);
+            var maxX = Math.Min(image.Width, area.Width);
+            var maxY = Math.Min(image.Height, area.Height);
 
-                    var colour = image[x, y];
+            for (var x = minX; x < maxX && x + area.X < Width - 1; x++)
+            {
+                for (var y = minY; y < maxY && y + area.Y < Height - 1; y++)
+                {
+                    var colour = image[x * 4, y * 4];
                     if (colour.Alpha == 0)
                         continue; // Dont draw something that's entirely transperant
 
-                    var offset = Math.Max(0, (area.X * 4) + (area.Y * Width * 4));
-                    var i = Math.Min(_backBuffer.Length - 1, x + (y * Width) + offset);
-
-                    if (i + 3 > _backBuffer.Length - 1)
-                        continue;
-                    
-                    _backBuffer[i] = colour.Red;
-                    _backBuffer[i + 1] = colour.Blue;
-                    _backBuffer[i + 2] = colour.Green;
-                    _backBuffer[i + 3] = colour.Alpha;
+                    SetPixel(x + area.X, y + area.Y, colour);
                 }
             }
         }
 
         public void DrawBytes(byte[] buffer, Rectangle area)
         {
-            var length = buffer.Length;
-            for (int i = 0; i < length; i += 4)
+            //todo: array.copy?
+            for (int i = 0; i < buffer.Length; i += 4)
             {
                 if (buffer[i + 3] == 0)
                     continue;
@@ -106,11 +95,11 @@ namespace MapEngine
 
         private void SetPixel(int x, int y, Colour colour)
         {
-            var index = (x * 4) + (y * 4 * Width);
-            
-            _backBuffer[index] = colour.Blue;
-            _backBuffer[index + 1] = colour.Green;
-            _backBuffer[index + 2] = colour.Red;
+            var index = x * 4 + y * 4 * Width;
+
+            _backBuffer[index] = colour.Red;
+            _backBuffer[index + 1] = colour.Blue;
+            _backBuffer[index + 2] = colour.Green;
             _backBuffer[index + 3] = colour.Alpha;
         }
 

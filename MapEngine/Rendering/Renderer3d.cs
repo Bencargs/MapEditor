@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 using Common;
 using Common.Entities;
 using MapEngine.Commands;
+using MapEngine.Entities;
 using MapEngine.Entities.Components;
-using MapEngine.Factories;
 using MapEngine.Handlers;
 using SoftEngine;
 
@@ -29,26 +30,24 @@ namespace MapEngine.Rendering
         {
             foreach (var entity in _entities)
             {
-                var team = entity.GetComponent<UnitComponent>().TeamId;
-                var isDetected = _sensorHandler.IsDetected(Constants.PlayerTeam, entity);
-                if (team != Constants.PlayerTeam && !isDetected)
+                var location = entity.GetComponent<LocationComponent>();
+                if (!viewport.Contains(location.Location))
                     continue;
 
-                var modelComponent = entity.GetComponent<ModelComponent>();
-                ModelFactory.TryGetModel(modelComponent.ModelId, out var model);
+                var isDetected = _sensorHandler.IsDetected(Constants.PlayerTeam, entity);
+                if (!entity.BelongsTo(Constants.PlayerTeam) && !isDetected)
+                    continue;
 
+                var model = entity.Model();
                 model.Location = new Vector3(0, 0, 2);
-                var location = entity.GetComponent<LocationComponent>();
 
-                // todo: buggy, weird rotation here
-                //var radians = (Math.PI / 180) * location.FacingAngle;
-                //model.Rotation = new Vector3((float)Math.Cos(radians), (float)Math.Cos(radians), model.Rotation.Z);
+                // Note: the tiny offset on the Y axis prevents clipping through the plane
+                var radians = (Math.PI / 180) * location.FacingAngle;
+                model.Rotation = new Vector3(0, 0.001f, (float)radians);
 
-                var textureId = entity.GetComponent<ImageComponent>().TextureId;
-                TextureFactory.TryGetTexture(textureId, out var texture);
+                var texture = entity.Texture();
                 var render = _3dEngine.Render(model, texture);
-                var tex = new Texture(render);
-                var area = tex.Area(location.Location);
+                var area = render.Area(location.Location);
                 area.Translate(viewport.X, viewport.Y);
 
                 graphics.DrawBytes(render.Buffer, area);
@@ -58,12 +57,7 @@ namespace MapEngine.Rendering
         public void Handle(CreateEntityCommand command)
         {
             var entity = command.Entity;
-            var textureId = entity.GetComponent<ImageComponent>().TextureId;
-            if (!TextureFactory.TryGetTexture(textureId, out _))
-                return;
-
-            var modelComponent = entity.GetComponent<ModelComponent>();
-            if (modelComponent == null || !ModelFactory.TryGetModel(modelComponent.ModelId, out _))
+            if (entity.Texture() == null || entity.Model() == null)
                 return;
 
             _entities.Add(entity);

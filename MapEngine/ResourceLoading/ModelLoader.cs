@@ -8,7 +8,7 @@ namespace MapEngine.ResourceLoading
     {
         public static Model LoadModel(string modelFilename)
         {
-            var data = "";
+            string data;
             using (var reader = File.OpenText(modelFilename))
             {
                 data = reader.ReadToEnd();
@@ -111,8 +111,8 @@ namespace MapEngine.ResourceLoading
             }
 
             // Todo - bug? seems to load objects in facing away from camera
-            // equivilent of rotating by 1 radian
-            model.Rotation = new Vector3(4.7f, 6.3f, 0);
+            // equivalent of rotating by 1 radian
+            //model.Rotation = new Vector3(4.7f, 6.3f, 0);
 
             return model;
         }

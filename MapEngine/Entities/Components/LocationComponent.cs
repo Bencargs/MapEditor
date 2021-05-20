@@ -1,5 +1,5 @@
-﻿using Common.Entities;
-using System.Numerics;
+﻿using System.Numerics;
+using Common.Entities;
 
 namespace MapEngine.Entities.Components
 {

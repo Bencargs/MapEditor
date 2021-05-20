@@ -1,5 +1,6 @@
 ﻿using Common;
 using System;
+using System.Numerics;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;

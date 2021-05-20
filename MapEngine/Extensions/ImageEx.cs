@@ -1,6 +1,8 @@
-﻿using System.Windows;
+﻿using System.Numerics;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Common;
 
 namespace MapEngine
 {
@@ -32,6 +34,13 @@ namespace MapEngine
                 , data, stride, 0);
 
             return target;
+        }
+
+        public static Rectangle Area(this IImage image, Vector2 point)
+        {
+            var x = point.X - (image.Width / 2);
+            var y = point.Y - (image.Height / 2);
+            return new Rectangle((int)x, (int)y, image.Width, image.Height);
         }
     }
 }

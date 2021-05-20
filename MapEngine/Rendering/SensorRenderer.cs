@@ -2,6 +2,7 @@
 using Common;
 using Common.Entities;
 using MapEngine.Commands;
+using MapEngine.Entities;
 using MapEngine.Entities.Components;
 
 namespace MapEngine.Rendering
@@ -17,16 +18,17 @@ namespace MapEngine.Rendering
         {
             foreach (var entity in _entities)
             {
-                var team = entity.GetComponent<UnitComponent>().TeamId;
-                if (team != Constants.PlayerTeam)
+                // todo: GameSettings.OwnTeam ?
+                if (!entity.BelongsTo(Constants.PlayerTeam)) 
                     continue;
 
-                var location = entity.GetComponent<LocationComponent>();
+                var location = entity.Location();
                 var sensors = entity.GetComponents<SensorComponent>();
                 foreach (var s in sensors)
                 {
-                    var radius = new Rectangle(location.Location, (int)s.Radius, (int)s.Radius);
-                    graphics.DrawCircle(new Colour(0, 0, 255, 255), radius);
+                    // todo: this should a setting relating sensor type to colour
+                    var radius = new Rectangle(location, (int)s.Radius, (int)s.Radius);
+                    graphics.DrawCircle(new Colour(0, 255, 0, 255), radius);
                 }
             }
         }

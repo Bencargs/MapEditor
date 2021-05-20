@@ -2,8 +2,8 @@
 using Common;
 using Common.Entities;
 using MapEngine.Commands;
+using MapEngine.Entities;
 using MapEngine.Entities.Components;
-using MapEngine.Factories;
 using MapEngine.Handlers;
 
 namespace MapEngine.Rendering
@@ -25,22 +25,21 @@ namespace MapEngine.Rendering
         {
             foreach (var entity in _entities)
             {
-                var team = entity.GetComponent<UnitComponent>().TeamId;
-                var isDetected = _sensorHandler.IsDetected(Constants.PlayerTeam, entity);
-                if (team != Constants.PlayerTeam && !isDetected)
+                var location = entity.GetComponent<LocationComponent>();
+                if (!viewport.Contains(location.Location))
                     continue;
 
-                var location = entity.GetComponent<LocationComponent>();
-                var textureId = entity.GetComponent<ImageComponent>().TextureId;
-                TextureFactory.TryGetTexture(textureId, out var texture);
-
-                //Translate against camera movement
-                var area = texture.Area(location.Location);
-                area.Translate(viewport.X, viewport.Y);
+                var isDetected = _sensorHandler.IsDetected(Constants.PlayerTeam, entity);
+                if (!entity.BelongsTo(Constants.PlayerTeam) && !isDetected)
+                    continue;
 
                 // Rotate image to movement / facing angle
-                // todo: rotate around centre point
+                var texture = entity.Texture();
                 var rotated = texture.Image.Rotate(location.FacingAngle);
+                
+                // Translate against camera movement
+                var area = rotated.Area(location.Location);
+                area.Translate(viewport.X, viewport.Y);
 
                 graphics.DrawImage(rotated, area);
             }
@@ -49,10 +48,12 @@ namespace MapEngine.Rendering
         public void Handle(CreateEntityCommand command)
         {
             var entity = command.Entity;
-            var textureId = entity.GetComponent<ImageComponent>().TextureId;
-            if (!TextureFactory.TryGetTexture(textureId, out _))
+            if (entity.Texture() == null)
                 return;
-
+            
+            if (entity.Model() != null)
+                return; // don't render 3d models here
+            
             _entities.Add(entity);
         }
 
