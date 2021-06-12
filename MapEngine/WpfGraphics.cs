@@ -1,5 +1,6 @@
 ﻿using Common;
 using System;
+using System.Linq;
 using System.Numerics;
 using System.Windows.Media.Imaging;
 
@@ -105,7 +106,40 @@ namespace MapEngine
 
         public void DrawLines(Colour colour, Vector2[] points)
         {
-            throw new NotImplementedException();
+            var p1 = points[0];
+            var p2 = points[1];
+
+            // via Bresenham's
+            var dx = Math.Abs(p2.X - p1.X);
+            var dy = Math.Abs(p2.Y - p1.Y);
+            
+            var sx = p1.X < p2.X ? 1 : -1;
+            var sy = p1.Y < p2.Y ? 1 : -1;
+            var err = (dx > dy ? dx : -dy) / 2;
+            var tolerance = 0.001;
+
+            for (int j = 0; j < 50; j++)
+            {
+                if (p1.X > 0 && p1.Y > 0 && p1.X < Width - 1 && p1.Y < Height - 1)
+                    SetPixel((int)p1.X, (int)p1.Y, colour);
+                
+                if (Math.Abs(p1.X - p2.X) < tolerance && 
+                    Math.Abs(p1.Y - p2.Y) < tolerance)
+                    break;
+
+                var e2 = err;
+                if (e2 > -dx)
+                {
+                    err -= dy;
+                    p1.X += sx;
+                }
+
+                if (e2 < dy)
+                {
+                    err += dx;
+                    p1.Y += sy;
+                }
+            }
         }
 
         public void DrawRectangle(Colour colour, Rectangle area)

@@ -93,7 +93,9 @@
     <Compile Include="Entities\Components\MovementComponent.cs" />
     <Compile Include="Entities\Components\WeaponComponent.cs" />
     <Compile Include="Entities\EntityEx.cs" />
+    <Compile Include="Extensions\DegreesEx.cs" />
     <Compile Include="Extensions\EnumerableEx.cs" />
+    <Compile Include="Extensions\MathEx.cs" />
     <Compile Include="Factories\ModelFactory.cs" />
     <Compile Include="Factories\UnitFactory.cs" />
     <Compile Include="Handlers\CameraHandler.cs" />
