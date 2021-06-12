@@ -2,6 +2,7 @@
 
 namespace MapEngine.Entities.Components
 {
+    // todo: multiple responsibilities?
     public class UnitComponent : IComponent
     {
         public ComponentType Type => ComponentType.Unit;

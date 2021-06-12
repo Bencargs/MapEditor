@@ -3,6 +3,7 @@ using System.Linq;
 using Common.Collision;
 using Common.Entities;
 using MapEngine.Commands;
+using MapEngine.Entities;
 using MapEngine.Entities.Components;
 
 namespace MapEngine.Handlers
@@ -33,7 +34,6 @@ namespace MapEngine.Handlers
         {
             foreach (var e in _entities)
             {
-                var location = e.GetComponent<LocationComponent>().Location;
                 var sensorComponents = e.GetComponents<SensorComponent>();
                 foreach (var s in sensorComponents)
                 {
@@ -41,7 +41,7 @@ namespace MapEngine.Handlers
                     var hitbox = new BoundingCircle
                     {
                         Radius = s.Radius,
-                        Location = location
+                        Location = e.Location()
                     };
 
                     var collisions = _collisionHandler.GetCollisions(hitbox)
