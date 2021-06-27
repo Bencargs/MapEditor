@@ -139,6 +139,19 @@ namespace MapEngine.ResourceLoading
                 }
             }
 
+            var particles = (IEnumerable<dynamic>) unitData.Particles;
+            if (particles != null)
+            {
+                foreach (var p in particles)
+                {
+                    string particleType = p.Type;
+                    if (!ParticleFactory.TryGetParticle(particleType, out var particle))
+                        continue;
+                    
+                    entity.AddComponent(particle);
+                }
+            }
+
             var area = unitData.Area;
             if (area != null)
             {

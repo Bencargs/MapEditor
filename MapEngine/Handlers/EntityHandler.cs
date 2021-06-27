@@ -41,12 +41,13 @@ namespace MapEngine.Handlers
             _collisionHandler = collisionHandler;
         }
 
-        public void Initialise(string unitsFilepath, string mapFilename, string weaponFilepath, string modelFilepath)
+        public void Initialise(string unitsFilepath, string mapFilename, string weaponFilepath, string modelFilepath, string particleFilepath)
         {
             // todo: refactor this to: 
             // unit = LoadUnitModel(); 
             // LoadTexture(unit.Texture);
             // factories.Initialise..?
+            ParticleFactory.LoadParticles(particleFilepath);
             TextureFactory.LoadTextures(@"C:\Source\MapEditor\MapEngine\Content\Textures");
             WeaponFactory.LoadWeapons(weaponFilepath); // todo: code stink - requires factories to be initialised in an order
             UnitFactory.LoadUnits(unitsFilepath);

@@ -10,6 +10,7 @@
         Weapon,
         Collision,
         Model,
-        Sensor
+        Sensor,
+        Particle,
     }
 }

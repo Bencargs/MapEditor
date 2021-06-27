@@ -50,6 +50,14 @@ namespace MapEngine
             return new WpfImage(scaled);
         }
 
+        public void Fade(byte fade)
+        {
+            for (int i = 3; i < Buffer.Length; i += 4)
+            {
+                Buffer[i] = (byte)Math.Max(0, Buffer[i] - fade);
+            }
+        }
+
         public Colour this[int x, int y] 
         {
             get

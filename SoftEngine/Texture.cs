@@ -64,5 +64,10 @@ namespace SoftEngine
         {
             throw new NotImplementedException();
         }
+
+        public void Fade(byte fade)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

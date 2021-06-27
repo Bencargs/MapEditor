@@ -3,7 +3,7 @@ using MapEditor.Common;
 using MapEngine.Commands;
 using MapEngine.Handlers;
 using System;
-using System.Linq;
+using MapEngine.Handlers.ParticleHandler;
 
 namespace MapEngine
 {
@@ -15,6 +15,7 @@ namespace MapEngine
         private readonly EntityHandler _unitHandler;
         private readonly CameraHandler _cameraHandler;
         private readonly EffectsHandler _effectsHandler;
+        private readonly ParticleHandler _particleHandler;
 
         public Scene(
             IGraphics graphics,
@@ -22,7 +23,8 @@ namespace MapEngine
             MapHandler mapHandler,
             EntityHandler unitHandler,
             CameraHandler cameraHandler,
-            EffectsHandler effectsHandler)
+            EffectsHandler effectsHandler,
+            ParticleHandler particleHandler)
         {
             _graphics = graphics;
             _messageHub = messageHub;
@@ -30,30 +32,22 @@ namespace MapEngine
             _unitHandler = unitHandler;
             _cameraHandler = cameraHandler;
             _effectsHandler = effectsHandler;
+            _particleHandler = particleHandler;
         }
 
         public void Initialise()
         {
-            var mapFilename = @"C:\Source\MapEditor\MapEngine\Content\Maps\TestMap7.json";
+            var mapFilename = @"C:\Source\MapEditor\MapEngine\Content\Maps\TestMap5.json";
             _cameraHandler.Initialise(mapFilename);
             _mapHandler.Initialise(mapFilename);
             
             var weaponsPath = @"C:\Source\MapEditor\MapEngine\Content\Weapons\";
             var unitsPath = @"C:\Source\MapEditor\MapEngine\Content\Units\";
             var modelsPath = @"C:\Source\MapEditor\MapEngine\Content\Models";
-            _unitHandler.Initialise(unitsPath, mapFilename, weaponsPath, modelsPath);
+            var particlesPath = @"C:\Source\MapEditor\MapEngine\Content\Particles";
+            _unitHandler.Initialise(unitsPath, mapFilename, weaponsPath, modelsPath, particlesPath);
 
             _effectsHandler.Initialise();
-            for (var i = 0; i < 512; i++)
-            {
-                // todo: temporary
-                _messageHub.Post(new CreateEffectCommand
-                {
-                    Name = "FluidEffect", // todo: these should be constant or enum values?
-                    Location = new Vector2 { X = 1, Y = i },
-                    Value = 2f
-                });
-            }
         }
 
         double _totalElapsed = 0;
@@ -81,12 +75,14 @@ namespace MapEngine
             _cameraHandler.Update();
             _unitHandler.Update();
             _effectsHandler.Update();
+            _particleHandler.Update();
         }
 
         private void Render()
         {
             var viewport = _cameraHandler.GetViewport();
             _mapHandler.Render(viewport, _graphics);
+            _particleHandler.Render(viewport, _graphics);
             _unitHandler.Render(viewport, _graphics);
             _effectsHandler.Render(viewport, _graphics);
 
