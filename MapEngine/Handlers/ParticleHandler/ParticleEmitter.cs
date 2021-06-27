@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Common;
 using Common.Entities;
 using MapEngine.Entities.Components;
@@ -48,8 +45,9 @@ namespace MapEngine.Handlers.ParticleHandler
                         Location = locationComponent.Location,
                         Lifetime = 0,
                         Fade = 0,
-                        TextureId = textureId, // todo: randomise the texture from a set
-                        FacingAngle = rotation, // todo: add rotation jitter
+                        Size = 1,
+                        TextureId = textureId,
+                        FacingAngle = rotation,
                     });
                 }
             }
@@ -58,6 +56,7 @@ namespace MapEngine.Handlers.ParticleHandler
             foreach (var p in _particles)
             {
                 p.Lifetime += (float)elapsed;
+                p.Size *= particleComponent.GrowRate;
                 p.Fade = (byte) Math.Min(255, p.Fade + particleComponent.FadeRate); // todo: this should be timebased
             }
 
@@ -79,9 +78,10 @@ namespace MapEngine.Handlers.ParticleHandler
                     continue;
 
                 // rotate image to facing angle
-                var rotated = texture.Image.Rotate(p.FacingAngle);
-                
-                rotated.Fade(p.Fade);
+                var rotated = texture.Image
+                    .Rotate(p.FacingAngle)
+                    .Scale(p.Size)
+                    .Fade(p.Fade);
 
                 // Translate against camera movement
                 var area = rotated.Area(p.Location);

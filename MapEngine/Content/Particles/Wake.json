@@ -5,9 +5,10 @@
 		"Wake2"
 	],
 	"SpawnRate": 500,
-	"MinVelocity": 0.2,
+	"MinVelocity": 0.5,
 	"Lifetime": 24000,
 	"FadeRate": 5,
 	"MinInitialRotation": -5,
 	"MaxInitialRotation": 5,
+	"GrowRate": 1.01,
 }

@@ -11,6 +11,7 @@ namespace MapEngine.Entities.Components
         public float Lifetime { get; set; }
         public float SpawnRate { get; set; }
         public float FadeRate { get; set; }
+        public float GrowRate { get; set; }
         public int MinInitialRotation { get; set; }
         public int MaxInitialRotation { get; set; }
 
@@ -24,6 +25,7 @@ namespace MapEngine.Entities.Components
                 MinVelocity = MinVelocity,
                 Lifetime = Lifetime,
                 FadeRate = FadeRate,
+                GrowRate = GrowRate,
                 MinInitialRotation = MinInitialRotation,
                 MaxInitialRotation = MaxInitialRotation,
             };

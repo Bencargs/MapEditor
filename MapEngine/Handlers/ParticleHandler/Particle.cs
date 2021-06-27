@@ -9,5 +9,6 @@ namespace MapEngine.Handlers.ParticleHandler
         public float Lifetime { get; set; }
         public float FacingAngle { get; set; }
         public byte Fade { get; set; }
+        public float Size { get; set; }
     }
 }

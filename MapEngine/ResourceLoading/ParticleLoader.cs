@@ -26,6 +26,7 @@ namespace MapEngine.ResourceLoading
                 FadeRate = particleData.FadeRate,
                 MinInitialRotation = particleData.MinInitialRotation,
                 MaxInitialRotation = particleData.MaxInitialRotation,
+                GrowRate = particleData.GrowRate,
             };
 
             return particle;

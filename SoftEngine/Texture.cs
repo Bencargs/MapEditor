@@ -65,7 +65,7 @@ namespace SoftEngine
             throw new NotImplementedException();
         }
 
-        public void Fade(byte fade)
+        public IImage Fade(byte fade)
         {
             throw new NotImplementedException();
         }
