@@ -15,5 +15,6 @@
 	"SpawnOffset": 5,
 	"SpawnCount": 5,
 	"InitialSize": 0.25,
-	"PaletteTextureId": "ExplosionPalette"
+	"PaletteTextureId": "ExplosionPalette",
+	"PalleteSpeed": 40
 }

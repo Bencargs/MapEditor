@@ -71,26 +71,58 @@ namespace MapEngine.Handlers
                         selfVelocity.Velocity = newSelfVelocity;
                     }
 
-                    //if (force > collider.MaxImpactForce)
-                    //{
-                    //    ParticleFactory.TryGetParticle("Explosion1", out var particle);
-                    //    var location = entity.GetComponent<LocationComponent>();
-                    //    _messageHub.Post(new CreateEntityCommand
-                    //    {
-                    //        Entity = new Entity
-                    //        {
-                    //            Components = new List<IComponent>
-                    //                            {
-                    //                                particle,
-                    //                                new LocationComponent
-                    //                                {
-                    //                                    Location = location.Location
-                    //                                }
-                    //                            }
-                    //        }
-                    //    });
-                    //    _messageHub.Post(new DestroyEntityCommand { Entity = entity });
-                    //}
+                    if (force > collider.MaxImpactForce)
+                    {
+                        var location = entity.GetComponent<LocationComponent>();
+                        ParticleFactory.TryGetParticle("Flash1", out var particle1);
+                        _messageHub.Post(new CreateEntityCommand
+                        {
+                            Entity = new Entity
+                            {
+                                Components = new List<IComponent>
+                                {
+                                    particle1,
+                                    new LocationComponent
+                                    {
+                                        Location = location.Location
+                                    }
+                                }
+                            }
+                        });
+
+                        ParticleFactory.TryGetParticle("Shrapnel1", out var particle3);
+                        _messageHub.Post(new CreateEntityCommand
+                        {
+                            Entity = new Entity
+                            {
+                                Components = new List<IComponent>
+                                {
+                                    particle3,
+                                    new LocationComponent
+                                    {
+                                        Location = location.Location
+                                    }
+                                }
+                            }
+                        });
+
+                        ParticleFactory.TryGetParticle("Explosion1", out var particle2);
+                        _messageHub.Post(new CreateEntityCommand
+                        {
+                            Entity = new Entity
+                            {
+                                Components = new List<IComponent>
+                                {
+                                    particle2,
+                                    new LocationComponent
+                                    {
+                                        Location = location.Location
+                                    }
+                                }
+                            }
+                        });
+                        _messageHub.Post(new DestroyEntityCommand { Entity = entity });
+                    }
                 }
             }
         }

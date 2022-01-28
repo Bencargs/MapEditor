@@ -18,7 +18,10 @@ namespace MapEngine.Entities.Components
         public int SpawnOffset { get; set; }
         public int? SpawnCount { get; set; }
         public float InitialSize { get; set; }
+        public float InitialFade { get; set; }
+        public int InitialVelocity { get; set; }
         public string PaletteTextureId { get; set; }
+        public int PalleteSpeed { get; set; }
 
         public IComponent Clone()
         {
@@ -37,7 +40,10 @@ namespace MapEngine.Entities.Components
                 SpawnOffset = SpawnOffset,
                 SpawnCount = SpawnCount,
                 InitialSize = InitialSize,
-                PaletteTextureId = PaletteTextureId
+                InitialFade = InitialFade,
+                InitialVelocity = InitialVelocity,
+                PaletteTextureId = PaletteTextureId,
+                PalleteSpeed = PalleteSpeed
             };
         }
     }

@@ -21,18 +21,21 @@ namespace MapEngine.ResourceLoading
             {
                 ParticleType = particleData.Type,
                 TextureIds = textureIds,
-                SpawnRate = particleData.SpawnRate,
+                SpawnRate = particleData?.SpawnRate ?? 0,
                 MinVelocity = particleData.MinVelocity,
                 Lifetime = particleData.Lifetime,
                 FadeDelay = particleData?.FadeDelay ?? 0,
-                FadeRate = particleData.FadeRate,
+                FadeRate = particleData?.FadeRate ?? 0,
                 MinInitialRotation = particleData.MinInitialRotation,
                 MaxInitialRotation = particleData.MaxInitialRotation,
-                GrowRate = particleData.GrowRate,
+                GrowRate = particleData?.GrowRate ?? 1,
                 SpawnOffset = particleData?.SpawnOffset ?? 0,
                 SpawnCount = particleData.SpawnCount,
                 InitialSize = particleData.InitialSize,
-                PaletteTextureId = particleData.PaletteTextureId
+                InitialFade = particleData?.InitialFade ?? 0,
+                InitialVelocity = particleData?.InitialVelocity ?? 0,
+                PaletteTextureId = particleData.PaletteTextureId,
+                PalleteSpeed = particleData?.PalleteSpeed ?? 1
             };
 
             return particle;

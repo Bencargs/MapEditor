@@ -57,7 +57,7 @@ namespace MapEngine
             return new WpfImage(scaled);
         }
 
-        public IImage Fade(byte fade)
+        public IImage Fade(float fade)
         {
             for (int i = 3; i < Buffer.Length; i += 4)
             {

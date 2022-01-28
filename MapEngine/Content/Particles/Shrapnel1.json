@@ -1,0 +1,16 @@
+{
+	"Type": "Shrapnel1",
+	"TextureIds": [
+		"projectile"
+	],
+	"Lifetime": 2000,
+	"MinInitialRotation": 0,
+	"MaxInitialRotation": 0,
+	"SpawnCount": 30,
+	"InitialSize": 1,
+	"InitialFade": 0,
+	"InitialVelocity": 5,
+	"InitialSize": 0.7,
+	"PaletteTextureId": "ExplosionPalette",
+	"PalleteSpeed": 5
+}

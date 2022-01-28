@@ -37,8 +37,10 @@ namespace MapEngine.Handlers.ParticleHandler
             // Check initial conditions emission
             while (ShouldEmit(elapsed, movementComponent, particleComponent))
             {
+
                 // Spawn new particles
                 _previousSpawn = DateTime.Now;
+                var velocity = GetVelocity(rng, particleComponent);
                 var rotation = GetRotation(rng, locationComponent, particleComponent);
                 var location = GetLocation(rng, locationComponent, particleComponent);
                 var textureId = particleComponent.TextureIds[rng.Next(particleComponent.TextureIds.Length)];
@@ -46,12 +48,14 @@ namespace MapEngine.Handlers.ParticleHandler
                 _particles.Add(new Particle
                 {
                     Location = location,
+                    Velocity = velocity,
                     Lifetime = 0,
-                    Fade = 0,
+                    Fade = particleComponent.InitialFade,
                     Size = particleComponent.InitialSize,
                     TextureId = textureId,
                     FacingAngle = rotation,
                     PaletteTextureId = particleComponent.PaletteTextureId,
+                    PalleteSpeed = particleComponent.PalleteSpeed,
                 });
             }
 
@@ -60,6 +64,7 @@ namespace MapEngine.Handlers.ParticleHandler
             {
                 p.Lifetime += (float)elapsed;
                 p.Size *= particleComponent.GrowRate;
+                p.Location += p.Velocity;
 
                 if (p.Lifetime > particleComponent.FadeDelay)
                     p.Fade = (byte) Math.Min(255, p.Fade + particleComponent.FadeRate); // todo: this should be timebased
@@ -94,7 +99,7 @@ namespace MapEngine.Handlers.ParticleHandler
                 if (TextureFactory.TryGetTexture(p.PaletteTextureId, out var palette))
                 {
                     // todo: change this to stay on the last colour?
-                    var hue = palette.Image.GetPalette(p.HueIndex++, 40);
+                    var hue = palette.Image.GetPalette(p.HueIndex++, p.PalleteSpeed);
                     rotated.ChangeHue(hue);
                 }
 
@@ -104,6 +109,13 @@ namespace MapEngine.Handlers.ParticleHandler
 
                 graphics.DrawImage(rotated, area);
             }
+        }
+
+        private static Vector2 GetVelocity(Random rng, ParticleComponent particleComponent)
+        {
+            var jitterX = rng.Next(-particleComponent.InitialVelocity, particleComponent.InitialVelocity);
+            var jitterY = rng.Next(-particleComponent.InitialVelocity, particleComponent.InitialVelocity);
+            return new Vector2(jitterX, jitterY);
         }
 
         private static Vector2 GetLocation(Random rng, LocationComponent locationComponent, ParticleComponent particleComponent)

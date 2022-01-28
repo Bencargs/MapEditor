@@ -1,0 +1,14 @@
+{
+	"Type": "Flash1",
+	"TextureIds": [
+		"Flash1"
+	],
+	"SpawnRate": 0,
+	"Lifetime": 100000,
+	"FadeRate": 40,
+	"MinInitialRotation": -90,
+	"MaxInitialRotation": 90,
+	"SpawnCount": 1,
+	"InitialSize": 0.5,
+	"InitialFade": 0
+}
