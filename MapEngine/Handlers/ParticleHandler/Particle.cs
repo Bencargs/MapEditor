@@ -10,5 +10,7 @@ namespace MapEngine.Handlers.ParticleHandler
         public float FacingAngle { get; set; }
         public byte Fade { get; set; }
         public float Size { get; set; }
+        public int HueIndex { get; set; }
+        public string PaletteTextureId { get; set; }
     }
 }

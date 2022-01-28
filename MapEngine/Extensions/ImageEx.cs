@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -41,6 +42,71 @@ namespace MapEngine
             var x = point.X - (image.Width / 2);
             var y = point.Y - (image.Height / 2);
             return new Rectangle((int)x, (int)y, image.Width, image.Height);
+        }
+
+        public static Colour GetPalette(this IImage palette, int index, int range)
+        {
+            var width = palette.Width;
+            var low = (int) Math.Min(width - 1, Math.Floor(((float)index / range) * width));
+            var high = Math.Min(width - 1, low + 1);
+            var lowColour = palette[low * 4, 0];
+            var highColour = palette[high * 4, 0];
+
+            var interpolation = (index % ((float)range / width)) / 10;
+
+            return lowColour.Interpolate(highColour, interpolation);
+        }
+
+        public static Colour Interpolate(
+            this Colour endPoint1,
+            Colour endPoint2,
+            double fraction)
+        {
+            fraction %= 1;
+
+            var color = new Colour(
+                InterpolateComponent(endPoint1, endPoint2, fraction, x => x.Red),
+                InterpolateComponent(endPoint1, endPoint2, fraction, x => x.Blue),
+                InterpolateComponent(endPoint1, endPoint2, fraction, x => x.Green),
+                255);
+
+            return color;
+        }
+
+        private static byte InterpolateComponent(
+            Colour endPoint1,
+            Colour endPoint2,
+            double lambda,
+            Func<Colour, byte> selector)
+            => (byte)(selector(endPoint1) + (selector(endPoint2) - selector(endPoint1)) * lambda);
+
+        public static void ChangeHue(this IImage bmp, Colour colour)
+        {
+            for (var x = 0; x < bmp.Width * 4; x += 4)
+            {
+                for (var y = 0; y < bmp.Height * 4; y += 4)
+                {
+                    var existing = bmp[x, y];
+
+                    if (existing.Alpha != 0)
+                    {
+                        var redIntensity = (float)existing.Red / 256;
+                        var blueIntensity = (float)existing.Blue / 256;
+                        var greenIntensity = (float)existing.Green / 256;
+
+                        var r = colour.Red * redIntensity;
+                        var g = colour.Green * greenIntensity;
+                        var b = colour.Blue * blueIntensity;
+
+                        var newColour = new Colour(
+                            (byte)r,
+                            (byte)b,
+                            (byte)g,
+                            existing.Alpha);
+                        bmp[x, y] = newColour;
+                    }
+                }
+            }
         }
     }
 }

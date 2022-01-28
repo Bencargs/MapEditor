@@ -17,6 +17,8 @@ namespace MapEngine.Handlers.ParticleHandler
             {
                 e.Update();
             }
+
+            _emitters.RemoveAll(x => x.IsComplete);
         }
 
         // todo: this class is pretty anemic - whats the point?

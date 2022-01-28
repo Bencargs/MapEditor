@@ -1,6 +1,12 @@
 ﻿using Common;
 using MapEditor.Common;
+﻿using System.Collections.Generic;
+using System.Numerics;
+using Common;
+using Common.Entities;
 using MapEngine.Commands;
+using MapEngine.Entities.Components;
+using MapEngine.Factories;
 using MapEngine.Handlers;
 using System;
 using MapEngine.Handlers.ParticleHandler;
@@ -80,11 +86,14 @@ namespace MapEngine
 
         private void Render()
         {
+            _graphics.Clear();
+
+            // Todo: need to order rendering by Z height
             var viewport = _cameraHandler.GetViewport();
             _mapHandler.Render(viewport, _graphics);
-            _particleHandler.Render(viewport, _graphics);
             _unitHandler.Render(viewport, _graphics);
             _effectsHandler.Render(viewport, _graphics);
+            _particleHandler.Render(viewport, _graphics);
 
             _graphics.Render();
         }

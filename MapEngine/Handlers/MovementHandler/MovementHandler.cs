@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using MapEngine.Services.PathfindingService;
+using MapEngine.Factories;
 
 namespace MapEngine.Handlers
 {

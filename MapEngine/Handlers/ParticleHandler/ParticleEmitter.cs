@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
 using Common;
 using Common.Entities;
 using MapEngine.Entities.Components;
@@ -10,7 +12,8 @@ namespace MapEngine.Handlers.ParticleHandler
     public class ParticleEmitter
     {
         public Entity Entity { get; }
-        private DateTime _previousSpawn;
+        public bool IsComplete { get; private set; }
+        private DateTime _previousSpawn = DateTime.Now;
         private readonly List<Particle> _particles = new List<Particle>();
 
         public ParticleEmitter(Entity entity)
@@ -27,29 +30,29 @@ namespace MapEngine.Handlers.ParticleHandler
             // todo: make particle spawn conditions a generic method
             // Check spawn conditions
             var elapsed = (DateTime.Now - _previousSpawn).TotalMilliseconds;
-            if (movementComponent.Velocity.Length() > particleComponent.MinVelocity)
+
+            // todo: common random class - repeatable seed
+            var rng = new Random();
+
+            // Check initial conditions emission
+            while (ShouldEmit(elapsed, movementComponent, particleComponent))
             {
-                if (elapsed > particleComponent.SpawnRate)
+                // Spawn new particles
+                _previousSpawn = DateTime.Now;
+                var rotation = GetRotation(rng, locationComponent, particleComponent);
+                var location = GetLocation(rng, locationComponent, particleComponent);
+                var textureId = particleComponent.TextureIds[rng.Next(particleComponent.TextureIds.Length)];
+                
+                _particles.Add(new Particle
                 {
-                    // todo: for some particle emitters some values should be ransomised, eg direciton, velocity, location
-                    // todo: common random class - repeatable seed
-                    var rng = new Random();
-                    
-                    // Spawn new particles
-                    _previousSpawn = DateTime.Now;
-                    var rotation = locationComponent.FacingAngle + rng.Next(particleComponent.MinInitialRotation, particleComponent.MaxInitialRotation);
-                    var textureId = particleComponent.TextureIds[rng.Next(particleComponent.TextureIds.Length)];
-                    
-                    _particles.Add(new Particle
-                    {
-                        Location = locationComponent.Location,
-                        Lifetime = 0,
-                        Fade = 0,
-                        Size = 1,
-                        TextureId = textureId,
-                        FacingAngle = rotation,
-                    });
-                }
+                    Location = location,
+                    Lifetime = 0,
+                    Fade = 0,
+                    Size = particleComponent.InitialSize,
+                    TextureId = textureId,
+                    FacingAngle = rotation,
+                    PaletteTextureId = particleComponent.PaletteTextureId,
+                });
             }
 
             // Age particles
@@ -57,12 +60,17 @@ namespace MapEngine.Handlers.ParticleHandler
             {
                 p.Lifetime += (float)elapsed;
                 p.Size *= particleComponent.GrowRate;
-                p.Fade = (byte) Math.Min(255, p.Fade + particleComponent.FadeRate); // todo: this should be timebased
+
+                if (p.Lifetime > particleComponent.FadeDelay)
+                    p.Fade = (byte) Math.Min(255, p.Fade + particleComponent.FadeRate); // todo: this should be timebased
             }
 
             // Delete expired particles
             _particles.RemoveAll(x => x.Lifetime > particleComponent.Lifetime ||
                                       x.Fade == 255);
+
+            // should this logic be custom to each emitter type?
+            IsComplete = _particles.Count == 0;
         }
 
         // todo: particle renderer
@@ -79,9 +87,16 @@ namespace MapEngine.Handlers.ParticleHandler
 
                 // rotate image to facing angle
                 var rotated = texture.Image
-                    .Rotate(p.FacingAngle)
                     .Scale(p.Size)
+                    .Rotate(p.FacingAngle)
                     .Fade(p.Fade);
+                
+                if (TextureFactory.TryGetTexture(p.PaletteTextureId, out var palette))
+                {
+                    // todo: change this to stay on the last colour?
+                    var hue = palette.Image.GetPalette(p.HueIndex++, 40);
+                    rotated.ChangeHue(hue);
+                }
 
                 // Translate against camera movement
                 var area = rotated.Area(p.Location);
@@ -89,6 +104,36 @@ namespace MapEngine.Handlers.ParticleHandler
 
                 graphics.DrawImage(rotated, area);
             }
+        }
+
+        private static Vector2 GetLocation(Random rng, LocationComponent locationComponent, ParticleComponent particleComponent)
+        {
+            var jitterX = rng.Next(-particleComponent.SpawnOffset, particleComponent.SpawnOffset);
+            var jitterY = rng.Next(-particleComponent.SpawnOffset, particleComponent.SpawnOffset);
+            return new Vector2(locationComponent.Location.X + jitterX, locationComponent.Location.Y + jitterY);
+        }
+
+        private static float GetRotation(Random rng, LocationComponent locationComponent, ParticleComponent particleComponent)
+        {
+            var jitter = rng.Next(particleComponent.MinInitialRotation, particleComponent.MaxInitialRotation);
+            return locationComponent.FacingAngle + jitter;
+        }
+
+        private static bool ShouldEmit(
+            double elapsed,
+            MovementComponent movementComponent,
+            ParticleComponent particleComponent)
+        {
+            if (particleComponent.MinVelocity != null && !(movementComponent.Velocity.Length() > particleComponent.MinVelocity))
+                return false;
+
+            if (!(elapsed >= particleComponent.SpawnRate))
+                return false;
+
+            if (particleComponent.SpawnCount-- < 1)
+                return false;
+
+            return true;
         }
     }
 }

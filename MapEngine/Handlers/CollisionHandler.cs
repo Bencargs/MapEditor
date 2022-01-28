@@ -7,6 +7,7 @@ using System.Linq;
 using System.Numerics;
 using MapEngine.Entities;
 using System;
+using MapEngine.Factories;
 
 namespace MapEngine.Handlers
 {
@@ -18,6 +19,12 @@ namespace MapEngine.Handlers
         , IHandleCommand<DestroyEntityCommand>
     {
         private readonly List<Entity> _entities = new List<Entity>();
+        private readonly MessageHub _messageHub;
+
+        public CollisionHandler(MessageHub messageHub)
+        {
+            _messageHub = messageHub;
+        }
 
         public void Update()
         {
@@ -44,7 +51,7 @@ namespace MapEngine.Handlers
                     var sourceLocation = entity.GetComponent<LocationComponent>();
                     var sourceVelocity = entity.GetComponent<MovementComponent>();
                     var force = GetImpactForce(sourceVelocity);
-                    if (force > 0)
+                    if (force > 0 )
                     {
                         // If its a meaningful impact, modify velocity
                         var selfLocation = i.GetComponent<LocationComponent>();
@@ -63,21 +70,28 @@ namespace MapEngine.Handlers
 
                         selfVelocity.Velocity = newSelfVelocity;
                     }
+
+                    //if (force > collider.MaxImpactForce)
+                    //{
+                    //    ParticleFactory.TryGetParticle("Explosion1", out var particle);
+                    //    var location = entity.GetComponent<LocationComponent>();
+                    //    _messageHub.Post(new CreateEntityCommand
+                    //    {
+                    //        Entity = new Entity
+                    //        {
+                    //            Components = new List<IComponent>
+                    //                            {
+                    //                                particle,
+                    //                                new LocationComponent
+                    //                                {
+                    //                                    Location = location.Location
+                    //                                }
+                    //                            }
+                    //        }
+                    //    });
+                    //    _messageHub.Post(new DestroyEntityCommand { Entity = entity });
+                    //}
                 }
-
-                //var impactForce = _collisionHandler.GetImpactForce(entity);
-                //if (impactForce > collider.MaxImpactForce)
-                //{
-
-                // todo: explosions!
-
-                // todo: entity lifetime should be handled by entity handler - not here
-                // raise a collisionEvent, let the entity handle it?
-
-                //var explosion = ParticleFactory.Create(entity);
-                //_messageHub.Post(new CreateEffectCommand { Entity = explosion });
-                //_messageHub.Post(new DestroyEntityCommand { Entity = entity });
-                //}
             }
         }
 

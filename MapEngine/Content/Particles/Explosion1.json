@@ -1,0 +1,19 @@
+{
+	"Type": "Explosion1",
+	"TextureIds": [
+		"Smoke1",
+		"Smoke2",
+		"Smoke3"
+	],
+	"SpawnRate": 0,
+	"Lifetime": 800000,
+	"FadeDelay": 100000,
+	"FadeRate": 10,
+	"MinInitialRotation": -90,
+	"MaxInitialRotation": 90,
+	"GrowRate": 1.005,
+	"SpawnOffset": 5,
+	"SpawnCount": 5,
+	"InitialSize": 0.25,
+	"PaletteTextureId": "ExplosionPalette"
+}

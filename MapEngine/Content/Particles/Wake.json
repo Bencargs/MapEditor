@@ -11,4 +11,5 @@
 	"MinInitialRotation": -5,
 	"MaxInitialRotation": 5,
 	"GrowRate": 1.01,
+	"InitialSize": 1,
 }

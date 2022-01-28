@@ -25,7 +25,7 @@
     {
       "Id": 0,
       "Team": 0,
-      "Type": "MobileDummy",
+      "Type": "ModelDummy",
       "Location": {
         "X": 100,
         "Y": 300,
@@ -55,7 +55,7 @@
 	{
 		"Id":1,
 		"Team":1,
-		"Type":"MobileDummy",
+		"Type":"ModelDummy",
 		"Location":{
 			"X":300,
 			"Y":50,

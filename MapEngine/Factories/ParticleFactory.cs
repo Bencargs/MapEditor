@@ -25,7 +25,11 @@ namespace MapEngine.Factories
 
         public static bool TryGetParticle(string type, out ParticleComponent particle)
         {
-            return _prototypes.TryGetValue(type, out particle);
+            if (!_prototypes.TryGetValue(type, out particle))
+                return false;
+
+            particle = (ParticleComponent) particle.Clone();
+            return true;
         }
     }
 }
