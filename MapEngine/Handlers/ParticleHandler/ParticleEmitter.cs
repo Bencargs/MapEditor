@@ -34,29 +34,31 @@ namespace MapEngine.Handlers.ParticleHandler
             // todo: common random class - repeatable seed
             var rng = new Random();
 
-            // Check initial conditions emission
-            while (ShouldEmit(elapsed, movementComponent, particleComponent))
+            // Check initial conditions to spawn new particles
+            if (ShouldEmit(elapsed, movementComponent, particleComponent))
             {
-
-                // Spawn new particles
-                _previousSpawn = DateTime.Now;
-                var velocity = GetVelocity(rng, particleComponent);
-                var rotation = GetRotation(rng, locationComponent, particleComponent);
-                var location = GetLocation(rng, locationComponent, particleComponent);
-                var textureId = particleComponent.TextureIds[rng.Next(particleComponent.TextureIds.Length)];
-                
-                _particles.Add(new Particle
+                // Spawn seed population
+                while (particleComponent.InitialSpawnCount-- > 0)
                 {
-                    Location = location,
-                    Velocity = velocity,
-                    Lifetime = 0,
-                    Fade = particleComponent.InitialFade,
-                    Size = particleComponent.InitialSize,
-                    TextureId = textureId,
-                    FacingAngle = rotation,
-                    PaletteTextureId = particleComponent.PaletteTextureId,
-                    PalleteSpeed = particleComponent.PalleteSpeed,
-                });
+                    _previousSpawn = DateTime.Now;
+                    var velocity = GetVelocity(rng, particleComponent);
+                    var rotation = GetRotation(rng, locationComponent, particleComponent);
+                    var location = GetLocation(rng, locationComponent, particleComponent);
+                    var textureId = particleComponent.TextureIds[rng.Next(particleComponent.TextureIds.Length)];
+
+                    _particles.Add(new Particle
+                    {
+                        Location = location,
+                        Velocity = velocity,
+                        Lifetime = 0,
+                        Fade = particleComponent.InitialFade,
+                        Size = particleComponent.InitialSize,
+                        TextureId = textureId,
+                        FacingAngle = rotation,
+                        PaletteTextureId = particleComponent.PaletteTextureId,
+                        PalleteSpeed = particleComponent.PalleteSpeed,
+                    });
+                }
             }
 
             // Age particles
@@ -75,8 +77,8 @@ namespace MapEngine.Handlers.ParticleHandler
                                       x.Fade == 255);
 
             // should this logic be custom to each emitter type?
-            IsComplete = _particles.Count == 0;
-        }
+            IsComplete = !particleComponent.ContinousSpawn && _particles.Count == 0;
+        }   
 
         // todo: particle renderer
         public void Draw(Rectangle viewport, IGraphics graphics)
@@ -136,14 +138,17 @@ namespace MapEngine.Handlers.ParticleHandler
             MovementComponent movementComponent,
             ParticleComponent particleComponent)
         {
-            if (particleComponent.MinVelocity != null && !(movementComponent.Velocity.Length() > particleComponent.MinVelocity))
+            if (particleComponent.MinVelocity != null && (movementComponent.Velocity.Length() <= particleComponent.MinVelocity))
                 return false;
 
-            if (!(elapsed >= particleComponent.SpawnRate))
+            if (particleComponent.SpawnRate != null && (elapsed < particleComponent.SpawnRate))
                 return false;
 
-            if (particleComponent.SpawnCount-- < 1)
+            if (particleComponent.TotalCount != null && particleComponent.TotalCount < 1)
                 return false;
+
+            if (particleComponent.ContinousSpawn)
+                particleComponent.InitialSpawnCount = 1;
 
             return true;
         }
