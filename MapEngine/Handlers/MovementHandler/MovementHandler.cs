@@ -16,18 +16,12 @@ namespace MapEngine.Handlers
         , IHandleCommand<MoveCommand>
     {
         private readonly PathfindingService _pathfinding;
-        private readonly MessageHub _messageHub;
-        private readonly CollisionHandler _collisionHandler;
         private readonly List<Entity> _entities = new List<Entity>();
 
         public MovementHandler(
-            MessageHub messageHub, 
-            CollisionHandler collisionHandler,
             PathfindingService pathfindingService)
         {
-            _messageHub = messageHub;
             _pathfinding = pathfindingService;
-            _collisionHandler = collisionHandler;
         }
 
         public void Update()
@@ -62,35 +56,14 @@ namespace MapEngine.Handlers
                         break;
                 }
             }
-            HandleCollisions(entity);
-        }
-
-        private void HandleCollisions(Entity entity)
-        {
-            // todo - ?? seems like units are colliding with their own projectiles, and exploding?
-            //if (entity.Id != 72)
-            //    return;
-
-            var collider = entity.GetComponent<CollisionComponent>();
-            if (collider == null)
-                return;
-
-            if (_collisionHandler.HasCollided(entity, out var _))
+            else
             {
-                var impactForce = _collisionHandler.GetImpactForce(entity);
-                if (impactForce > collider.MaxImpactForce)
-                {
-                    // todo: explosions!
-                    
-                    // todo: entity lifetime should be handled by entity handler - not here
-                    // raise a collisionEvent, let the entity handle it?
-                    
-                    //var explosion = ParticleFactory.Create(entity);
-                    //_messageHub.Post(new CreateEffectCommand { Entity = explosion });
-                    //_messageHub.Post(new DestroyEntityCommand { Entity = entity });
-                }
+                // eg. an entity having a force applied to it
+                location.Location += movement.Velocity;
+                ApplyFriction(movement);
             }
         }
+
 
         private static void ApplyFriction(MovementComponent movement)
         {

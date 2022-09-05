@@ -15,6 +15,7 @@ namespace MapEngine.Handlers
         private readonly MessageHub _messageHub;
         private readonly WeaponHandler _weaponHandler;
         private readonly MovementHandler _movementHandler;
+        private readonly CollisionHandler _collisionHandler;
         private readonly SensorHandler _sensorHandler;
         private readonly IRenderer _2dRenderer;
         private readonly IRenderer _3dRenderer;
@@ -23,6 +24,7 @@ namespace MapEngine.Handlers
         public EntityHandler(
             MessageHub messageHub, 
             MovementHandler movementHandler, 
+            CollisionHandler collisionHandler,
             SensorHandler sensorHandler,
             WeaponHandler weaponHandler,
             Renderer2d renderer2d, // todo: RenderFactory.GetRenderers?
@@ -36,6 +38,7 @@ namespace MapEngine.Handlers
             _3dRenderer = renderer3d;
             _sensorRenderer = sensorRenderer;
             _movementHandler = movementHandler;
+            _collisionHandler = collisionHandler;
         }
 
         public void Initialise(string unitsFilepath, string mapFilename, string weaponFilepath, string modelFilepath)
@@ -59,6 +62,7 @@ namespace MapEngine.Handlers
         public void Update()
         {
             _movementHandler.Update();
+            _collisionHandler.Update();
             _sensorHandler.Update();
             _weaponHandler.Update();
         }
