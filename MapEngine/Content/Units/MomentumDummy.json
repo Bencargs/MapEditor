@@ -1,0 +1,22 @@
+{
+	"Type":"MomentumDummy",
+	"Image": {
+		"TextureId": "Ball"
+	},
+	"Movement": {
+		"MaxVelocity":50,
+		"Mass":1,
+		"MaxForce":1000,
+		"StopRadius":10,
+		"BrakeForce":0.005
+	},
+	"Area": {
+		"BoundingBox": {
+			"Width":24,
+			"Height":24,
+		}
+	},
+	"Weapons": [
+		"Cannon",
+	]
+}

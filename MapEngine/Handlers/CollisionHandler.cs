@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using MapEngine.Entities;
+using System;
 
 namespace MapEngine.Handlers
 {
@@ -17,6 +18,68 @@ namespace MapEngine.Handlers
         , IHandleCommand<DestroyEntityCommand>
     {
         private readonly List<Entity> _entities = new List<Entity>();
+
+        public void Update()
+        {
+            foreach (var e in _entities)
+            {
+                HandleCollisions(e);
+            }
+        }
+
+        private void HandleCollisions(Entity entity)
+        {
+            // todo - ?? seems like units are colliding with their own projectiles, and exploding?
+            //if (entity.Id != 72)
+            //    return;
+
+            var collider = entity.GetComponent<CollisionComponent>();
+            if (collider == null)
+                return;
+
+            if (HasCollided(entity, out var impactors))
+            {
+                foreach (var i in impactors)
+                {
+                    var sourceLocation = entity.GetComponent<LocationComponent>();
+                    var sourceVelocity = entity.GetComponent<MovementComponent>();
+                    var force = GetImpactForce(sourceVelocity);
+                    if (force > 0)
+                    {
+                        // If its a meaningful impact, modify velocity
+                        var selfLocation = i.GetComponent<LocationComponent>();
+                        var selfVelocity = i.GetComponent<MovementComponent>();
+
+                        //https://gamedev.stackexchange.com/questions/15911/how-do-i-calculate-the-exit-vectors-of-colliding-projectiles
+                        var collisionVector = (selfLocation.Location - sourceLocation.Location).Normalize();
+                        var selfForce = Vector2.Dot(selfVelocity.Velocity, collisionVector);
+                        var sourceForce = Vector2.Dot(sourceVelocity.Velocity, collisionVector);
+
+                        // todo: involve mass of each object in calculating reflection angle and speed
+                        // Math.Min stops objects 'sticking' to each other
+                        var optimisedP = (float) Math.Min(0, 2.0 * (selfForce - sourceForce));
+                        
+                        var newSelfVelocity = selfVelocity.Velocity - optimisedP * collisionVector;
+
+                        selfVelocity.Velocity = newSelfVelocity;
+                    }
+                }
+
+                //var impactForce = _collisionHandler.GetImpactForce(entity);
+                //if (impactForce > collider.MaxImpactForce)
+                //{
+
+                // todo: explosions!
+
+                // todo: entity lifetime should be handled by entity handler - not here
+                // raise a collisionEvent, let the entity handle it?
+
+                //var explosion = ParticleFactory.Create(entity);
+                //_messageHub.Post(new CreateEffectCommand { Entity = explosion });
+                //_messageHub.Post(new DestroyEntityCommand { Entity = entity });
+                //}
+            }
+        }
 
         public bool HasCollided(Entity entity, out List<Entity> collisions)
         {
@@ -33,13 +96,12 @@ namespace MapEngine.Handlers
             return collisions.Any();
         }
 
-        public double GetImpactForce(Entity source)
+        public float GetImpactForce(MovementComponent movementComponent)
         {
-            var movementComponent = source.GetComponent<MovementComponent>();
             if (movementComponent == null)
-                return 0d;
+                return 0f;
 
-            var impactForce = 0.5 * movementComponent.Mass * movementComponent.Velocity.LengthSquared();
+            var impactForce = 0.5f * movementComponent.Mass * movementComponent.Velocity.LengthSquared();
             return impactForce;
         }
 
