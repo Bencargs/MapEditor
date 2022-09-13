@@ -55,8 +55,9 @@ namespace MapEngine.Handlers
                         var selfForce = Vector2.Dot(selfVelocity.Velocity, collisionVector);
                         var sourceForce = Vector2.Dot(sourceVelocity.Velocity, collisionVector);
 
+                        // todo: involve mass of each object in calculating reflection angle and speed
                         // Math.Min stops objects 'sticking' to each other
-                        var optimisedP = (float) Math.Min(0, 2.0 * (selfForce - sourceForce) / selfVelocity.Mass);
+                        var optimisedP = (float) Math.Min(0, 2.0 * (selfForce - sourceForce));
                         
                         var newSelfVelocity = selfVelocity.Velocity - optimisedP * collisionVector;
 
