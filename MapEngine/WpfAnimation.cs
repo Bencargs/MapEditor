@@ -43,6 +43,7 @@ namespace MapEngine
         {
             nextFrame = _index;
 
+            // todo: revisit this considering game loop changes
             var elapsed = (now - _previous).TotalMilliseconds;
             var drawFrames = (int)elapsed / _frameRate;
             if (drawFrames > 0)

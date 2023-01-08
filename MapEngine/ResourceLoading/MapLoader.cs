@@ -1,4 +1,5 @@
 ﻿using Common;
+using MapEngine.Services.Effects.FluidEffect;
 using MapEngine.Services.Map;
 using Newtonsoft.Json;
 using System.Collections.Generic;
@@ -25,6 +26,7 @@ namespace MapEngine.ResourceLoading
                 Height = mapData.Height,
                 Teams = teams,
                 Tiles = tiles,
+                FluidEffects = LoadFluidEffects(mapData)
             };
 
             return map;
@@ -47,6 +49,16 @@ namespace MapEngine.ResourceLoading
             }).ToArray();
             var tiles = rawTileData.To2DArray((int)mapData.TileWidth, (int)mapData.TileHeight);
             return tiles;
+        }
+
+        private static FluidEffects LoadFluidEffects(dynamic mapData)
+        {
+            var fluidConfig = ((IEnumerable<dynamic>)mapData.Effects)?.FirstOrDefault(x => x.Name == "FluidEffect");
+            return new FluidEffects
+            {
+                Resolution = (float)(fluidConfig?.Resolution ?? 0.01f),
+                Surface = fluidConfig?.Surface ?? ""
+            };
         }
     }
 }

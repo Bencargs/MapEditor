@@ -1,7 +1,5 @@
 ﻿using Common;
 using System;
-using System.Numerics;
-using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -19,9 +17,7 @@ namespace MapEngine
             Width = bitmap.PixelWidth;
             Height = bitmap.PixelHeight;
             Bitmap = bitmap;
-
-            Buffer = new byte[Width * Height * 4];
-            Bitmap.CopyPixels(Buffer, Width * 4, 0);
+            Buffer = Bitmap.ToByteArray();
         }
 
         public WpfImage(int width, int height)
@@ -37,8 +33,7 @@ namespace MapEngine
 
         public void Draw(byte[] buffer)
         {
-            var area = new Int32Rect(0, 0, Width, Height);
-            Bitmap.WritePixels(area, buffer, Width * 4, 0);
+            Bitmap.FromByteArray(buffer);
         }
 
         public IImage Rotate(float angle)
@@ -51,7 +46,7 @@ namespace MapEngine
         {
             var width = (int)scale * Width;
             var height = (int)scale * Height;
-            var scaled = Bitmap.Resize(width, height, WriteableBitmapExtensions.Interpolation.NearestNeighbor);
+            var scaled = Bitmap.Resize(width, height, WriteableBitmapExtensions.Interpolation.NearestNeighbor); // Nearest neighbour?! BiLinear? BiCubic?
             return new WpfImage(scaled);
         }
 
@@ -59,7 +54,7 @@ namespace MapEngine
         {
             get
             {
-                var index = x + (y * Width);
+                var index = (x * 4) + ((y * 4) * Width);
                 var colour = new Colour(
                     Buffer[index],
                     Buffer[index + 1],

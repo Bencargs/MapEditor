@@ -62,10 +62,38 @@ namespace MapEngine
             return false;
         }
 
-        public static void Deconstruct<T1, T2>(this KeyValuePair<T1, T2> tuple, out T1 key, out T2 value)
+        public static float[,] Scale(this float[] self, float scaleX, float scaleY, int width, int height)
         {
-            key = tuple.Key;
-            value = tuple.Value;
+            int newWidth = (int)((width) * scaleX);
+            int newHeight = (int)((height) * scaleY);
+            var newImage = new float[newWidth, newHeight];
+
+            for (int y = 0; y < newHeight; y++)
+            {
+                for (int x = 0; x < newWidth; x++)
+                {
+                    float gx = ((float)x) / newWidth * (width - 1);
+                    float gy = ((float)y) / newHeight * (height - 1);
+                    int gxi = (int)gx;
+                    int gyi = (int)gy;
+
+                    var c00 = self[(gxi) * (height) + (gyi)];
+                    var c10 = self[(gxi + 1) * (height) + (gyi)];
+                    var c01 = self[(gxi) * (height) + (gyi + 1)];
+                    var c11 = self[(gxi + 1) * (height) + (gyi + 1)];
+
+                    var red = Blerp(c00, c10, c01, c11, gx - gxi, gy - gyi);
+                    newImage[x, y] = red;
+                }
+            }
+
+            return newImage;
         }
+
+        private static float Blerp(float c00, float c10, float c01, float c11, float tx, float ty)
+            => Lerp(Lerp(c00, c10, tx), Lerp(c01, c11, tx), ty);
+
+        private static float Lerp(float s, float e, float t)
+            => s + (e - s) * t;
     }
 }
