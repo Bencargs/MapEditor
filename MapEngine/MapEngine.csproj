@@ -128,6 +128,9 @@
     <Compile Include="Services\Effects\FluidEffect\Field.cs" />
     <Compile Include="Services\Effects\FluidEffect\FluidEffects.cs" />
     <Compile Include="Services\Effects\FluidEffect\FluidEffectService.cs" />
+    <Compile Include="Services\Effects\WaveEffect\WaterParticle.cs" />
+    <Compile Include="Services\Effects\WaveEffect\WaveEffects.cs" />
+    <Compile Include="Services\Effects\WaveEffect\WaveEffectService.cs" />
     <Compile Include="Services\Map\MapService.cs" />
     <Compile Include="Services\PathfindingService\PathfindingService.cs" />
     <Compile Include="Services\PathfindingService\Node.cs" />

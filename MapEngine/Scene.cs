@@ -46,7 +46,6 @@ namespace MapEngine
             _effectsHandler.Initialise();
             for (var i = 0; i < 512; i++)
             {
-                // todo: temporary
                 _messageHub.Post(new CreateEffectCommand
                 {
                     Name = "FluidEffect", // todo: these should be constant or enum values?
@@ -54,6 +53,13 @@ namespace MapEngine
                     Value = 2f
                 });
             }
+
+            _messageHub.Post(new CreateEffectCommand
+            {
+                Name = "WaveEffect",
+                Location = new Vector2 { X = 90, Y = 110 },
+                Value = 1000
+            });
         }
 
         double _totalElapsed = 0;

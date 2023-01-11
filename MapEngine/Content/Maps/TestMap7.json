@@ -26,15 +26,23 @@
         "X": 0,
         "Y": 0
       },
-      "TextureId": "CBDFluidSurfaceTexture",
+      "TextureId": "CBDTexture",
       "Type": 1
     }
   ],
   "Effects": [
-	{
+    {
 	  "Name": "FluidEffect",
 	  "Resolution": 0.003,
-	  "Surface": "CBDFluidSurface"
+      "Surface": "CBDFluidSurface"
+	},
+	{
+	  "Name": "WaveEffect",
+	  "Resolution": 5,
+	  "Mass": 0.1,
+	  "MaxHeight": 500,
+	  "Sustain": 1000,
+	  "Surface": "CBDWaveSurface"
 	}
   ]
 }
