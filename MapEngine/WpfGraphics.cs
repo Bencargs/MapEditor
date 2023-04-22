@@ -62,6 +62,9 @@ namespace MapEngine
                     if (colour.Alpha == 0)
                         continue; // Dont draw something that's entirely transperant
 
+                    if (colour.Alpha != 255) // If there's an alpha component, blend with background
+                        colour = BlendColour(x, y, colour);
+
                     SetPixel(x + area.X, y + area.Y, colour);
                 }
             }
@@ -104,6 +107,31 @@ namespace MapEngine
             _backBuffer[index + 1] = colour.Blue;
             _backBuffer[index + 2] = colour.Green;
             _backBuffer[index + 3] = colour.Alpha;
+        }
+
+        private Colour GetPixel(int x, int y)
+        {
+            var index = x * 4 + y * 4 * Width;
+
+            var red = _backBuffer[index];
+            var blue = _backBuffer[index + 1];
+            var green = _backBuffer[index + 2];
+            var alpha = _backBuffer[index + 3];
+
+            return new Colour(red, blue, green, alpha);
+        }
+
+        private Colour BlendColour(int x, int y, Colour colour)
+        {
+            var original = GetPixel(x, y);
+            var blend = (float)colour.Alpha / 255;
+            var reciprocal = 1 - blend;
+
+            return new Colour(
+                (byte)(colour.Red * blend + original.Red * reciprocal),
+                (byte)(colour.Blue * blend + original.Blue * reciprocal),
+                (byte)(colour.Green * blend + original.Green * reciprocal),
+                255);
         }
 
         public void DrawLines(Colour colour, Vector2[] points)

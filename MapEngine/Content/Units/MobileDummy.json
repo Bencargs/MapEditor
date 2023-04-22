@@ -26,10 +26,13 @@
 			"Height":24,
 		}
 	},
-	"Sensors": [
-		{
+	"Sensors": [{
 			"Type": "Radar",
 			"Radius": 200
 		}
-	  ],
+	],
+	"Particles": [{
+			"Type": "Wake"
+		}
+	]
 }

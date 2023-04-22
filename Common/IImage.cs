@@ -15,5 +15,6 @@
         void Draw(byte[] buffer);
         IImage Scale(float scale);
         IImage Rotate(float angle);
+        IImage Fade(byte fade);
     }
 }
