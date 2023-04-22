@@ -1,0 +1,40 @@
+{
+  "Width": 768,
+  "Height": 512,
+  "Heightmap": "WaterHeightmap.png",
+  "Description":"Fluid Effects Test",
+  "TileWidth":1,
+  "TileHeight":1,
+  "Camera": {
+	"X": 0,
+	"Y": 0,
+	"Z": 10,
+	"Width": 768,
+	"Height": 512
+  },
+  "Teams": [
+	{
+		"Id":0,
+		"Name":"Player"
+	}
+  ],
+  "Units": [],
+  "Tiles": [
+    {
+      "Id": 0,
+      "Location": {
+        "X": 0,
+        "Y": 0
+      },
+      "TextureId": "CBDFluidSurfaceTexture",
+      "Type": 1
+    }
+  ],
+  "Effects": [
+	{
+	  "Name": "FluidEffect",
+	  "Resolution": 0.003,
+	  "Surface": "CBDFluidSurface"
+	}
+  ]
+}

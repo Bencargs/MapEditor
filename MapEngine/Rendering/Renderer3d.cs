@@ -17,7 +17,8 @@ namespace MapEngine.Rendering
         , IHandleCommand<DestroyEntityCommand>
     {
         // todo: this is pretty sus - should come from a game settings class
-        private readonly Device _3dEngine = new Device(new WpfImage(640, 480));
+        private readonly Device _3dEngine = new Device(new WpfImage(768, 512));
+        //private readonly Device _3dEngine = new Device(new WpfImage(640, 480));
         private readonly List<Entity> _entities = new List<Entity>();
         private readonly SensorHandler _sensorHandler;
 

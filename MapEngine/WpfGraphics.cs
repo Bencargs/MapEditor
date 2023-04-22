@@ -1,6 +1,5 @@
 ﻿using Common;
 using System;
-using System.Linq;
 using System.Numerics;
 using System.Windows.Media.Imaging;
 
@@ -10,29 +9,22 @@ namespace MapEngine
     {
         public int Width { get; }
         public int Height { get; }
-        public WriteableBitmap Bitmap => _window.Bitmap;
-        
-        private readonly WpfImage _window;
+        public WriteableBitmap Bitmap;
+
         private readonly byte[] _backBuffer;
 
-        public WpfGraphics(WpfImage image)
+        public WpfGraphics(int width, int height)
         {
-            Width = image.Width;
-            Height = image.Height;
+            Width = width;
+            Height = height;
 
-            _window = image;
-            _backBuffer = new byte[Width * Height * 4];
+            Bitmap = BitmapFactory.New(Width, Height);
+            _backBuffer = Bitmap.ToByteArray();
         }
 
         public void Clear()
         {
-            for (var i = 0; i < _backBuffer.Length; i += 4)
-            {
-                _backBuffer[i] = 0;
-                _backBuffer[i + 1] = 0;
-                _backBuffer[i + 2] = 0;
-                _backBuffer[i + 3] = 0;
-            }
+            Bitmap.Clear();
         }
 
         public void DrawCircle(Colour colour, Rectangle area)
@@ -66,7 +58,7 @@ namespace MapEngine
             {
                 for (var y = minY; y < maxY && y + area.Y < Height - 1; y++)
                 {
-                    var colour = image[x * 4, y * 4];
+                    var colour = image[x, y];
                     if (colour.Alpha == 0)
                         continue; // Dont draw something that's entirely transperant
 
@@ -87,11 +79,21 @@ namespace MapEngine
                 if (k > _backBuffer.Length || k < 0)
                     continue;
 
-                _backBuffer[k] = buffer[i];
-                _backBuffer[k + 1] = buffer[i + 1];
-                _backBuffer[k + 2] = buffer[i + 2];
-                _backBuffer[k + 3] = buffer[i + 3];
+                var opacity = (float)(buffer[i + 3] / 255f);
+                _backBuffer[k + 0] = MergePixel(_backBuffer[k + 0], buffer[i + 0], opacity);
+                _backBuffer[k + 1] = MergePixel(_backBuffer[k + 1], buffer[i + 1], opacity);
+                _backBuffer[k + 2] = MergePixel(_backBuffer[k + 2], buffer[i + 2], opacity);
+                _backBuffer[k + 3] = 255;
             }
+        }
+
+        private byte MergePixel(byte a, byte b, float alpha)
+        {
+            var reciprical = 1 - alpha;
+
+            var c = (a * reciprical) + (b * alpha);
+
+            return (byte)c;
         }
 
         private void SetPixel(int x, int y, Colour colour)
@@ -154,7 +156,7 @@ namespace MapEngine
 
         public void Render()
         {
-            _window.Draw(_backBuffer);
+            Bitmap.FromByteArray(_backBuffer);
         }
     }
 }

@@ -2,6 +2,7 @@
 using MapEngine.Commands;
 using MapEngine.Handlers;
 using MapEngine.Rendering;
+using MapEngine.Services.Effect;
 using MapEngine.Services.Map;
 using MapEngine.Services.PathfindingService;
 
@@ -30,10 +31,12 @@ namespace MapEngine
 
         private static void RegisterServices(ContainerBuilder builder)
         {
-            var image = new WpfImage(640, 480);
-            builder.RegisterInstance(new WpfGraphics(image)).SingleInstance();
+            // todo: read window resolution from a config file
+            builder.RegisterInstance(new WpfGraphics(768, 512)).SingleInstance();
+            //builder.RegisterInstance(new WpfGraphics(640, 480)).SingleInstance();
             builder.RegisterType<MapService>().SingleInstance();
             builder.RegisterType<PathfindingService>().SingleInstance();
+            builder.RegisterType<FluidEffectService>().SingleInstance();
         }
 
         private static void RegisterHandlers(ContainerBuilder builder)
@@ -43,6 +46,7 @@ namespace MapEngine
             builder.RegisterType<WeaponHandler>().SingleInstance();
             builder.RegisterType<EntityHandler>().SingleInstance();
             builder.RegisterType<CameraHandler>().SingleInstance();
+            builder.RegisterType<EffectsHandler>().SingleInstance();
             builder.RegisterType<MapHandler>().SingleInstance();
             builder.RegisterType<SensorHandler>().SingleInstance();
         }

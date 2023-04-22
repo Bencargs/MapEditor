@@ -87,6 +87,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Commands\CreateEffectCommand.cs" />
     <Compile Include="Commands\CreateEntityCommand.cs" />
     <Compile Include="Commands\DestroyEntityCommand.cs" />
     <Compile Include="Commands\ICommand.cs" />
@@ -118,10 +119,15 @@
     <Compile Include="Entities\Components\LocationComponent.cs" />
     <Compile Include="Factories\WeaponFactory.cs" />
     <Compile Include="Handlers\SensorHandler.cs" />
+    <Compile Include="Handlers\EffectsHandler.cs" />
     <Compile Include="Rendering\IRenderer.cs" />
     <Compile Include="Rendering\Renderer2d.cs" />
     <Compile Include="Rendering\Renderer3d.cs" />
     <Compile Include="Rendering\SensorRenderer.cs" />
+    <Compile Include="Services\Effects\FluidEffect\Direction.cs" />
+    <Compile Include="Services\Effects\FluidEffect\Field.cs" />
+    <Compile Include="Services\Effects\FluidEffect\FluidEffects.cs" />
+    <Compile Include="Services\Effects\FluidEffect\FluidEffectService.cs" />
     <Compile Include="Services\Map\MapService.cs" />
     <Compile Include="Services\PathfindingService\PathfindingService.cs" />
     <Compile Include="Services\PathfindingService\Node.cs" />

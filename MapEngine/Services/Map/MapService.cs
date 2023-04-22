@@ -1,5 +1,7 @@
 ﻿using Common;
+using MapEngine.Services.Effects.FluidEffect;
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 
 namespace MapEngine.Services.Map
@@ -11,6 +13,7 @@ namespace MapEngine.Services.Map
         public Tile[,] Tiles => _map.Tiles;
         public int Width => _map.Width;
         public int Height => _map.Height;
+        public FluidEffects FluidEffects => _map.FluidEffects; // todo: this all seems a little redundant, whats the value add here?
 
         public void Initialise(Map map)
         {

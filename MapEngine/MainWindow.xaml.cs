@@ -25,7 +25,8 @@ namespace MapEngine
             _scene = new Scene(graphics, messageHub,
                 container.Resolve<MapHandler>(),
                 container.Resolve<EntityHandler>(),
-                container.Resolve<CameraHandler>());
+                container.Resolve<CameraHandler>(),
+                container.Resolve<EffectsHandler>());
 
             messageHub.Initialise(container);
             _scene.Initialise();
@@ -34,7 +35,7 @@ namespace MapEngine
 
             var dispatcherTimer = new DispatcherTimer();
             dispatcherTimer.Tick += Update;
-            dispatcherTimer.Interval = TimeSpan.FromMilliseconds(20);
+            dispatcherTimer.Interval = TimeSpan.FromMilliseconds(20); // should be 16 for 60fps
             dispatcherTimer.Start();
         }
 
