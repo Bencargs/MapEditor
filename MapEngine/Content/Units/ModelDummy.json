@@ -22,6 +22,11 @@
 	"Weapons": [
 		"Cannon",
 	],
+	"Sensors": [{
+			"Type": "Sight",
+			"Radius": 200
+		}
+	],
 	//"Particles": [{
 	//	"Type": "Wake"
 	//}]
