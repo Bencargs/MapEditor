@@ -1,5 +1,6 @@
 ﻿using Common;
 using MapEngine.Services.Effects.FluidEffect;
+using MapEngine.Services.Effects.WaveEffect;
 using MapEngine.Services.Map;
 using Newtonsoft.Json;
 using System.Collections.Generic;
@@ -26,7 +27,8 @@ namespace MapEngine.ResourceLoading
                 Height = mapData.Height,
                 Teams = teams,
                 Tiles = tiles,
-                FluidEffects = LoadFluidEffects(mapData)
+                FluidEffects = LoadFluidEffects(mapData),
+                WaveEffects = LoadWaveEffects(mapData)
             };
 
             return map;
@@ -58,6 +60,19 @@ namespace MapEngine.ResourceLoading
             {
                 Resolution = (float)(fluidConfig?.Resolution ?? 0.01f),
                 Surface = fluidConfig?.Surface ?? ""
+            };
+        }
+
+        private static WaveEffects LoadWaveEffects(dynamic mapData)
+        {
+            var waveConfig = ((IEnumerable<dynamic>)mapData.Effects)?.FirstOrDefault(x => x.Name == "WaveEffect");
+            return new WaveEffects
+            {
+                Resolution = (float)(waveConfig?.Resolution ?? 0.01f),
+                Mass = (float)(waveConfig?.Mass ?? 0.01f),
+                MaxHeight = (float)(waveConfig?.MaxHeight ?? 0.01f),
+                Sustain = (float)(waveConfig?.Sustain ?? 0.01f),
+                Surface = waveConfig?.Surface ?? ""
             };
         }
     }

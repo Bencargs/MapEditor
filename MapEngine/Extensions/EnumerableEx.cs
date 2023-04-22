@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Common;
+using MapEngine.Services.Effects.WaveEffect;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace MapEngine
@@ -62,11 +65,11 @@ namespace MapEngine
             return false;
         }
 
-        public static float[,] Scale(this float[] self, float scaleX, float scaleY, int width, int height)
+        public static float[,] Scale<T>(this T[] self, Func<T, float> selector, float scaleX, float scaleY, int width, int height)
         {
             int newWidth = (int)((width) * scaleX);
             int newHeight = (int)((height) * scaleY);
-            var newImage = new float[newWidth, newHeight];
+            var scaledArray = new float[newWidth, newHeight];
 
             for (int y = 0; y < newHeight; y++)
             {
@@ -77,23 +80,51 @@ namespace MapEngine
                     int gxi = (int)gx;
                     int gyi = (int)gy;
 
-                    var c00 = self[(gxi) * (height) + (gyi)];
-                    var c10 = self[(gxi + 1) * (height) + (gyi)];
-                    var c01 = self[(gxi) * (height) + (gyi + 1)];
-                    var c11 = self[(gxi + 1) * (height) + (gyi + 1)];
+                    var c00 = selector(self[(gxi) * (height) + (gyi)]);
+                    var c10 = selector(self[(gxi + 1) * (height) + (gyi)]);
+                    var c01 = selector(self[(gxi) * (height) + (gyi + 1)]);
+                    var c11 = selector(self[(gxi + 1) * (height) + (gyi + 1)]);
 
-                    var red = Blerp(c00, c10, c01, c11, gx - gxi, gy - gyi);
-                    newImage[x, y] = red;
+                    var value = Blerp(c00, c10, c01, c11, gx - gxi, gy - gyi);
+                    scaledArray[x, y] = value;
                 }
             }
 
-            return newImage;
+            return scaledArray;
         }
 
-        private static float Blerp(float c00, float c10, float c01, float c11, float tx, float ty)
+        public static float[,] Scale<T>(this T[,] self, Func<T, float> selector, float scaleX, float scaleY, int width, int height)
+        {
+            int newWidth = (int)((width) * scaleX);
+            int newHeight = (int)((height) * scaleY);
+            var scaledArray = new float[newWidth, newHeight];
+
+            for (int y = 0; y < newHeight; y++)
+            {
+                for (int x = 0; x < newWidth; x++)
+                {
+                    float gx = ((float)x) / newWidth * (width - 1);
+                    float gy = ((float)y) / newHeight * (height - 1);
+                    int gxi = (int)gx;
+                    int gyi = (int)gy;
+
+                    var c00 = selector(self[gxi, gyi]);
+                    var c10 = selector(self[gxi + 1, gyi]);
+                    var c01 = selector(self[gxi, gyi + 1]);
+                    var c11 = selector(self[gxi + 1, gyi + 1]);
+
+                    var value = Blerp(c00, c10, c01, c11, gx - gxi, gy - gyi);
+                    scaledArray[x, y] = value;
+                }
+            }
+
+            return scaledArray;
+        }
+
+        public static float Blerp(float c00, float c10, float c01, float c11, float tx, float ty)
             => Lerp(Lerp(c00, c10, tx), Lerp(c01, c11, tx), ty);
 
-        private static float Lerp(float s, float e, float t)
+        public static float Lerp(float s, float e, float t)
             => s + (e - s) * t;
     }
 }
