@@ -27,6 +27,10 @@
 		}
 	},
 	"Sensors": [{
+			"Type": "Sight",
+			"Radius": 200
+		},
+		{
 			"Type": "Radar",
 			"Radius": 200
 		}

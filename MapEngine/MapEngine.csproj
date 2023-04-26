@@ -112,6 +112,7 @@
     <Compile Include="Factories\UnitFactory.cs" />
     <Compile Include="Handlers\CameraHandler.cs" />
     <Compile Include="Handlers\CollisionHandler.cs" />
+    <Compile Include="Handlers\EffectsHandler.cs" />
     <Compile Include="Handlers\MapHandler.cs" />
     <Compile Include="Handlers\MovementHandler\MovementHandler.cs" />
     <Compile Include="Handlers\MovementHandler\MoveOrder.cs" />
@@ -133,6 +134,7 @@
     <Compile Include="Services\Effects\FluidEffect\Field.cs" />
     <Compile Include="Services\Effects\FluidEffect\FluidEffects.cs" />
     <Compile Include="Services\Effects\FluidEffect\FluidEffectService.cs" />
+    <Compile Include="ResourceLoading\EffectsLoader.cs" />
     <Compile Include="ResourceLoading\ParticleLoader.cs" />
     <Compile Include="Services\Map\MapService.cs" />
     <Compile Include="Services\PathfindingService\PathfindingService.cs" />

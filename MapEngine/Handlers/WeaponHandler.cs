@@ -45,7 +45,7 @@ namespace MapEngine.Handlers
 
                 // get closest target in range -- in future we could have an AI component with target priorities here
                 var target = collisions.First().entity;
-                if (target.GetComponent<UnitComponent>().TeamId == e.GetComponent<UnitComponent>().TeamId) // todo: some kind of alliance lookup?
+                if (target.GetComponent<UnitComponent>()?.TeamId == e.GetComponent<UnitComponent>().TeamId) // todo: some kind of alliance lookup?
                     continue;
 
                 if (!TryGetAim(e, target, out var aimPoint))
@@ -73,7 +73,7 @@ namespace MapEngine.Handlers
                         Velocity = target,
                         Steering = Vector2.Zero,
                         MaxVelocity = weaponComponent.Speed,
-                        Mass = 1,
+                        Mass = 0,
                         MaxForce = weaponComponent.MaxImpactForce,
                         Destinations = new Queue<MoveOrder>(new[]
                         {

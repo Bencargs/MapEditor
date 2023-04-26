@@ -39,18 +39,25 @@ namespace MapEngine
         public IImage Rotate(float angle)
         {
             var rotated = Bitmap.RotateFree(180 - angle, false);
+            if (rotated.Format != PixelFormats.Bgra32)
+            {
+                // Todo: for some reason rotation changes pixel format to Pbgra32 (?!)
+                var bitmapSource = new FormatConvertedBitmap(rotated, PixelFormats.Bgra32, null, 0);
+                rotated = new WriteableBitmap(bitmapSource);
+            }
+
             return new WpfImage(rotated);
         }
 
         public IImage Scale(float scale)
         {
-            var width = (int)scale * Width;
-            var height = (int)scale * Height;
+            var width = (int)(scale * Width);
+            var height = (int)(scale * Height);
             var scaled = Bitmap.Resize(width, height, WriteableBitmapExtensions.Interpolation.NearestNeighbor); // Nearest neighbour?! BiLinear? BiCubic?
             return new WpfImage(scaled);
         }
 
-        public IImage Fade(byte fade)
+        public IImage Fade(float fade)
         {
             for (int i = 3; i < Buffer.Length; i += 4)
             {
@@ -72,7 +79,14 @@ namespace MapEngine
                     Buffer[index + 3]);
                 return colour;
             }
-            set => throw new NotImplementedException(); 
+            set
+            {
+                var index = (x * 4) + ((y * 4) * Width);
+                Buffer[index] = value.Red;
+                Buffer[index + 1] = value.Blue;
+                Buffer[index + 2] = value.Green;
+                Buffer[index + 3] = value.Alpha;
+            }
         }
     }
 }

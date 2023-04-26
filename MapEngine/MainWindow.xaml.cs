@@ -2,8 +2,13 @@
 using MapEngine.Commands;
 using MapEngine.Handlers;
 using System;
+using System.Collections.Generic;
+using System.Numerics;
 using System.Windows;
 using System.Windows.Threading;
+using Common.Entities;
+using MapEngine.Entities.Components;
+using MapEngine.Factories;
 using MapEngine.Handlers.ParticleHandler;
 
 namespace MapEngine
