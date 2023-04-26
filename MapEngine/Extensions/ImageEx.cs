@@ -49,8 +49,8 @@ namespace MapEngine
             var width = palette.Width;
             var low = (int) Math.Min(width - 1, Math.Floor(((float)index / range) * width));
             var high = Math.Min(width - 1, low + 1);
-            var lowColour = palette[low * 4, 0];
-            var highColour = palette[high * 4, 0];
+            var lowColour = palette[low, 0];
+            var highColour = palette[high, 0];
 
             var interpolation = (index % ((float)range / width)) / 10;
 
@@ -82,9 +82,9 @@ namespace MapEngine
 
         public static void ChangeHue(this IImage bmp, Colour colour)
         {
-            for (var x = 0; x < bmp.Width * 4; x += 4)
+            for (var x = 0; x < bmp.Width; x++)
             {
-                for (var y = 0; y < bmp.Height * 4; y += 4)
+                for (var y = 0; y < bmp.Height; y++)
                 {
                     var existing = bmp[x, y];
 

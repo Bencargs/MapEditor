@@ -51,8 +51,8 @@ namespace MapEngine
 
         public IImage Scale(float scale)
         {
-            var width = (int)scale * Width;
-            var height = (int)scale * Height;
+            var width = (int)(scale * Width);
+            var height = (int)(scale * Height);
             var scaled = Bitmap.Resize(width, height, WriteableBitmapExtensions.Interpolation.NearestNeighbor); // Nearest neighbour?! BiLinear? BiCubic?
             return new WpfImage(scaled);
         }
@@ -81,7 +81,7 @@ namespace MapEngine
             }
             set
             {
-                var index = x + (y * Width);
+                var index = (x * 4) + ((y * 4) * Width);
                 Buffer[index] = value.Red;
                 Buffer[index + 1] = value.Blue;
                 Buffer[index + 2] = value.Green;

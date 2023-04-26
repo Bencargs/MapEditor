@@ -97,7 +97,7 @@ namespace MapEngine.Handlers.ParticleHandler
                     .Scale(p.Size)
                     .Rotate(p.FacingAngle)
                     .Fade(p.Fade);
-                
+
                 if (TextureFactory.TryGetTexture(p.PaletteTextureId, out var palette))
                 {
                     // todo: change this to stay on the last colour?

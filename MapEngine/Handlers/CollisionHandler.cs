@@ -51,7 +51,7 @@ namespace MapEngine.Handlers
                     var sourceLocation = entity.GetComponent<LocationComponent>();
                     var sourceVelocity = entity.GetComponent<MovementComponent>();
                     var force = GetImpactForce(sourceVelocity);
-                    if (force > 0 )
+                    if (force > 0)
                     {
                         // If its a meaningful impact, modify velocity
                         var selfLocation = i.GetComponent<LocationComponent>();
@@ -121,7 +121,7 @@ namespace MapEngine.Handlers
                                 }
                             }
                         });
-                        _messageHub.Post(new DestroyEntityCommand { Entity = entity });
+                        _messageHub.Post(new DestroyEntityCommand { Entity = i });
                     }
                 }
             }
