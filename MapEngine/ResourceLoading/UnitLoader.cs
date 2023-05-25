@@ -44,7 +44,7 @@ namespace MapEngine.ResourceLoading
                 if (movement != null)
                 {
                     var movementComponent = entity.GetComponent<MovementComponent>();
-                    movementComponent.Velocity = new Vector2((int)movement.Velocity.X, (int)movement.Velocity.Y);
+                    movementComponent.Velocity = new Vector3((int)movement.Velocity.X, (int)movement.Velocity.Y, 0);
                     movementComponent.Steering = new Vector2((int)movement.Steering.X, (int)movement.Steering.Y);
                     movementComponent.Destinations = (movement.Destinations != null) 
                         ? ((IEnumerable<dynamic>)movement.Destinations).Select(x => new MoveOrder
@@ -109,7 +109,7 @@ namespace MapEngine.ResourceLoading
             {
                 entity.AddComponent(new MovementComponent
                 {
-                    Velocity = Vector2.Zero,
+                    Velocity = Vector3.Zero,
                     Steering = Vector2.Zero,
                     MaxVelocity = (float)movement.MaxVelocity,
                     Mass = (float)(movement.Mass ?? 1),

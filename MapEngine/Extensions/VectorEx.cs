@@ -37,6 +37,16 @@ namespace MapEngine
             return source;
         }
 
+        public static Vector3 Truncate(this Vector3 source, float max)
+        {
+            if (source.Length() > max)
+            {
+                source = source.Normalize();
+                source *= max;
+            }
+            return source;
+        }
+
         public static Vector2 Normalize(this Vector2 source)
         {
             var distance =  Math.Sqrt(source.X * source.X + source.Y * source.Y);
@@ -51,6 +61,11 @@ namespace MapEngine
         public static float Distance(this Vector2 source, Vector2 destination)
         {
             return Vector2.Distance(source, destination);
+        }
+
+        public static Vector2 ToVector2(this Vector3 source)
+        {
+            return new Vector2(source.X, source.Y);
         }
     }
 }

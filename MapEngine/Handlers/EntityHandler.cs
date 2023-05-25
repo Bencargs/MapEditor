@@ -1,8 +1,11 @@
 ﻿using Common;
 using MapEngine.Commands;
+using MapEngine.Entities;
+using MapEngine.Entities.Components;
 using MapEngine.Factories;
 using MapEngine.ResourceLoading;
 using MapEngine.Rendering;
+using MapEngine.Services.Map;
 
 namespace MapEngine.Handlers
 {
@@ -11,12 +14,14 @@ namespace MapEngine.Handlers
     /// to represent update of entity state
     /// </summary>
     public class EntityHandler // todo: rename entityManager?
+        : IHandleCommand<CreateEntityCommand>
     {
         private readonly MessageHub _messageHub;
         private readonly WeaponHandler _weaponHandler;
         private readonly MovementHandler _movementHandler;
         private readonly CollisionHandler _collisionHandler;
         private readonly SensorHandler _sensorHandler;
+        private readonly MapService _mapService;
         private readonly IRenderer _2dRenderer;
         private readonly IRenderer _3dRenderer;
         private readonly IRenderer _sensorRenderer;
@@ -27,6 +32,7 @@ namespace MapEngine.Handlers
             CollisionHandler collisionHandler,
             SensorHandler sensorHandler,
             WeaponHandler weaponHandler,
+            MapService mapService,
             Renderer2d renderer2d, // todo: RenderFactory.GetRenderers?
             Renderer3d renderer3d,
             SensorRenderer sensorRenderer)
@@ -39,6 +45,7 @@ namespace MapEngine.Handlers
             _sensorRenderer = sensorRenderer;
             _movementHandler = movementHandler;
             _collisionHandler = collisionHandler;
+            _mapService = mapService;
         }
 
         public void Initialise(string unitsFilepath, string mapFilename, string weaponFilepath, string modelFilepath, string particleFilepath)
@@ -73,6 +80,13 @@ namespace MapEngine.Handlers
             _3dRenderer.DrawLayer(viewport, graphics);
             _2dRenderer.DrawLayer(viewport, graphics);
             _sensorRenderer.DrawLayer(viewport, graphics);
+        }
+
+        public void Handle(CreateEntityCommand command)
+        {
+            var entity = command.Entity;
+            var mapHeight = _mapService.GetHeight(entity.Location());
+            entity.GetComponent<LocationComponent>().Height = mapHeight;
         }
     }
 }

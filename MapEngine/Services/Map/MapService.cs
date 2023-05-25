@@ -1,4 +1,5 @@
 ﻿using Common;
+using MapEngine.Factories;
 using MapEngine.Services.Effects.FluidEffect;
 using System;
 using System.Collections.Generic;
@@ -27,6 +28,21 @@ namespace MapEngine.Services.Map
             x = Math.Max(0, Math.Min(x, _map.Tiles.GetLength(0) - 1));
             y = Math.Max(0, Math.Min(y, _map.Tiles.GetLength(1) - 1));
             return _map.Tiles[x, y];
+        }
+
+        public int GetHeight(Vector2 location)
+        {
+            var tile = GetTile(location);
+
+            if (TextureFactory.TryGetTexture(tile.HeightmapTextureId, out var heightmap))
+            {
+                // todo: use full RGB colour range to represent heights for better verticality
+                // see https://jonathancritchley.ca/TOHeight_post.html
+                var height = heightmap.Image[(int)location.X, (int)location.Y].Blue;
+                return height;
+            }
+
+            return 0;
         }
 
         public (int X, int Y) GetCoordinates(Tile tile)

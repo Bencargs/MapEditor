@@ -72,6 +72,7 @@ namespace MapEngine
             get
             {
                 var index = (x * 4) + ((y * 4) * Width);
+
                 var colour = new Colour(
                     Buffer[index],
                     Buffer[index + 1],

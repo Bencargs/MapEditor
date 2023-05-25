@@ -34,9 +34,5 @@
 			"Type": "Radar",
 			"Radius": 200
 		}
-	],
-	"Particles": [{
-			"Type": "Wake"
-		}
 	]
 }
