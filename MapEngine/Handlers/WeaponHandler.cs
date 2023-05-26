@@ -58,10 +58,8 @@ namespace MapEngine.Handlers
             }
         }
 
-        private Entity CreateProjectile(LocationComponent location, Vector2 target, WeaponComponent weaponComponent)
+        private Entity CreateProjectile(LocationComponent location, Vector2 aimPoint, WeaponComponent weaponComponent)
         {
-            var verticalVelocity = weaponComponent.Speed / 2; // assuming 45 degree angle - todo: this is pretty amateur
-
             var projectile = new Entity
             {
                 Id = 72, // todo: EntityFactory
@@ -72,7 +70,7 @@ namespace MapEngine.Handlers
                     new ImageComponent { TextureId = weaponComponent.TextureId },
                     new MovementComponent
                     {
-                        Velocity = new Vector3(target.X, target.Y, verticalVelocity),
+                        Velocity = new Vector3(aimPoint.X, aimPoint.Y, weaponComponent.Speed),
                         Steering = Vector2.Zero,
                         MaxVelocity = weaponComponent.Speed,
                         Mass = 0,
@@ -82,7 +80,7 @@ namespace MapEngine.Handlers
                             new MoveOrder
                             {
                                 MovementMode = MovementMode.Direct,
-                                Destination = target
+                                Destination = aimPoint
                             }
                         })
                     },

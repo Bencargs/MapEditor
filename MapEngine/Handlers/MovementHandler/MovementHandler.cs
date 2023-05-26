@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using MapEngine.Entities;
 using MapEngine.Services.PathfindingService;
 using MapEngine.Services.Map;
 
@@ -72,14 +71,10 @@ namespace MapEngine.Handlers
 
         private void ApplyGravity(LocationComponent location, MovementComponent movement)
         {
-            const int Gravity = 1;// 9.81 in tenths of meters rounded to int
+            const int Gravity = -1;// 9.81 in tenths of meters rounded to int
 
-            var mapHeight = _mapService.GetHeight(location.Location);
-            if (location.Height > mapHeight)
-            {
-                movement.Velocity -= new Vector3(0, 0, Gravity);
-                location.Height -= (int)movement.Velocity.Z;
-            }
+            movement.Velocity += new Vector3(0, 0, Gravity);
+            location.Height += (int)movement.Velocity.Z;
         }
 
 

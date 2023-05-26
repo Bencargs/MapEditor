@@ -175,7 +175,7 @@ namespace MapEngine.Handlers
                 var entityHeight = e.Height();
                 var entityLocation = e.Location();
                 var mapHeight = _mapService.GetHeight(entityLocation);
-                if (entityHeight < mapHeight) // this is backwards right?
+                if (entityHeight < mapHeight)
                 {
                     yield return (e, 0f);
                 }
