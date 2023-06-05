@@ -7,6 +7,7 @@ namespace MapEngine.Entities.Components
     {
         public ComponentType Type => ComponentType.Location;
         public Vector2 Location { get; set; }
+        public int Height { get; set; }
         public float FacingAngle { get; set; }
 
         public IComponent Clone()
@@ -14,7 +15,8 @@ namespace MapEngine.Entities.Components
             return new LocationComponent
             {
                 Location = Location,
-                FacingAngle = FacingAngle
+                FacingAngle = FacingAngle,
+                Height = Height
             };
         }
     }

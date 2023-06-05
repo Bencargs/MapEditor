@@ -11,7 +11,7 @@ namespace MapEngine.Entities.Components
     {
         public ComponentType Type { get; } = ComponentType.Movement;
         
-        public Vector2 Velocity { get; set; }
+        public Vector3 Velocity { get; set; }
         public Vector2 Steering { get; set; }
         public float BrakeForce { get; set; }
 

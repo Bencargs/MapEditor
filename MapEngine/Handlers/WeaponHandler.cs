@@ -39,7 +39,7 @@ namespace MapEngine.Handlers
 
                 var location = e.GetComponent<LocationComponent>(); // todo: replace these with entity extension methods?
                 var collider = new BoundingCircle { Radius = weaponComponent.Range, Location = location.Location };
-                var collisions = _collisionHandler.GetCollisions(collider).Where(x => x.entity.Id != e.Id);
+                var collisions = _collisionHandler.GetCollisions(collider).Where(x => x.entity.Id != e.Id).ToList();
                 if (!collisions.Any())
                     continue;
 
@@ -58,7 +58,7 @@ namespace MapEngine.Handlers
             }
         }
 
-        private Entity CreateProjectile(LocationComponent location, Vector2 target, WeaponComponent weaponComponent)
+        private Entity CreateProjectile(LocationComponent location, Vector2 aimPoint, WeaponComponent weaponComponent)
         {
             var projectile = new Entity
             {
@@ -70,7 +70,7 @@ namespace MapEngine.Handlers
                     new ImageComponent { TextureId = weaponComponent.TextureId },
                     new MovementComponent
                     {
-                        Velocity = target,
+                        Velocity = new Vector3(aimPoint.X, aimPoint.Y, weaponComponent.Speed),
                         Steering = Vector2.Zero,
                         MaxVelocity = weaponComponent.Speed,
                         Mass = 0,
@@ -80,7 +80,7 @@ namespace MapEngine.Handlers
                             new MoveOrder
                             {
                                 MovementMode = MovementMode.Direct,
-                                Destination = target
+                                Destination = aimPoint
                             }
                         })
                     },
@@ -95,7 +95,7 @@ namespace MapEngine.Handlers
             var weapon = self.GetComponent<WeaponComponent>();
             var selfLocation = self.Location();
             var targetLocation = target.Location();
-            var targetVelocity = target.GetComponent<MovementComponent>()?.Velocity ?? Vector2.Zero;
+            var targetVelocity = target.GetComponent<MovementComponent>()?.Velocity.ToVector2() ?? Vector2.Zero;
 
             // calculate target and projectiles location at each step in the future
             // return the leading aim location on the first possible intercept

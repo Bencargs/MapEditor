@@ -112,7 +112,6 @@
     <Compile Include="Factories\UnitFactory.cs" />
     <Compile Include="Handlers\CameraHandler.cs" />
     <Compile Include="Handlers\CollisionHandler.cs" />
-    <Compile Include="Handlers\EffectsHandler.cs" />
     <Compile Include="Handlers\MapHandler.cs" />
     <Compile Include="Handlers\MovementHandler\MovementHandler.cs" />
     <Compile Include="Handlers\MovementHandler\MoveOrder.cs" />

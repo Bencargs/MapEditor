@@ -8,5 +8,6 @@ namespace Common
 		public Vector2 Location { get; set; }
 		public string TextureId { get; set; }
 		public TerrainType Type { get; set; }
+		public string HeightmapTextureId { get; set; }
 	}
 }

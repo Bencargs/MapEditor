@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using MapEngine.Services.PathfindingService;
-using MapEngine.Factories;
+using MapEngine.Services.Map;
 
 namespace MapEngine.Handlers
 {
@@ -17,11 +17,14 @@ namespace MapEngine.Handlers
         , IHandleCommand<MoveCommand>
     {
         private readonly PathfindingService _pathfinding;
+        private readonly MapService _mapService;
         private readonly List<Entity> _entities = new List<Entity>();
 
         public MovementHandler(
+            MapService mapService,
             PathfindingService pathfindingService)
         {
+            _mapService = mapService;
             _pathfinding = pathfindingService;
         }
 
@@ -40,12 +43,13 @@ namespace MapEngine.Handlers
             if (location == null || movement == null)
                 return;
 
+            ApplyGravity(location, movement);
             if (TryGetTarget(location, movement, out var target))
             {
                 switch (target.MovementMode)
                 {
                     case MovementMode.Direct:
-                        location.Location += movement.Velocity;
+                        location.Location += movement.Velocity.ToVector2();
                         break;
                     case MovementMode.Seek:
                         //todo: would a better way be:
@@ -60,9 +64,17 @@ namespace MapEngine.Handlers
             else
             {
                 // eg. an entity having a force applied to it
-                location.Location += movement.Velocity;
+                location.Location += movement.Velocity.ToVector2();
                 ApplyFriction(movement);
             }
+        }
+
+        private void ApplyGravity(LocationComponent location, MovementComponent movement)
+        {
+            const int Gravity = -1;// 9.81 in tenths of meters rounded to int
+
+            movement.Velocity += new Vector3(0, 0, Gravity);
+            location.Height += (int)movement.Velocity.Z;
         }
 
 
@@ -107,18 +119,19 @@ namespace MapEngine.Handlers
             var desiredVelocity = directionVector.Truncate(target.MaxVelocity);
 
             //subtract velocity from the desired velocity to get the force vector
-            target.Steering = desiredVelocity - target.Velocity;
+            target.Steering = desiredVelocity - target.Velocity.ToVector2();
 
             //divide the steeringForce by the mass(which makes it the acceleration), 
             target.Steering = target.Steering.Truncate(target.MaxForce) / target.Mass;
 
             //then add it to velocity to get the new velocity
-            target.Velocity = (target.Velocity + target.Steering).Truncate(target.MaxVelocity);
+            var targetVelocity2 = (target.Velocity.ToVector2() + target.Steering).Truncate(target.MaxVelocity);
+            target.Velocity = new Vector3(targetVelocity2.X, targetVelocity2.Y, 0);
 
             //Set the facingAngle (used to draw the image, in radians) to velocity
-            location.FacingAngle = target.Velocity.Angle();
+            location.FacingAngle = target.Velocity.ToVector2().Angle();
 
-            location.Location += target.Velocity;
+            location.Location += target.Velocity.ToVector2();
         }
 
         public void Handle(CreateEntityCommand command)
