@@ -6,7 +6,7 @@ using Common.Entities;
 using MapEngine.Commands;
 using MapEngine.Entities;
 using MapEngine.Entities.Components;
-using MapEngine.Handlers;
+using MapEngine.Handlers.SensorHandler;
 using SoftEngine;
 
 namespace MapEngine.Rendering

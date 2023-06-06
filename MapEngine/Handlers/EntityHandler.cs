@@ -6,6 +6,7 @@ using MapEngine.Factories;
 using MapEngine.ResourceLoading;
 using MapEngine.Rendering;
 using MapEngine.Services.Map;
+using MapEngine.Handlers.SensorHandler;
 
 namespace MapEngine.Handlers
 {
@@ -20,29 +21,26 @@ namespace MapEngine.Handlers
         private readonly WeaponHandler _weaponHandler;
         private readonly MovementHandler _movementHandler;
         private readonly CollisionHandler _collisionHandler;
-        private readonly SensorHandler _sensorHandler;
+        private readonly SensorHandler.SensorHandler _sensorHandler;
         private readonly MapService _mapService;
         private readonly IRenderer _2dRenderer;
         private readonly IRenderer _3dRenderer;
-        private readonly IRenderer _sensorRenderer;
 
         public EntityHandler(
             MessageHub messageHub, 
             MovementHandler movementHandler, 
             CollisionHandler collisionHandler,
-            SensorHandler sensorHandler,
+            SensorHandler.SensorHandler sensorHandler,
             WeaponHandler weaponHandler,
             MapService mapService,
             Renderer2d renderer2d, // todo: RenderFactory.GetRenderers?
-            Renderer3d renderer3d,
-            SensorRenderer sensorRenderer)
+            Renderer3d renderer3d)
         {
             _messageHub = messageHub;
             _sensorHandler = sensorHandler;
             _weaponHandler = weaponHandler;
             _2dRenderer = renderer2d;
             _3dRenderer = renderer3d;
-            _sensorRenderer = sensorRenderer;
             _movementHandler = movementHandler;
             _collisionHandler = collisionHandler;
             _mapService = mapService;
@@ -77,9 +75,9 @@ namespace MapEngine.Handlers
 
         public void Render(Rectangle viewport, IGraphics graphics)
         {
+            _sensorHandler.DrawLayer(viewport, graphics);
             _3dRenderer.DrawLayer(viewport, graphics);
             _2dRenderer.DrawLayer(viewport, graphics);
-            _sensorRenderer.DrawLayer(viewport, graphics);
         }
 
         public void Handle(CreateEntityCommand command)

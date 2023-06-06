@@ -11,7 +11,7 @@ namespace MapEngine.Entities
     // todo: wrap entity in a Unit class instead of extension methods?
     public static class EntityEx
     {
-        // todo: team enum / class?
+        // todo: this may require an alliance lookup instead of simply comparing teams
         public static bool BelongsTo(this Entity entity, int team)
         {
             var entityTeam = entity.GetComponent<UnitComponent>()?.TeamId ?? 0;
@@ -30,6 +30,12 @@ namespace MapEngine.Entities
             return location.Height;
         }
 
+        public static bool IsMoving(this Entity entity)
+        {
+            var movement = entity.GetComponent<MovementComponent>();
+            return (movement?.Velocity.Length() ?? 0) > 0;
+        }
+
         public static Texture Texture(this Entity entity)
         {
             var imageComponent = entity.GetComponent<ImageComponent>();
@@ -40,7 +46,6 @@ namespace MapEngine.Entities
             return TextureFactory.TryGetTexture(textureId, out var texture) ? texture : null; // todo: null object?
         }
 
-        // todo: tryget?
         public static Model Model(this Entity entity)
         {
             var modelComponent = entity.GetComponent<ModelComponent>();

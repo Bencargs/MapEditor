@@ -4,7 +4,7 @@ using Common.Entities;
 using MapEngine.Commands;
 using MapEngine.Entities;
 using MapEngine.Entities.Components;
-using MapEngine.Handlers;
+using MapEngine.Handlers.SensorHandler;
 
 namespace MapEngine.Rendering
 {
@@ -29,12 +29,10 @@ namespace MapEngine.Rendering
                 if (!viewport.Contains(location.Location))
                     continue;
 
-                if (false) //todo: LOS game settings
-                {
-                    var isDetected = _sensorHandler.IsDetected(Constants.PlayerTeam, entity);
-                    if (!entity.BelongsTo(Constants.PlayerTeam) && !isDetected)
-                        continue;
-                }
+                // If enemy unit hasn't been detected, don't draw
+                if (!entity.BelongsTo(Constants.PlayerTeam) && 
+                    !_sensorHandler.IsDetected(Constants.PlayerTeam, entity))
+                    continue;
 
                 // Rotate image to movement / facing angle
                 var texture = entity.Texture();

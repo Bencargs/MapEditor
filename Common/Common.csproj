@@ -45,6 +45,7 @@
     <Compile Include="Camera.cs" />
     <Compile Include="Collision\BoundingBox.cs" />
     <Compile Include="Collision\BoundingCircle.cs" />
+    <Compile Include="Collision\BoundingPolygon.cs" />
     <Compile Include="Collision\CollisionEx.cs" />
     <Compile Include="Collision\ICollider.cs" />
     <Compile Include="Colour.cs" />

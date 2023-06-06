@@ -82,7 +82,7 @@ namespace MapEngine
                 if (k > _backBuffer.Length || k < 0)
                     continue;
 
-                var opacity = (float)(buffer[i + 3] / 255f);
+                var opacity = buffer[i + 3] / 255f;
                 _backBuffer[k + 0] = MergePixel(_backBuffer[k + 0], buffer[i + 0], opacity);
                 _backBuffer[k + 1] = MergePixel(_backBuffer[k + 1], buffer[i + 1], opacity);
                 _backBuffer[k + 2] = MergePixel(_backBuffer[k + 2], buffer[i + 2], opacity);
@@ -90,6 +90,29 @@ namespace MapEngine
             }
         }
 
+        public void Desaturate(float[] buffer, Rectangle area)
+        {
+            for (int i = 0; i < buffer.Length; i ++)
+            {
+                var amount = buffer[i];
+                if (amount == 0f) continue;
+
+                int x = i % Width;
+                int y = i / Width;
+                
+                var original = GetPixel(x, y);
+
+                var newColour = new Colour(
+                    (byte)Math.Max(0, original.Red - 255 * amount),
+                    (byte)Math.Max(0, original.Blue - 255 * amount),
+                    (byte)Math.Max(0, original.Green - 255 * amount),
+                    original.Alpha);
+
+                SetPixel(x, y, newColour);
+            }
+        }
+
+        // todo: merge with BlendColour
         private byte MergePixel(byte a, byte b, float alpha)
         {
             var reciprical = 1 - alpha;
@@ -134,40 +157,61 @@ namespace MapEngine
                 255);
         }
 
-        public void DrawLines(Colour colour, Vector2[] points)
+        public void DrawLine(Colour colour, Vector2 a, Vector2 b, int thickness = 1)
         {
-            var p1 = points[0];
-            var p2 = points[1];
-
             // via Bresenham's
-            var dx = Math.Abs(p2.X - p1.X);
-            var dy = Math.Abs(p2.Y - p1.Y);
-            
-            var sx = p1.X < p2.X ? 1 : -1;
-            var sy = p1.Y < p2.Y ? 1 : -1;
-            var err = (dx > dy ? dx : -dy) / 2;
-            var tolerance = 0.001;
+            // Calculate the delta and absolute values for the x and y components
+            float deltaX = b.X - a.X;
+            float deltaY = b.Y - a.Y;
+            float absDeltaX = Math.Abs(deltaX);
+            float absDeltaY = Math.Abs(deltaY);
 
-            for (int j = 0; j < 50; j++)
+            // Calculate the step sizes for each component
+            float stepX = Math.Sign(deltaX);
+            float stepY = Math.Sign(deltaY);
+
+            // Calculate the initial error values
+            float error = absDeltaX - absDeltaY;
+            float error2;
+
+            // Calculate the starting position
+            int x = (int)a.X;
+            int y = (int)a.Y;
+
+            // Draw the line by iterating along the longer component
+            while (x != (int)b.X || y != (int)b.Y)
             {
-                if (p1.X > 0 && p1.Y > 0 && p1.X < Width - 1 && p1.Y < Height - 1)
-                    SetPixel((int)p1.X, (int)p1.Y, colour);
-                
-                if (Math.Abs(p1.X - p2.X) < tolerance && 
-                    Math.Abs(p1.Y - p2.Y) < tolerance)
-                    break;
 
-                var e2 = err;
-                if (e2 > -dx)
+                for (int i = -thickness / 2; i <= thickness / 2; i++)
                 {
-                    err -= dy;
-                    p1.X += sx;
+                    for (int j = -thickness / 2; j <= thickness / 2; j++)
+                    {
+                        //int position = (y * Width + x) * 4; // Each pixel is represented by 4 bytes (RGBA)
+                        int position = ((y + j) * Width + (x + i)) * 4; // Each pixel is represented by 4 bytes (RGBA)
+                        if (position < 0 || position > _backBuffer.Length - 1) continue;
+
+                        // Set the RGBA values for the color
+                        var opacity = (float)(colour.Alpha / 255f);
+                        _backBuffer[position + 0] = MergePixel(_backBuffer[position + 0], colour.Red, opacity);
+                        _backBuffer[position + 1] = MergePixel(_backBuffer[position + 1], colour.Green, opacity);
+                        _backBuffer[position + 2] = MergePixel(_backBuffer[position + 2], colour.Blue, opacity);
+                        _backBuffer[position + 3] = MergePixel(_backBuffer[position + 3], colour.Alpha, opacity);
+                    }
                 }
 
-                if (e2 < dy)
+                // Calculate the error2 value
+                error2 = 2 * error;
+
+                // Adjust the position based on the error values
+                if (error2 > -absDeltaY)
                 {
-                    err += dx;
-                    p1.Y += sy;
+                    error -= absDeltaY;
+                    x += (int)stepX;
+                }
+                if (error2 < absDeltaX)
+                {
+                    error += absDeltaX;
+                    y += (int)stepY;
                 }
             }
         }

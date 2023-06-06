@@ -1,0 +1,73 @@
+{
+  "Width": 643,
+  "Height": 428,
+  "Description":"Line of Sight Test",
+  "TileWidth":1,
+  "TileHeight":1,
+  "Camera": {
+	"X": 0,
+	"Y": 0,
+	"Z": 10,
+	"Width": 643,
+	"Height": 428
+  },
+  "Teams": [
+	{
+		"Id":0,
+		"Name":"Player"
+	},
+	{
+		"Id":1,
+		"Name":"AI"
+	}
+  ],
+  "Units": [
+  {
+		"Id":0,
+		"Team":1,
+		"Type":"Dummy",
+		"Location":{
+			"X":370,
+			"Y":330
+		}
+  },
+  {
+	  "Id":1,
+	  "Team":0,
+	  "Type":"SightDummy",
+	  "Location":{
+		  "X":200,
+		  "Y":160
+	  },
+	  "Movement": {
+		"FacingAngle":0,
+		"Velocity": {
+			"X":0,
+			"Y":0,
+		},
+		"Steering": {
+			"X":0,
+			"Y":0,
+		},
+		"Destinations": [{
+			"MovementMode":"Seek",
+			"Destination":{
+				"X":580,
+				"Y":302
+			}
+		}]
+	  }
+  }],
+  "Tiles": [
+    {
+      "Id": 0,
+      "Location": {
+        "X": 0,
+        "Y": 0
+      },
+      "TextureId": "CBDMiniTexture",
+	  "HeightmapTextureId": "CBDMini",
+      "Type": 2
+    }
+  ]
+}
