@@ -1,0 +1,17 @@
+{
+	"Type": "Shrapnel1",
+	"TextureIds": [
+		"Smoke1",
+		"Smoke2",
+		"Smoke3"
+	],
+	"Lifetime": 2000,
+	"MinInitialRotation": 0,
+	"MaxInitialRotation": 0,
+	"InitialSpawnCount": 15,
+	"InitialVelocity": 3,
+	"InitialSize": 0.7,
+	"GrowRate": 0.60,
+	"PaletteTextureId": "ExplosionPalette",
+	"PalleteSpeed": 5
+}

@@ -1,0 +1,22 @@
+{
+	"Type":"PointDummy",
+	"Image": {
+		"TextureId": "projectile"
+	},
+	"Movement": {
+		"MaxVelocity":100,
+		"Mass":1000,
+		"MaxForce":100,
+		"StopRadius":10,
+		"BrakeForce":0.05
+	},
+	"Area": {
+		"BoundingBox": {
+			"Width":2,
+			"Height":2,
+		}
+	},
+	"Weapons": [
+		"Cannon",
+	]
+}

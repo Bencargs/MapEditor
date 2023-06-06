@@ -2,8 +2,14 @@
 using MapEngine.Commands;
 using MapEngine.Handlers;
 using System;
+using System.Collections.Generic;
+using System.Numerics;
 using System.Windows;
 using System.Windows.Threading;
+using Common.Entities;
+using MapEngine.Entities.Components;
+using MapEngine.Factories;
+using MapEngine.Handlers.ParticleHandler;
 
 namespace MapEngine
 {
@@ -26,7 +32,8 @@ namespace MapEngine
                 container.Resolve<MapHandler>(),
                 container.Resolve<EntityHandler>(),
                 container.Resolve<CameraHandler>(),
-                container.Resolve<EffectsHandler>());
+                container.Resolve<EffectsHandler>(),
+                container.Resolve<ParticleHandler>());
 
             messageHub.Initialise(container);
             _scene.Initialise();

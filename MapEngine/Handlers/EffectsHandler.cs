@@ -73,15 +73,15 @@ namespace MapEngine.Handlers
             {
                 case "WaveEffect":
                     _waveService.SetHeight(
-                    command.Location.X,
-                    command.Location.Y,
-                    command.Value);
+                        (int)command.Location.X,
+                        (int)command.Location.Y,
+                        command.Value);
                     break;
 
                 case "FluidEffect":
                     _fluidEffectService.SetEmitter(
-                        command.Location.X, 
-                        command.Location.Y, 
+                        (int)command.Location.X,
+                        (int)command.Location.Y, 
                         command.Value);
                     break;
             }

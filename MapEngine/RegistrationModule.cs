@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using MapEngine.Commands;
 using MapEngine.Handlers;
+using MapEngine.Handlers.ParticleHandler;
 using MapEngine.Rendering;
 using MapEngine.Services.Effect;
 using MapEngine.Services.Effects.WaveEffect;
@@ -33,6 +34,7 @@ namespace MapEngine
         private static void RegisterServices(ContainerBuilder builder)
         {
             // todo: read window resolution from a config file
+            //builder.RegisterInstance(new WpfGraphics(643, 428)).SingleInstance();
             builder.RegisterInstance(new WpfGraphics(768, 512)).SingleInstance();
             //builder.RegisterInstance(new WpfGraphics(640, 480)).SingleInstance();
             builder.RegisterType<MapService>().SingleInstance();
@@ -43,6 +45,7 @@ namespace MapEngine
 
         private static void RegisterHandlers(ContainerBuilder builder)
         {
+            builder.RegisterType<ParticleHandler>().SingleInstance();
             builder.RegisterType<CollisionHandler>().SingleInstance();
             builder.RegisterType<MovementHandler>().SingleInstance();
             builder.RegisterType<WeaponHandler>().SingleInstance();

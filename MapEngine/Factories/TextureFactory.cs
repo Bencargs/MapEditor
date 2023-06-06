@@ -30,6 +30,10 @@ namespace MapEngine.Factories
 
         public static bool TryGetTexture(string textureId, out Texture texture)
         {
+            texture = default;
+            if (textureId is null)
+                return false;
+            
             return _textures.TryGetValue(textureId, out texture);
         }
     }

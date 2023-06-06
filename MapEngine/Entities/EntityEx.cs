@@ -24,12 +24,19 @@ namespace MapEngine.Entities
             return location.Location;
         }
 
+        public static int Height(this Entity entity)
+        {
+            var location = entity.GetComponent<LocationComponent>();
+            return location.Height;
+        }
+
         public static Texture Texture(this Entity entity)
         {
-            var textureId = entity.GetComponent<ImageComponent>().TextureId;
-            if (textureId == null)
+            var imageComponent = entity.GetComponent<ImageComponent>();
+            if (imageComponent == null)
                 return null;
-            
+
+            var textureId = imageComponent.TextureId;
             return TextureFactory.TryGetTexture(textureId, out var texture) ? texture : null; // todo: null object?
         }
 

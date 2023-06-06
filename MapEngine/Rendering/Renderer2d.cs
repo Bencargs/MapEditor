@@ -29,9 +29,12 @@ namespace MapEngine.Rendering
                 if (!viewport.Contains(location.Location))
                     continue;
 
-                var isDetected = _sensorHandler.IsDetected(Constants.PlayerTeam, entity);
-                if (!entity.BelongsTo(Constants.PlayerTeam) && !isDetected)
-                    continue;
+                if (false) //todo: LOS game settings
+                {
+                    var isDetected = _sensorHandler.IsDetected(Constants.PlayerTeam, entity);
+                    if (!entity.BelongsTo(Constants.PlayerTeam) && !isDetected)
+                        continue;
+                }
 
                 // Rotate image to movement / facing angle
                 var texture = entity.Texture();
