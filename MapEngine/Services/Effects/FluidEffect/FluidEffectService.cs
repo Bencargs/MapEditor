@@ -101,7 +101,7 @@ namespace MapEngine.Services.Effect
             if (!_enabled) return new byte[0];
 
             // Upscale up the internal model 4x to fit screen (improves update processing speed)
-            var scaledMap = _flow.Scale(4, 4, Width, Height);
+            var scaledMap = _flow.Scale(x => x, 4, 4, Width, Height);
 
             // todo: remove this +/- 2 boarder hack
             var width = (Width - 2) * 4;

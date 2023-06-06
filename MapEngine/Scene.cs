@@ -1,12 +1,6 @@
 ﻿using Common;
-using MapEditor.Common;
-﻿using System.Collections.Generic;
 using System.Numerics;
-using Common;
-using Common.Entities;
 using MapEngine.Commands;
-using MapEngine.Entities.Components;
-using MapEngine.Factories;
 using MapEngine.Handlers;
 using System;
 using MapEngine.Handlers.ParticleHandler;
@@ -43,7 +37,7 @@ namespace MapEngine
 
         public void Initialise()
         {
-            var mapFilename = @"C:\Source\MapEditor\MapEngine\Content\Maps\TestMap8.json";
+            var mapFilename = @"C:\Source\MapEditor\MapEngine\Content\Maps\TestMap7.json";
             _cameraHandler.Initialise(mapFilename);
             _mapHandler.Initialise(mapFilename);
             
@@ -54,6 +48,23 @@ namespace MapEngine
             _unitHandler.Initialise(unitsPath, mapFilename, weaponsPath, modelsPath, particlesPath);
 
             _effectsHandler.Initialise();
+
+            for (var i = 0; i < 512; i++)
+            {
+                _messageHub.Post(new CreateEffectCommand
+                {
+                    Name = "FluidEffect", // todo: these should be constant or enum values?
+                    Location = new Vector2 { X = 1, Y = i },
+                    Value = 2f
+                });
+            }
+
+            _messageHub.Post(new CreateEffectCommand
+            {
+                Name = "WaveEffect",
+                Location = new Vector2 { X = 90, Y = 110 },
+                Value = 1000
+            });
         }
 
         double _totalElapsed = 0;

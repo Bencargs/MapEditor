@@ -2,6 +2,7 @@
 using Common.Entities;
 using MapEngine.Commands;
 using MapEngine.Services.Effect;
+using MapEngine.Services.Effects.WaveEffect;
 using System.Collections.Generic;
 
 namespace MapEngine.Handlers
@@ -13,22 +14,28 @@ namespace MapEngine.Handlers
         , IHandleCommand<MoveCommand>
         , IHandleCommand<CreateEffectCommand>
     {
+        private readonly WaveEffectService _waveService;
         private readonly FluidEffectService _fluidEffectService;
         private readonly List<Entity> _entities = new List<Entity>();
 
         public EffectsHandler(
+            WaveEffectService waveService,
             FluidEffectService fluidEffectService)
         {
+            _waveService = waveService;
             _fluidEffectService = fluidEffectService;
         }
 
         public void Initialise()
         {
+            _waveService.Initialise();
             _fluidEffectService.Initialise();
         }
 
         public void Update()
         {
+            _waveService.Simulate();
+
             // todo: consider dynamic obstructions, eg units moving
             //foreach (var e in _entities)
             //{
@@ -40,6 +47,9 @@ namespace MapEngine.Handlers
 
         public void Render(Rectangle viewport, IGraphics graphics)
         {
+            var waveRender = _waveService.GenerateBitmap();
+            graphics.DrawBytes(waveRender, viewport);
+
             var fluidRender = _fluidEffectService.GenerateBitmap();
             graphics.DrawBytes(fluidRender, viewport);
         }
@@ -61,8 +71,18 @@ namespace MapEngine.Handlers
         {
             switch (command.Name)
             {
+                case "WaveEffect":
+                    _waveService.SetHeight(
+                        (int)command.Location.X,
+                        (int)command.Location.Y,
+                        command.Value);
+                    break;
+
                 case "FluidEffect":
-                    _fluidEffectService.SetEmitter(command.Location.X, command.Location.Y, command.Value);
+                    _fluidEffectService.SetEmitter(
+                        (int)command.Location.X,
+                        (int)command.Location.Y, 
+                        command.Value);
                     break;
             }
         }

@@ -1,5 +1,6 @@
 ﻿using Common;
 using MapEngine.Services.Effects.FluidEffect;
+using MapEngine.Services.Effects.WaveEffect;
 
 namespace MapEngine.Services.Map
 {
@@ -10,5 +11,6 @@ namespace MapEngine.Services.Map
         public Team[] Teams { get; set; }
         public Tile[,] Tiles { get; set; }
         public FluidEffects FluidEffects { get; set; }
+        public WaveEffects WaveEffects { get; set; }
     }
 }
