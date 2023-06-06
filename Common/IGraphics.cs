@@ -8,7 +8,7 @@ namespace Common
         int Height { get; }
 
         void Clear();
-        void DrawLine(Colour colour, Vector2 p1, Vector2 p2, int thickness = 1);
+        void DrawLines(Colour colour, Vector2[] points);
         void DrawRectangle(Colour colour, Rectangle area);
         void FillRectangle(Colour colour, Rectangle area);
         void DrawCircle(Colour colour, Rectangle area);

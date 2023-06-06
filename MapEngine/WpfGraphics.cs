@@ -157,63 +157,9 @@ namespace MapEngine
                 255);
         }
 
-        public void DrawLine(Colour colour, Vector2 a, Vector2 b, int thickness = 1)
+        public void DrawLines(Colour colour, Vector2[] points)
         {
-            // via Bresenham's
-            // Calculate the delta and absolute values for the x and y components
-            float deltaX = b.X - a.X;
-            float deltaY = b.Y - a.Y;
-            float absDeltaX = Math.Abs(deltaX);
-            float absDeltaY = Math.Abs(deltaY);
-
-            // Calculate the step sizes for each component
-            float stepX = Math.Sign(deltaX);
-            float stepY = Math.Sign(deltaY);
-
-            // Calculate the initial error values
-            float error = absDeltaX - absDeltaY;
-            float error2;
-
-            // Calculate the starting position
-            int x = (int)a.X;
-            int y = (int)a.Y;
-
-            // Draw the line by iterating along the longer component
-            while (x != (int)b.X || y != (int)b.Y)
-            {
-
-                for (int i = -thickness / 2; i <= thickness / 2; i++)
-                {
-                    for (int j = -thickness / 2; j <= thickness / 2; j++)
-                    {
-                        //int position = (y * Width + x) * 4; // Each pixel is represented by 4 bytes (RGBA)
-                        int position = ((y + j) * Width + (x + i)) * 4; // Each pixel is represented by 4 bytes (RGBA)
-                        if (position < 0 || position > _backBuffer.Length - 1) continue;
-
-                        // Set the RGBA values for the color
-                        var opacity = (float)(colour.Alpha / 255f);
-                        _backBuffer[position + 0] = MergePixel(_backBuffer[position + 0], colour.Red, opacity);
-                        _backBuffer[position + 1] = MergePixel(_backBuffer[position + 1], colour.Green, opacity);
-                        _backBuffer[position + 2] = MergePixel(_backBuffer[position + 2], colour.Blue, opacity);
-                        _backBuffer[position + 3] = MergePixel(_backBuffer[position + 3], colour.Alpha, opacity);
-                    }
-                }
-
-                // Calculate the error2 value
-                error2 = 2 * error;
-
-                // Adjust the position based on the error values
-                if (error2 > -absDeltaY)
-                {
-                    error -= absDeltaY;
-                    x += (int)stepX;
-                }
-                if (error2 < absDeltaX)
-                {
-                    error += absDeltaX;
-                    y += (int)stepY;
-                }
-            }
+            throw new NotImplementedException();
         }
 
         public void DrawRectangle(Colour colour, Rectangle area)

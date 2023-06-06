@@ -66,19 +66,6 @@ using MapEngine.Services.Map;
             }
         }
 
-        // highlight rendered area - perhaps for an overlay or minimap?
-        public void RenderDetection(IGraphics graphics, SensorComponent sensor)
-        {
-            var colour = new Colour(0, 0, 255, 5);
-            var entityLocation = sensor.VisibilityRaycast.Location;
-            foreach (var v in sensor.VisibilityRaycast.Points)
-            {
-                var center = new Vector2(sensor.Radius, sensor.Radius);
-                var rayLocation = (v - center) + entityLocation;
-                graphics.DrawLine(colour, entityLocation, rayLocation, 5);
-            }
-        }
-
         private void GenerateVisibilityRaycast(
             int entityHeight,
             Vector2 entityLocation,
