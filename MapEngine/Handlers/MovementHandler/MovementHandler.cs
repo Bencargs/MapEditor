@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using MapEngine.Entities;
 using MapEngine.Services.PathfindingService;
 using MapEngine.Services.Map;
 
@@ -73,8 +74,9 @@ namespace MapEngine.Handlers
         {
             //todo: this is ick
             const int Gravity = -1;// 9.81 in tenths of meters rounded to int
+
             var mapHeight = _mapService.GetHeight(location.Location);
-            
+
             // Eg. airborne - apply gravity to velocity, and apply velocity to height
             movement.Velocity += new Vector3(0, 0, Gravity);
             location.Height += (int)movement.Velocity.Z;
@@ -117,7 +119,7 @@ namespace MapEngine.Handlers
 
         private static bool HasArrived(Vector2 location, Vector2 target, float stopRadius)
         {
-            return Math.Abs(location.Distance(target)) < stopRadius;
+            return Math.Abs(Vector2.Distance(location, target)) < stopRadius;
         }
 
         private static void Seek(LocationComponent location, MovementComponent target, Vector2 destination)
@@ -160,15 +162,27 @@ namespace MapEngine.Handlers
 
         public void Handle(MoveCommand command)
         {
-            var movementComponent = command.Entity.GetComponent<MovementComponent>();
+            var entityDestinations = FormationService.GetFormationPositions(command.Entities, command.Destination);
+            foreach (var entity in command.Entities)
+            {
+                var movementComponent = entity.GetComponent<MovementComponent>();
 
-            var path = _pathfinding.GetPath(command.Entity, command.Destination);
-            var orders = ToMoveOrders(path, command.MovementMode);
+                var destination = entityDestinations.First(x => x.Source == entity);
+                //var path = _pathfinding.GetPath(entity, command.Destination);
+                //var orders = ToMoveOrders(path, command.MovementMode);
 
-            if (!command.Queue)
-                movementComponent.Destinations.Clear();
 
-            movementComponent.Destinations.Enqueue(orders);
+                var orders = new MoveOrder
+                {
+                    MovementMode = command.MovementMode,
+                    Destination = destination.Destination,
+                };
+
+                if (!command.Queue)
+                    movementComponent.Destinations.Clear();
+
+                movementComponent.Destinations.Enqueue(orders);
+            }
         }
 
         private static IEnumerable<MoveOrder> ToMoveOrders(Tile[] path, MovementMode movementMode) =>

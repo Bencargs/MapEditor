@@ -104,7 +104,15 @@ namespace MapEngine.Services.PathfindingService
             var (currentX, currentY) = _map.GetCoordinates(current);
 
             var results = new List<Tile>();
-            foreach (var (x, y) in movementComponent.MovementMask)
+
+            //movementComponent.MovementMask
+            var movementMask = new[,]
+            {
+                { (-1,-1),  (0,-1),  (1,-1) },
+                { (-1, 0),  (0, 0),  (1, 0) },
+                { (-1, 1),  (0, 1),  (1, 1) }
+            };
+            foreach (var (x, y) in movementMask)
             {
                 if (currentX + x < 0 || currentY + y < 0 ||
                     currentX + x > tiles.GetLength(0) - 1 ||

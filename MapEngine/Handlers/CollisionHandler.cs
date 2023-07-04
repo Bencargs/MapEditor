@@ -45,6 +45,7 @@ namespace MapEngine.Handlers
             if (collider == null)
                 return;
 
+            // todo: there's a bug in here some where that allows units to overlap
             if (HasCollided(entity, out var impactors))
             {
                 foreach (var i in impactors)
@@ -79,63 +80,63 @@ namespace MapEngine.Handlers
                         selfVelocity.Velocity = new Vector3(newSelfVelocity.X, newSelfVelocity.Y, selfVelocity.Velocity.Z);
                     }
 
-                    if (force >= collider.MaxImpactForce)
-                    {
-                        // todo: this is confused and feels out of place - should there be an effects handler for this?
-                        // eg on a such a collision, use explosion effect [flash, shrapnel, fireball]
-                        var location = i.GetComponent<LocationComponent>();
-                        ParticleFactory.TryGetParticle("Flash1", out var particle1);
-                        _messageHub.Post(new CreateEntityCommand
-                        {
-                            Entity = new Entity
-                            {
-                                Components = new List<IComponent>
-                                {
-                                    particle1,
-                                    new LocationComponent
-                                    {
-                                        Location = location.Location
-                                    }
-                                }
-                            }
-                        });
+                    //// todo: This should raise an event, that units can subscribe to or not
+                    //// eg. if projectile - explode
+                    //// if unit with a max impact force (aircraft?) - explode
+                    //// else ignore?
+                    //if (force > collider.MaxImpactForce)
+                    //{
+                    //    var location = i.GetComponent<LocationComponent>();
+                    //    ParticleFactory.TryGetParticle("Flash1", out var particle1);
+                    //    _messageHub.Post(new CreateEntityCommand
+                    //    {
+                    //        Entity = new Entity
+                    //        {
+                    //            Components = new List<IComponent>
+                    //            {
+                    //                particle1,
+                    //                new LocationComponent
+                    //                {
+                    //                    Location = location.Location
+                    //                }
+                    //            }
+                    //        }
+                    //    });
 
-                        ParticleFactory.TryGetParticle("Shrapnel1", out var particle3);
-                        _messageHub.Post(new CreateEntityCommand
-                        {
-                            Entity = new Entity
-                            {
-                                Components = new List<IComponent>
-                                {
-                                    particle3,
-                                    new LocationComponent
-                                    {
-                                        Location = location.Location
-                                    }
-                                }
-                            }
-                        });
+                    //    // todo: this should be part of an effects handler
+                    //    ParticleFactory.TryGetParticle("Shrapnel1", out var particle3);
+                    //    _messageHub.Post(new CreateEntityCommand
+                    //    {
+                    //        Entity = new Entity
+                    //        {
+                    //            Components = new List<IComponent>
+                    //            {
+                    //                particle3,
+                    //                new LocationComponent
+                    //                {
+                    //                    Location = location.Location
+                    //                }
+                    //            }
+                    //        }
+                    //    });
 
-                        ParticleFactory.TryGetParticle("Explosion1", out var particle2);
-                        _messageHub.Post(new CreateEntityCommand
-                        {
-                            Entity = new Entity
-                            {
-                                Components = new List<IComponent>
-                                {
-                                    particle2,
-                                    new LocationComponent
-                                    {
-                                        Location = location.Location
-                                    }
-                                }
-                            }
-                        });
-
-                        // todo: this is to destroy projectiles that have collided, not units - make nicer
-                        if (i.Id == 72)
-                            _messageHub.Post(new DestroyEntityCommand { Entity = i });
-                    }
+                    //    ParticleFactory.TryGetParticle("Explosion1", out var particle2);
+                    //    _messageHub.Post(new CreateEntityCommand
+                    //    {
+                    //        Entity = new Entity
+                    //        {
+                    //            Components = new List<IComponent>
+                    //            {
+                    //                particle2,
+                    //                new LocationComponent
+                    //                {
+                    //                    Location = location.Location
+                    //                }
+                    //            }
+                    //        }
+                    //    });
+                    //    _messageHub.Post(new DestroyEntityCommand { Entity = i });
+                    //}
                 }
             }
         }
@@ -146,7 +147,7 @@ namespace MapEngine.Handlers
             var collider = entity.Hitbox();
             if (collider == null)
                 return false;
-            
+
             collisions = GetCollisions(collider)
                 .Where(x => x.entity.Id != entity.Id)
                 .OrderBy(x => x.distance)
@@ -175,6 +176,7 @@ namespace MapEngine.Handlers
                 {
                     var distance = Vector2.Distance(source.Location, targetLocation);
                     yield return (e, distance);
+                    continue;
                 }
 
                 // Determine collision with terrain
@@ -183,6 +185,7 @@ namespace MapEngine.Handlers
                 if (entityHeight < (mapHeight - 5)) // todo: address fudge factor here
                 {
                     yield return (e, 0f);
+                    continue;
                 }
             }
         }

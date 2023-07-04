@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Numerics;
+using Common;
 using Common.Collision;
 using Common.Entities;
 using MapEngine.Entities.Components;
@@ -61,8 +62,14 @@ namespace MapEngine.Entities
             if (colliderComponent == null)
                 return null; //  todo: null object?
 
-            var sourceLocation = entity.GetComponent<LocationComponent>().Location;
-            var collider = colliderComponent.GetCollider(sourceLocation);// yuck
+            var sourceLocation = entity.Location();
+            var test = new Vector2(sourceLocation.X - 12, sourceLocation.Y - 12);
+            var collider = colliderComponent.GetCollider(test);// yuck
+
+            //var facingAngle = entity.GetComponent<LocationComponent>().FacingAngle;
+            //var rotated = collider.Rotate(facingAngle);
+            //return rotated;
+
             return collider;
         }
 

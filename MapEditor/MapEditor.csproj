@@ -65,7 +65,7 @@
     <Compile Include="Commands\SelectUnitsCommand.cs" />
     <Compile Include="Commands\StopCommand.cs" />
     <Compile Include="Commands\UndoCommand.cs" />
-    <Compile Include="Commands\UnitComponent.cs" />
+    <Compile Include="Entities\Components\UnitComponent.cs" />
     <Compile Include="Common\CollisionEx.cs" />
     <Compile Include="Common\EntityEx.cs" />
     <Compile Include="Common\Matrix.cs" />

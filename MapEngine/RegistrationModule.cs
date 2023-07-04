@@ -20,6 +20,7 @@ namespace MapEngine
             var builder = new ContainerBuilder();
 
             RegisterMessageHub(builder);
+            RegisterModels(builder);
             RegisterServices(builder);
             RegisterRenderers(builder);
             RegisterHandlers(builder);
@@ -32,6 +33,11 @@ namespace MapEngine
         {
             var messageHub = new MessageHub();
             builder.RegisterInstance(messageHub);
+        }
+
+        public static void RegisterModels(ContainerBuilder builder)
+        {
+            builder.RegisterType<InputState>().SingleInstance();
         }
 
         private static void RegisterServices(ContainerBuilder builder)
@@ -57,6 +63,8 @@ namespace MapEngine
             builder.RegisterType<EffectsHandler>().SingleInstance();
             builder.RegisterType<MapHandler>().SingleInstance();
             RegisterSensorHandler(builder);
+            builder.RegisterType<InputHandler>().SingleInstance();
+            builder.RegisterType<InterfaceHandler>().SingleInstance();
         }
 
         private static void RegisterRenderers(ContainerBuilder builder)

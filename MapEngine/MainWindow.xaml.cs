@@ -4,6 +4,7 @@ using MapEngine.Handlers;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Runtime.Remoting.Channels;
 using System.Windows;
 using System.Windows.Threading;
 using Common.Entities;
@@ -33,10 +34,33 @@ namespace MapEngine
                 container.Resolve<EntityHandler>(),
                 container.Resolve<CameraHandler>(),
                 container.Resolve<EffectsHandler>(),
-                container.Resolve<ParticleHandler>());
+                container.Resolve<ParticleHandler>(),
+                container.Resolve<InterfaceHandler>());
 
             messageHub.Initialise(container);
             _scene.Initialise();
+
+            var inputHandler = container.Resolve<InputHandler>();
+            MouseLeftButtonDown += (sender, args) =>
+            {
+                var location = inputHandler.GetMouseLocation(args, frontBuffer);
+                inputHandler.HandleLeftMouseDown(location);
+            };
+            MouseLeftButtonUp += (sender, args) =>
+            {
+                var location = inputHandler.GetMouseLocation(args, frontBuffer);
+                inputHandler.HandleLeftMouseUp(location);
+            };
+            MouseRightButtonDown += (sender, args) =>
+            {
+                var location = inputHandler.GetMouseLocation(args, frontBuffer);
+                inputHandler.HandleRightMouseDown(location);
+            };
+            MouseMove += (sender, args) =>
+            {
+                var location = inputHandler.GetMouseLocation(args, frontBuffer);
+                inputHandler.HandleMouseMove(location);
+            };
 
             frontBuffer.Source = graphics.Bitmap;
 

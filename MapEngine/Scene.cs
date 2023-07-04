@@ -16,6 +16,7 @@ namespace MapEngine
         private readonly CameraHandler _cameraHandler;
         private readonly EffectsHandler _effectsHandler;
         private readonly ParticleHandler _particleHandler;
+        private readonly InterfaceHandler _interfaceHandler;
 
         public Scene(
             IGraphics graphics,
@@ -24,7 +25,8 @@ namespace MapEngine
             EntityHandler unitHandler,
             CameraHandler cameraHandler,
             EffectsHandler effectsHandler,
-            ParticleHandler particleHandler)
+            ParticleHandler particleHandler,
+            InterfaceHandler interfaceHandler)
         {
             _graphics = graphics;
             _messageHub = messageHub;
@@ -33,11 +35,12 @@ namespace MapEngine
             _cameraHandler = cameraHandler;
             _effectsHandler = effectsHandler;
             _particleHandler = particleHandler;
+            _interfaceHandler = interfaceHandler;
         }
 
         public void Initialise()
         {
-            var mapFilename = @"C:\Source\MapEditor\MapEngine\Content\Maps\TestMap9.json";
+            var mapFilename = @"C:\Source\MapEditor\MapEngine\Content\Maps\TestMap10.json";
             _cameraHandler.Initialise(mapFilename);
             _mapHandler.Initialise(mapFilename);
             
@@ -48,23 +51,6 @@ namespace MapEngine
             _unitHandler.Initialise(unitsPath, mapFilename, weaponsPath, modelsPath, particlesPath);
 
             _effectsHandler.Initialise();
-
-            for (var i = 0; i < 512; i++)
-            {
-                _messageHub.Post(new CreateEffectCommand
-                {
-                    Name = "FluidEffect", // todo: these should be constant or enum values?
-                    Location = new Vector2 { X = 1, Y = i },
-                    Value = 2f
-                });
-            }
-
-            _messageHub.Post(new CreateEffectCommand
-            {
-                Name = "WaveEffect",
-                Location = new Vector2 { X = 90, Y = 110 },
-                Value = 1000
-            });
         }
 
         double _totalElapsed = 0;
@@ -97,14 +83,13 @@ namespace MapEngine
 
         private void Render()
         {
-            _graphics.Clear();
-
             // Todo: need to order rendering by Z height
             var viewport = _cameraHandler.GetViewport();
             _mapHandler.Render(viewport, _graphics);
             _unitHandler.Render(viewport, _graphics);
             _effectsHandler.Render(viewport, _graphics);
             _particleHandler.Render(viewport, _graphics);
+            _interfaceHandler.Render(viewport, _graphics);
 
             _graphics.Render();
         }

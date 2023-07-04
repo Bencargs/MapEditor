@@ -36,12 +36,6 @@ namespace MapEngine.Handlers
         {
             _waveService.Simulate();
 
-            // todo: consider dynamic obstructions, eg units moving
-            //foreach (var e in _entities)
-            //{
-            //_fluidEffectService.SetSurface[previous, Fluid]
-            //_fluidEffectService.SetSurface[current, Solid]
-            //}
             _fluidEffectService.Simulate(1 / 60f, 5);
         }
 

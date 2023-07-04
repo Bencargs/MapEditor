@@ -1,4 +1,5 @@
-﻿using Common;
+﻿using System.Numerics;
+using Common;
 using MapEngine.Commands;
 using MapEngine.Entities;
 using MapEngine.Entities.Components;
