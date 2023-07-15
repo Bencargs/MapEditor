@@ -167,16 +167,9 @@ namespace MapEngine.Handlers
             {
                 var movementComponent = entity.GetComponent<MovementComponent>();
 
-                var destination = entityDestinations.First(x => x.Source == entity);
-                //var path = _pathfinding.GetPath(entity, command.Destination);
-                //var orders = ToMoveOrders(path, command.MovementMode);
-
-
-                var orders = new MoveOrder
-                {
-                    MovementMode = command.MovementMode,
-                    Destination = destination.Destination,
-                };
+                var destination = entityDestinations[entity];
+                var path = _pathfinding.GetPath(entity.Location(), destination);
+                var orders = ToMoveOrders(path, command.MovementMode);
 
                 if (!command.Queue)
                     movementComponent.Destinations.Clear();
@@ -185,7 +178,7 @@ namespace MapEngine.Handlers
             }
         }
 
-        private static IEnumerable<MoveOrder> ToMoveOrders(Tile[] path, MovementMode movementMode) =>
+        private static IEnumerable<MoveOrder> ToMoveOrders(List<Tile> path, MovementMode movementMode) =>
             path.Select(x => new MoveOrder
             {
                 MovementMode = movementMode,

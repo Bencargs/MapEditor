@@ -10,7 +10,7 @@ namespace MapEngine.Handlers
     public class FormationService
     {
         // todo: add an enum here for type of position, circular, triangle, grid etc
-        public static List<(Entity Source, Vector2 Destination)> GetFormationPositions(List<Entity> entities, Vector2 destination)
+        public static Dictionary<Entity, Vector2> GetFormationPositions(List<Entity> entities, Vector2 destination)
         {
             var unitAreas = entities.Select(x => x.Texture()).ToList();
             var positions = GetCircleFormation(unitAreas)
@@ -19,7 +19,7 @@ namespace MapEngine.Handlers
 
             var paths = GetPaths(entities, positions);
 
-            return paths;
+            return paths.ToDictionary(k => k.Source, v => v.Destination);
         }
 
         private static List<(Entity Source, Vector2 Destination)> GetPaths(List<Entity> entities, List<Vector2> positions)

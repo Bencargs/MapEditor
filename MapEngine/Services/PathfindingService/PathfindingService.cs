@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using Common;
-using Common.Entities;
-using MapEngine.Entities;
-using MapEngine.Entities.Components;
 using MapEngine.Services.Map;
 
 namespace MapEngine.Services.PathfindingService
@@ -19,16 +16,14 @@ namespace MapEngine.Services.PathfindingService
             _map = mapService;
         }
 
-        public Tile[] GetPath(Entity entity, Vector2 target)
+        public List<Tile> GetPath(Vector2 location, Vector2 target)
         {
-            var location = entity.Location();
-            var movement = entity.GetComponent<MovementComponent>();
-
             var visited = new Dictionary<int, Node<Tile>>();
             var potentials = new NodeQueue<float, Tile>(x => x.Value);
 
             var destination = _map.GetTile(target);
             var currentTile = _map.GetTile(location);
+
             var initialNode = CreateNode(currentTile, destination, null);
             potentials.Push(initialNode);
 
@@ -38,17 +33,17 @@ namespace MapEngine.Services.PathfindingService
             {
                 current = potentials.Pop();
 
-                var mask = GetMask(movement, current.Item, _map.Tiles);
+                var mask = GetMask(current.Item, _map.PathfindingTiles);
                 foreach (var c in mask)
                 {
                     if (c == null || visited.ContainsKey(c.Id))
                         continue;
 
                     var node = CreateNode(c, destination, current);
-                    visited.Add(c.Id, node);
+                    visited[c.Id] = node;
                     potentials.Push(node);
                 }
-                found = current.Item == destination;
+                found = current.Item.Equals(destination);
             }
             while (potentials.Any() && !found);
 
@@ -56,15 +51,18 @@ namespace MapEngine.Services.PathfindingService
             {
                 // If there is no direct path, get the closest path to destination
                 current = visited.Any()
-                    ? visited.OrderBy(x => x.Value.Value).FirstOrDefault().Value
+                    ? visited.OrderBy(x => GetDistance(x.Value.Item, destination)).FirstOrDefault().Value
                     : current;
             }
 
-            return Prune(current).ToArray();
+            var path = SimplifyPath(current);
+
+            return path;
         }
 
         private Node<Tile> CreateNode(Tile tile, Tile destination, Node<Tile> current)
         {
+            // todo: include entity speed at tile (type, gradient etc)
             var goalCost = GetDistance(tile, destination);
             var movementCost = current != null
                 ? GetDistance(current.Item, tile)
@@ -77,54 +75,145 @@ namespace MapEngine.Services.PathfindingService
             };
         }
 
-        private static Node<Tile> Prune(Node<Tile> tail)
+        private List<Tile> SimplifyPath(Node<Tile> tail)
         {
-            var current = tail;
+            int currentIndex = 0;
+            var path = tail.ToList();
+            int lastIndex = path.Count - 1;
 
-            while (current?.Previous?.Previous != null)
+            while (currentIndex < lastIndex - 1)
             {
-                var temp = current.Previous.Previous;
+                Tile current = path[currentIndex];
+                Tile destination = path[lastIndex];
 
-                // if two points have the same slope, they are co-linear
-                var currentSlope = (current.Previous.Item.Location.Y - current.Item.Location.Y) / (current.Previous.Item.Location.X - current.Item.Location.X);
-                var previousSlope = (temp.Item.Location.Y - current.Previous.Item.Location.Y) / (temp.Item.Location.X - current.Previous.Item.Location.X);
-
-                // if all three points exist on the same line, remove the middle point
-                if (Math.Abs(currentSlope - previousSlope) < 0.1)
-                    current.Previous = temp;
+                if (!IsObstructed(current, destination))
+                {
+                    // If there is a clear path from current to destination, remove all items between them
+                    path.RemoveRange(currentIndex + 1, lastIndex - currentIndex - 1);
+                    currentIndex++;
+                    lastIndex = path.Count - 1;
+                }
                 else
-                    current = current.Previous;
+                {
+                    // If there is an obstruction, increment current and continue
+                    lastIndex--;
+                }
             }
-
-            return tail;
+            return path;
         }
 
-        private List<Tile> GetMask(MovementComponent movementComponent, Tile current, Tile[,] tiles)
+        // todo: move bresenhams ray casting to a common method (duplicate in LoS)
+        public bool IsObstructed(Tile source, Tile destination)
         {
-            var (currentX, currentY) = _map.GetCoordinates(current);
+            int sourceX = (int)source.Location.X / _map.Scale;
+            int sourceY = (int)source.Location.Y / _map.Scale;
+            int destX = (int)destination.Location.X / _map.Scale;
+            int destY = (int)destination.Location.Y / _map.Scale;
 
-            var results = new List<Tile>();
+            // Perform raycasting from source to destination using the _grid variable
+            // Assuming the grid has the same dimensions as the tile array
 
-            //movementComponent.MovementMask
-            var movementMask = new[,]
+            // Determine the delta values for x and y
+            int deltaX = Math.Abs(destX - sourceX);
+            int deltaY = Math.Abs(destY - sourceY);
+
+            // Determine the direction of movement in x and y
+            int stepX = sourceX < destX ? 1 : -1;
+            int stepY = sourceY < destY ? 1 : -1;
+
+            int error = deltaX - deltaY;
+
+            int x = sourceX;
+            int y = sourceY;
+
+            while (x != destX || y != destY)
             {
-                { (-1,-1),  (0,-1),  (1,-1) },
-                { (-1, 0),  (0, 0),  (1, 0) },
-                { (-1, 1),  (0, 1),  (1, 1) }
-            };
-            foreach (var (x, y) in movementMask)
-            {
-                if (currentX + x < 0 || currentY + y < 0 ||
-                    currentX + x > tiles.GetLength(0) - 1 ||
-                    currentY + y > tiles.GetLength(1) - 1)
-                    continue;
+                // Check if the current position encounters a null tile
+                if (!IsNavigable(_map.PathfindingTiles[x, y]))
+                {
+                    return true; // Obstruction found
+                }
 
-                var tile = tiles[currentX + x, currentY + y];
-                if (movementComponent.Terrains.Contains(tile.Type))
-                    results.Add(tile);
+                int error2 = error * 2;
+
+                if (error2 > -deltaY)
+                {
+                    error -= deltaY;
+                    x += stepX;
+                }
+
+                if (error2 < deltaX)
+                {
+                    error += deltaX;
+                    y += stepY;
+                }
             }
-            return results;
+
+            return false; // No obstruction found
         }
+
+        private List<Tile> GetMask(Tile current, Tile[,] tiles)
+        {
+            var gridWidth = tiles.GetLength(0);
+            var gridHeight = tiles.GetLength(1);
+            var x = (int)current.Location.X / _map.Scale;
+            var y = (int)current.Location.Y / _map.Scale;
+
+            var mask = new List<Tile>();
+
+            var startX = Math.Max(x - 1, 0);
+            var startY = Math.Max(y - 1, 0);
+            var endX = Math.Min(x + 1, gridWidth - 1);
+            var endY = Math.Min(y + 1, gridHeight - 1);
+
+            // Iterate over neighboring tiles
+            for (int i = startX; i <= endX; i++)
+            {
+                for (int j = startY; j <= endY; j++)
+                {
+                    if (i == x && j == y) // dont include self in mask
+                        continue;
+                    if (!IsNavigable(tiles[i, j]))
+                        continue;
+
+                    var tile = tiles[i, j];
+                    mask.Add(tile);
+                }
+            }
+
+            return mask;
+        }
+
+        private bool IsNavigable(Tile tile)
+        {
+            // todo: 
+            // if gradient to steep, terrain type is incompatible etc
+            // entity.TileTypes, max gradient etc etc
+            return tile != null;
+        }
+
+        //private List<Tile> GetMask(MovementComponent movementComponent, Tile current, Tile[,] tiles)
+        //{
+        //    var (currentX, currentY) = _map.GetCoordinates(current);
+        //    var currentX = (int)current.Location.X / 4;
+        //    var currentY = (int)current.Location.Y / 4;
+
+        //    var results = new List<Tile>();
+
+        //    movementComponent.MovementMask
+        //    foreach (var (x, y) in movementMask)
+        //    {
+        //        if (currentX + x < 0 || currentY + y < 0 ||
+        //            currentX + x > tiles.GetLength(0) - 1 ||
+        //            currentY + y > tiles.GetLength(1) - 1)
+        //            continue;
+
+        //        var tile = tiles[currentX + x, currentY + y];
+        //        if (movementComponent.Terrains.Contains(tile.Type))
+        //            results.Add(tile);
+        //    }
+        //    return results;
+        //}
 
         //// manhattan distance
         //public float GetDistance(Tile source, Tile destination) =>
@@ -133,5 +222,19 @@ namespace MapEngine.Services.PathfindingService
         // euclidean distance
         public float GetDistance(Tile source, Tile destination) =>
             Vector2.Distance(source.Location, destination.Location);
+
+        //// octile distance
+        //	public float GetDistance(Tile source, Tile destination)
+        //	{
+        //		var dx = Math.Abs(source.Location.X - destination.Location.X);
+        //		var dy = Math.Abs(source.Location.Y - destination.Location.Y);
+        //
+        //		var min = Math.Min(dx, dy);
+        //		var max = Math.Max(dx, dy);
+        //
+        //		var distance = (float)(Math.Sqrt(2) - 1) * min + max;
+        //
+        //		return distance;
+        //	}
     }
 }

@@ -25,7 +25,7 @@ namespace MapEngine.Handlers
 
         public void Render(Rectangle viewport, IGraphics graphics)
         {
-            DrawTiles(viewport, graphics, _mapService.Tiles);
+            DrawTiles(viewport, graphics, _mapService.TextureTiles);
         }
 
         private void DrawTiles(Rectangle viewport, IGraphics graphics, Tile[,] tiles)
