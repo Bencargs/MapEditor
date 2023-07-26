@@ -16,8 +16,8 @@ namespace MapEngine.Handlers
         , IHandleCommand<DestroyEntityCommand>
         , IHandleCommand<MoveCommand>
     {
-        private readonly PathfindingService _pathfinding;
         private readonly MapService _mapService;
+        private readonly PathfindingService _pathfinding;
         private readonly List<Entity> _entities = new List<Entity>();
 
         public MovementHandler(
@@ -71,10 +71,20 @@ namespace MapEngine.Handlers
 
         private void ApplyGravity(LocationComponent location, MovementComponent movement)
         {
+            //todo: this is ick
             const int Gravity = -1;// 9.81 in tenths of meters rounded to int
-
+            var mapHeight = _mapService.GetHeight(location.Location);
+            
+            // Eg. airborne - apply gravity to velocity, and apply velocity to height
             movement.Velocity += new Vector3(0, 0, Gravity);
             location.Height += (int)movement.Velocity.Z;
+
+            // Eg. on surface - follow terrain and remove downward velocity
+            if (location.Height <= mapHeight)
+            {
+                movement.Velocity = new Vector3(movement.Velocity.X, movement.Velocity.Y, 0);
+                location.Height = mapHeight;
+            }
         }
 
 

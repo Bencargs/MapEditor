@@ -98,7 +98,7 @@ namespace MapEngine.Services.Effect
 
         public byte[] GenerateBitmap()
         {
-            if (!_enabled) return new byte[0];
+            if (!_enabled) return Array.Empty<byte>();
 
             // Upscale up the internal model 4x to fit screen (improves update processing speed)
             var scaledMap = _flow.Scale(x => x, 4, 4, Width, Height);

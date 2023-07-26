@@ -40,8 +40,11 @@ namespace MapEngine.Services.Map
             {
                 // todo: use full RGB colour range to represent heights for better verticality
                 // see https://jonathancritchley.ca/TOHeight_post.html
-                var height = heightmap.Image[(int)location.X, (int)location.Y].Blue;
-                return height;
+                if (location.X < 0 || location.X > heightmap.Image.Width - 1 ||
+                    location.Y < 0 || location.Y > heightmap.Image.Height - 1)
+                    return 0;
+
+                return heightmap.Image[(int)location.X, (int)location.Y].Blue;
             }
 
             return 0;

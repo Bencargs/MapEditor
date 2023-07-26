@@ -44,25 +44,17 @@ namespace MapEngine.ResourceLoading
                 if (movement != null)
                 {
                     var movementComponent = entity.GetComponent<MovementComponent>();
-                    movementComponent.Velocity = new Vector3((int)movement.Velocity.X, (int)movement.Velocity.Y, 0);
-                    movementComponent.Steering = new Vector2((int)movement.Steering.X, (int)movement.Steering.Y);
-                    movementComponent.Destinations = (movement.Destinations != null) 
-                        ? ((IEnumerable<dynamic>)movement.Destinations).Select(x => new MoveOrder
-                        {
-                            MovementMode = (MovementMode)Enum.Parse(typeof(MovementMode), (string)x.MovementMode),
-                            Destination = new Vector2((int)x.Destination.X, (int)x.Destination.Y)
-                        }).ToQueue()
-                        : new Queue<MoveOrder>();
-                }
-
-                var sensors = (IEnumerable<dynamic>) u.Sensors;
-                if (sensors != null)
-                {
-                    // todo: bug here - what if these collections don't match?
-                    var sensorComponents = entity.GetComponents<SensorComponent>();
-                    for (int i = 0; i < sensorComponents.Length; i++)
+                    if (movementComponent != null)
                     {
-                        sensorComponents[i].Radius = (float)(sensors.ElementAt(i)?.Radius ?? 0);
+                        movementComponent.Velocity = new Vector3((int)movement.Velocity.X, (int)movement.Velocity.Y, 0);
+                        movementComponent.Steering = new Vector2((int)movement.Steering.X, (int)movement.Steering.Y);
+                        movementComponent.Destinations = (movement.Destinations != null)
+                            ? ((IEnumerable<dynamic>)movement.Destinations).Select(x => new MoveOrder
+                            {
+                                MovementMode = (MovementMode)Enum.Parse(typeof(MovementMode), (string)x.MovementMode),
+                                Destination = new Vector2((int)x.Destination.X, (int)x.Destination.Y)
+                            }).ToQueue()
+                            : new Queue<MoveOrder>();
                     }
                 }
 
@@ -134,6 +126,7 @@ namespace MapEngine.ResourceLoading
                 {
                     entity.AddComponent(new SensorComponent
                     {
+                        Name = s.Name,
                         Radius = s.Radius
                     });
                 }
@@ -182,8 +175,7 @@ namespace MapEngine.ResourceLoading
             return entity;
         }
 
-        private static readonly (int, int)[,] DefaultMask = new (int X, int Y)[,]
-        {
+        private static readonly (int, int)[,] DefaultMask = {
 			{ (-1, -1), (0, -1), (1, -1) },
             { (-1,  0), (0,  0), (1,  0) },
             { (-1,  1), (0,  1), (1,  1) }

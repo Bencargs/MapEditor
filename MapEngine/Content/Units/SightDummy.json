@@ -1,0 +1,29 @@
+{
+	"Type":"SightDummy",
+	"Image": {
+		"Width":24,
+		"Height":24,
+		"TextureId": "Dummy",
+	},
+	"Area": {
+		"BoundingBox": {
+			"Width":24,
+			"Height":24,
+		}
+	},
+	"Weapons": [
+		"Cannon",
+	],
+	"Sensors": [{
+			"Name": "Sight",
+			"Radius": 200
+		}
+	],
+	"Movement": {
+		"MaxVelocity":100,
+		"Mass":1000,
+		"MaxForce":100,
+		"StopRadius":10,
+		"BrakeForce":0.05
+	},
+}

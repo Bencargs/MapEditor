@@ -2,6 +2,7 @@
 using MapEngine.Commands;
 using MapEngine.Handlers;
 using MapEngine.Handlers.ParticleHandler;
+using MapEngine.Handlers.SensorHandler;
 using MapEngine.Rendering;
 using MapEngine.Services.Effect;
 using MapEngine.Services.Effects.WaveEffect;
@@ -12,6 +13,8 @@ namespace MapEngine
 {
     public static class RegistrationModule
     {
+        // todo: replace all this with a reflective type loader?
+
         public static IContainer Initialise()
         {
             var builder = new ContainerBuilder();
@@ -53,14 +56,20 @@ namespace MapEngine
             builder.RegisterType<CameraHandler>().SingleInstance();
             builder.RegisterType<EffectsHandler>().SingleInstance();
             builder.RegisterType<MapHandler>().SingleInstance();
-            builder.RegisterType<SensorHandler>().SingleInstance();
+            RegisterSensorHandler(builder);
         }
 
         private static void RegisterRenderers(ContainerBuilder builder)
         {
             builder.RegisterType<Renderer2d>().SingleInstance();
             builder.RegisterType<Renderer3d>().SingleInstance();
-            builder.RegisterType<SensorRenderer>().SingleInstance();
+        }
+
+        private static void RegisterSensorHandler(ContainerBuilder builder)
+        {
+            builder.RegisterType<SensorHandler>().SingleInstance();
+            builder.RegisterType<RadarSensor>().SingleInstance();
+            builder.RegisterType<SightSensor>().SingleInstance();
         }
     }
 }

@@ -7,7 +7,7 @@
         public byte Green { get; }
         public byte Alpha { get; }
 
-        public Colour(byte red, byte blue, byte green, byte alpha)
+        public Colour(byte red, byte blue, byte green, byte alpha = 255)
         {
             Red = red;
             Blue = blue;

@@ -41,10 +41,6 @@ namespace MapEngine.Handlers
 
         private void HandleCollisions(Entity entity)
         {
-            // todo - ?? seems like units are colliding with their own projectiles, and exploding?
-            //if (entity.Id != 72)
-            //    return;
-
             var collider = entity.GetComponent<CollisionComponent>();
             if (collider == null)
                 return;
@@ -53,6 +49,11 @@ namespace MapEngine.Handlers
             {
                 foreach (var i in impactors)
                 {
+                    // todo: clean up this - prevents projectiles colliding with spawner, but is messy
+                    if (collider.Ignore.Contains(i) == true ||
+                        i.GetComponent<CollisionComponent>()?.Ignore?.Contains(entity) == true)
+                        continue;
+
                     var sourceLocation = entity.GetComponent<LocationComponent>();
                     var sourceVelocity = entity.GetComponent<MovementComponent>();
                     var force = GetImpactForce(sourceVelocity);
@@ -78,8 +79,10 @@ namespace MapEngine.Handlers
                         selfVelocity.Velocity = new Vector3(newSelfVelocity.X, newSelfVelocity.Y, selfVelocity.Velocity.Z);
                     }
 
-                    if (force > collider.MaxImpactForce)
+                    if (force >= collider.MaxImpactForce)
                     {
+                        // todo: this is confused and feels out of place - should there be an effects handler for this?
+                        // eg on a such a collision, use explosion effect [flash, shrapnel, fireball]
                         var location = i.GetComponent<LocationComponent>();
                         ParticleFactory.TryGetParticle("Flash1", out var particle1);
                         _messageHub.Post(new CreateEntityCommand
@@ -128,7 +131,10 @@ namespace MapEngine.Handlers
                                 }
                             }
                         });
-                        _messageHub.Post(new DestroyEntityCommand { Entity = i });
+
+                        // todo: this is to destroy projectiles that have collided, not units - make nicer
+                        if (i.Id == 72)
+                            _messageHub.Post(new DestroyEntityCommand { Entity = i });
                     }
                 }
             }
@@ -164,7 +170,7 @@ namespace MapEngine.Handlers
             {
                 // Determine collision with target
                 var targetLocation = e.Location();
-                var target = e.GetComponent<CollisionComponent>().GetCollider(targetLocation);
+                var target = e.Hitbox();
                 if (source.HasCollided(target))
                 {
                     var distance = Vector2.Distance(source.Location, targetLocation);
@@ -173,9 +179,8 @@ namespace MapEngine.Handlers
 
                 // Determine collision with terrain
                 var entityHeight = e.Height();
-                var entityLocation = e.Location();
-                var mapHeight = _mapService.GetHeight(entityLocation);
-                if (entityHeight < mapHeight)
+                var mapHeight = _mapService.GetHeight(targetLocation);
+                if (entityHeight < (mapHeight - 5)) // todo: address fudge factor here
                 {
                     yield return (e, 0f);
                 }

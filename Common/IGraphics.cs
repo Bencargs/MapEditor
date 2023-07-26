@@ -14,6 +14,7 @@ namespace Common
         void DrawCircle(Colour colour, Rectangle area);
         void DrawImage(IImage image, Rectangle area);
         void DrawBytes(byte[] buffer, Rectangle area);
+        void Desaturate(float[] buffer, Rectangle area);
 
         void Render();
     }

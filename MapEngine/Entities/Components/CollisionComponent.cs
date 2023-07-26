@@ -1,6 +1,9 @@
-﻿using Common.Collision;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Common.Collision;
 using Common.Entities;
 using System.Numerics;
+using System.Windows.Documents;
 
 namespace MapEngine.Entities.Components
 {
@@ -8,6 +11,7 @@ namespace MapEngine.Entities.Components
     {
         public ComponentType Type => ComponentType.Collision;
         public float MaxImpactForce { get; set; }
+        public List<Entity> Ignore { get; set; } = new List<Entity>();
 
         private readonly ICollider _collider;
         public ICollider GetCollider(Vector2 location)
@@ -25,7 +29,11 @@ namespace MapEngine.Entities.Components
 
         public IComponent Clone()
         {
-            return new CollisionComponent(_collider);
+            return new CollisionComponent(_collider)
+            {
+                MaxImpactForce = MaxImpactForce,
+                Ignore = Ignore.ToList()
+            };
         }
     }
 }

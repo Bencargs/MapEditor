@@ -82,7 +82,7 @@ namespace MapEngine
                 if (k > _backBuffer.Length || k < 0)
                     continue;
 
-                var opacity = (float)(buffer[i + 3] / 255f);
+                var opacity = buffer[i + 3] / 255f;
                 _backBuffer[k + 0] = MergePixel(_backBuffer[k + 0], buffer[i + 0], opacity);
                 _backBuffer[k + 1] = MergePixel(_backBuffer[k + 1], buffer[i + 1], opacity);
                 _backBuffer[k + 2] = MergePixel(_backBuffer[k + 2], buffer[i + 2], opacity);
@@ -90,6 +90,29 @@ namespace MapEngine
             }
         }
 
+        public void Desaturate(float[] buffer, Rectangle area)
+        {
+            for (int i = 0; i < buffer.Length; i ++)
+            {
+                var amount = buffer[i];
+                if (amount == 0f) continue;
+
+                int x = i % Width;
+                int y = i / Width;
+                
+                var original = GetPixel(x, y);
+
+                var newColour = new Colour(
+                    (byte)Math.Max(0, original.Red - 255 * amount),
+                    (byte)Math.Max(0, original.Blue - 255 * amount),
+                    (byte)Math.Max(0, original.Green - 255 * amount),
+                    original.Alpha);
+
+                SetPixel(x, y, newColour);
+            }
+        }
+
+        // todo: merge with BlendColour
         private byte MergePixel(byte a, byte b, float alpha)
         {
             var reciprical = 1 - alpha;
@@ -136,40 +159,7 @@ namespace MapEngine
 
         public void DrawLines(Colour colour, Vector2[] points)
         {
-            var p1 = points[0];
-            var p2 = points[1];
-
-            // via Bresenham's
-            var dx = Math.Abs(p2.X - p1.X);
-            var dy = Math.Abs(p2.Y - p1.Y);
-            
-            var sx = p1.X < p2.X ? 1 : -1;
-            var sy = p1.Y < p2.Y ? 1 : -1;
-            var err = (dx > dy ? dx : -dy) / 2;
-            var tolerance = 0.001;
-
-            for (int j = 0; j < 50; j++)
-            {
-                if (p1.X > 0 && p1.Y > 0 && p1.X < Width - 1 && p1.Y < Height - 1)
-                    SetPixel((int)p1.X, (int)p1.Y, colour);
-                
-                if (Math.Abs(p1.X - p2.X) < tolerance && 
-                    Math.Abs(p1.Y - p2.Y) < tolerance)
-                    break;
-
-                var e2 = err;
-                if (e2 > -dx)
-                {
-                    err -= dy;
-                    p1.X += sx;
-                }
-
-                if (e2 < dy)
-                {
-                    err += dx;
-                    p1.Y += sy;
-                }
-            }
+            throw new NotImplementedException();
         }
 
         public void DrawRectangle(Colour colour, Rectangle area)

@@ -37,40 +37,65 @@ namespace MapEngine.Handlers
                 if (elapsed < weaponComponent.ReloadTime)
                     continue;
 
+                // todo: overlap with sensorSerivce.IsDetected?
+                var detections = e.GetComponents<SensorComponent>()
+                    .SelectMany(x => x.Detections)
+                    .ToList();
+                if (!detections.Any())
+                    continue;
+
                 var location = e.GetComponent<LocationComponent>(); // todo: replace these with entity extension methods?
                 var collider = new BoundingCircle { Radius = weaponComponent.Range, Location = location.Location };
-                var collisions = _collisionHandler.GetCollisions(collider).Where(x => x.entity.Id != e.Id).ToList();
+                var collisions = _collisionHandler.GetCollisions(collider)
+                    .Where(x => x.entity.Id != e.Id)
+                    .Where(x => detections.Contains(x.entity))
+                    .Where(x => x.entity.Id != 72) // todo: find a way to define what types of targets we want, units, projectiles etc
+                    .OrderBy(x => x.distance)
+                    .Select(x => x.entity)
+                    .ToList();
                 if (!collisions.Any())
                     continue;
 
                 // get closest target in range -- in future we could have an AI component with target priorities here
-                var target = collisions.First().entity;
+                var target = collisions.First();
                 if (target.GetComponent<UnitComponent>()?.TeamId == e.GetComponent<UnitComponent>().TeamId) // todo: some kind of alliance lookup?
                     continue;
 
                 if (!TryGetAim(e, target, out var aimPoint))
                     continue;
 
-                var projectile = CreateProjectile(location, aimPoint, weaponComponent);
+                var projectile = CreateProjectile(e, location, aimPoint, weaponComponent);
                 _messageHub.Post(new CreateEntityCommand { Entity = projectile });
 
                 weaponComponent.LastFiredTime = now;
             }
         }
 
-        private Entity CreateProjectile(LocationComponent location, Vector2 aimPoint, WeaponComponent weaponComponent)
+        private Entity CreateProjectile(
+            Entity entity, 
+            LocationComponent location, 
+            Vector2 aimPoint,
+            WeaponComponent weaponComponent)
         {
+            // todo: fix this when reassessing Gravity in MovementHandler
+            //var verticalSpeed = weaponComponent.Speed * (float)Math.Sin(45f.ToRadians());
+            var verticalSpeed = weaponComponent.Speed * 3;
+
             var projectile = new Entity
             {
                 Id = 72, // todo: EntityFactory
                 Components = new List<IComponent>
                 {
                     location.Clone(),
-                    new CollisionComponent (new BoundingCircle { Radius = weaponComponent.CollisionRadius } ), // should this be definable?
+                    new CollisionComponent(new BoundingCircle { Radius = weaponComponent.CollisionRadius })
+                    {
+                        MaxImpactForce = weaponComponent.MaxImpactForce,
+                        Ignore = new List<Entity> { entity }
+                    },
                     new ImageComponent { TextureId = weaponComponent.TextureId },
                     new MovementComponent
                     {
-                        Velocity = new Vector3(aimPoint.X, aimPoint.Y, weaponComponent.Speed),
+                        Velocity = new Vector3(aimPoint.X, aimPoint.Y, verticalSpeed),
                         Steering = Vector2.Zero,
                         MaxVelocity = weaponComponent.Speed,
                         Mass = 0,

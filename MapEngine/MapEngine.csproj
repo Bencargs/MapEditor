@@ -123,12 +123,13 @@
     <Compile Include="Handlers\ParticleHandler\Particle.cs" />
     <Compile Include="Handlers\ParticleHandler\ParticleEmitter.cs" />
     <Compile Include="Handlers\ParticleHandler\ParticleHandler.cs" />
-    <Compile Include="Handlers\SensorHandler.cs" />
+    <Compile Include="Handlers\SensorHandler\RadarSensor.cs" />
+    <Compile Include="Handlers\SensorHandler\SensorHandler.cs" />
     <Compile Include="Handlers\EffectsHandler.cs" />
+    <Compile Include="Handlers\SensorHandler\SightSensor.cs" />
     <Compile Include="Rendering\IRenderer.cs" />
     <Compile Include="Rendering\Renderer2d.cs" />
     <Compile Include="Rendering\Renderer3d.cs" />
-    <Compile Include="Rendering\SensorRenderer.cs" />
     <Compile Include="Services\Effects\FluidEffect\Direction.cs" />
     <Compile Include="Services\Effects\FluidEffect\Field.cs" />
     <Compile Include="Services\Effects\FluidEffect\FluidEffects.cs" />
