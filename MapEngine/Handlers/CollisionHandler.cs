@@ -84,8 +84,10 @@ namespace MapEngine.Handlers
                     //// eg. if projectile - explode
                     //// if unit with a max impact force (aircraft?) - explode
                     //// else ignore?
-                    //if (force > collider.MaxImpactForce)
+                    //if (force >= collider.MaxImpactForce)
                     //{
+                    //    todo: this is confused and feels out of place - should there be an effects handler for this?
+                    //    eg on a such a collision, use explosion effect [flash, shrapnel, fireball]
                     //    var location = i.GetComponent<LocationComponent>();
                     //    ParticleFactory.TryGetParticle("Flash1", out var particle1);
                     //    _messageHub.Post(new CreateEntityCommand
@@ -135,7 +137,10 @@ namespace MapEngine.Handlers
                     //            }
                     //        }
                     //    });
-                    //    _messageHub.Post(new DestroyEntityCommand { Entity = i });
+                    //
+                    //    todo: this is to destroy projectiles that have collided, not units - make nicer
+                    //    if (i.Id == 72)
+                    //        _messageHub.Post(new DestroyEntityCommand { Entity = i });
                     //}
                 }
             }
@@ -180,8 +185,8 @@ namespace MapEngine.Handlers
                 }
 
                 // Determine collision with terrain
-                var entityHeight = e.Height();
-                var mapHeight = _mapService.GetHeight(targetLocation);
+                var entityHeight = e.Elevation();
+                var mapHeight = _mapService.GetElevation(targetLocation);
                 if (entityHeight < (mapHeight - 5)) // todo: address fudge factor here
                 {
                     yield return (e, 0f);

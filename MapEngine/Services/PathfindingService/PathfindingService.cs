@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using Common;
+using Common.Entities;
+using MapEngine.Entities;
+using MapEngine.Entities.Components;
 using MapEngine.Services.Map;
 
 namespace MapEngine.Services.PathfindingService
@@ -16,13 +19,13 @@ namespace MapEngine.Services.PathfindingService
             _map = mapService;
         }
 
-        public List<Tile> GetPath(Vector2 location, Vector2 target)
+        public List<Tile> GetPath(Entity entity, Vector2 target)
         {
             var visited = new Dictionary<int, Node<Tile>>();
             var potentials = new NodeQueue<float, Tile>(x => x.Value);
 
             var destination = _map.GetTile(target);
-            var currentTile = _map.GetTile(location);
+            var currentTile = _map.GetTile(entity.Location());
 
             var initialNode = CreateNode(currentTile, destination, null);
             potentials.Push(initialNode);
@@ -36,7 +39,7 @@ namespace MapEngine.Services.PathfindingService
                 var mask = GetMask(current.Item, _map.PathfindingTiles);
                 foreach (var c in mask)
                 {
-                    if (c == null || visited.ContainsKey(c.Id))
+                    if (!entity.IsNavigable(c) || visited.ContainsKey(c.Id))
                         continue;
 
                     var node = CreateNode(c, destination, current);
@@ -55,7 +58,7 @@ namespace MapEngine.Services.PathfindingService
                     : current;
             }
 
-            var path = SimplifyPath(current);
+            var path = SimplifyPath(entity, current);
 
             return path;
         }
@@ -75,18 +78,19 @@ namespace MapEngine.Services.PathfindingService
             };
         }
 
-        private List<Tile> SimplifyPath(Node<Tile> tail)
+        private List<Tile> SimplifyPath(Entity entity, Node<Tile> tail)
         {
-            int currentIndex = 0;
+            // Removes intermediate nodes and returns an Any-angle path
+            var currentIndex = 0;
             var path = tail.ToList();
-            int lastIndex = path.Count - 1;
+            var lastIndex = path.Count - 1;
 
             while (currentIndex < lastIndex - 1)
             {
-                Tile current = path[currentIndex];
-                Tile destination = path[lastIndex];
+                var current = path[currentIndex];
+                var destination = path[lastIndex];
 
-                if (!IsObstructed(current, destination))
+                if (!IsObstructed(entity, current, destination))
                 {
                     // If there is a clear path from current to destination, remove all items between them
                     path.RemoveRange(currentIndex + 1, lastIndex - currentIndex - 1);
@@ -103,7 +107,7 @@ namespace MapEngine.Services.PathfindingService
         }
 
         // todo: move bresenhams ray casting to a common method (duplicate in LoS)
-        public bool IsObstructed(Tile source, Tile destination)
+        public bool IsObstructed(Entity entity, Tile source, Tile destination)
         {
             int sourceX = (int)source.Location.X / _map.Scale;
             int sourceY = (int)source.Location.Y / _map.Scale;
@@ -129,7 +133,7 @@ namespace MapEngine.Services.PathfindingService
             while (x != destX || y != destY)
             {
                 // Check if the current position encounters a null tile
-                if (!IsNavigable(_map.PathfindingTiles[x, y]))
+                if (!entity.IsNavigable(_map.PathfindingTiles[x, y]))
                 {
                     return true; // Obstruction found
                 }
@@ -173,8 +177,6 @@ namespace MapEngine.Services.PathfindingService
                 {
                     if (i == x && j == y) // dont include self in mask
                         continue;
-                    if (!IsNavigable(tiles[i, j]))
-                        continue;
 
                     var tile = tiles[i, j];
                     mask.Add(tile);
@@ -183,37 +185,6 @@ namespace MapEngine.Services.PathfindingService
 
             return mask;
         }
-
-        private bool IsNavigable(Tile tile)
-        {
-            // todo: 
-            // if gradient to steep, terrain type is incompatible etc
-            // entity.TileTypes, max gradient etc etc
-            return tile != null;
-        }
-
-        //private List<Tile> GetMask(MovementComponent movementComponent, Tile current, Tile[,] tiles)
-        //{
-        //    var (currentX, currentY) = _map.GetCoordinates(current);
-        //    var currentX = (int)current.Location.X / 4;
-        //    var currentY = (int)current.Location.Y / 4;
-
-        //    var results = new List<Tile>();
-
-        //    movementComponent.MovementMask
-        //    foreach (var (x, y) in movementMask)
-        //    {
-        //        if (currentX + x < 0 || currentY + y < 0 ||
-        //            currentX + x > tiles.GetLength(0) - 1 ||
-        //            currentY + y > tiles.GetLength(1) - 1)
-        //            continue;
-
-        //        var tile = tiles[currentX + x, currentY + y];
-        //        if (movementComponent.Terrains.Contains(tile.Type))
-        //            results.Add(tile);
-        //    }
-        //    return results;
-        //}
 
         //// manhattan distance
         //public float GetDistance(Tile source, Tile destination) =>

@@ -1,9 +1,9 @@
 {
-	"Type":"MobileDummy",
+	"Type":"WaterMobileDummy",
 	"Image": {
 		"Width":24,
 		"Height":24,
-		"TextureId": "Dummy"
+		"TextureId": "WaterDummy"
 	},
 	"Movement": {
 		"MaxVelocity":100,
@@ -13,8 +13,7 @@
 		"StopRadius":12,
 		"BrakeForce":0.05,
 		"Terrains":[
-			1,
-			2
+			1
 		]
 	},
 	"Area": {
@@ -23,13 +22,4 @@
 			"Height":24,
 		}
 	},
-	//"Sensors": [{
-	//		"Type": "Sight",
-	//		"Radius": 200
-	//	},
-	//	{
-	//		"Type": "Radar",
-	//		"Radius": 200
-	//	}
-	//]
 }

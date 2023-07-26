@@ -58,15 +58,15 @@ namespace MapEngine.Handlers
                         // 2. Update Speed
                         // 3. Update Position?
                         Seek(location, movement, target.Destination);
-                        ApplyFriction(movement);
+                        ApplyFriction(location, movement);
                         break;
                 }
             }
-            else
+            else if (movement.Velocity.Length() > 0)
             {
                 // eg. an entity having a force applied to it
                 location.Location += movement.Velocity.ToVector2();
-                ApplyFriction(movement);
+                ApplyFriction(location, movement);
             }
         }
 
@@ -75,26 +75,26 @@ namespace MapEngine.Handlers
             //todo: this is ick
             const int Gravity = -1;// 9.81 in tenths of meters rounded to int
 
-            var mapHeight = _mapService.GetHeight(location.Location);
+            var mapHeight = _mapService.GetElevation(location.Location);
 
             // Eg. airborne - apply gravity to velocity, and apply velocity to height
             movement.Velocity += new Vector3(0, 0, Gravity);
-            location.Height += (int)movement.Velocity.Z;
+            location.Elevation += (int)movement.Velocity.Z;
 
             // Eg. on surface - follow terrain and remove downward velocity
-            if (location.Height <= mapHeight)
+            if (location.Elevation <= mapHeight)
             {
                 movement.Velocity = new Vector3(movement.Velocity.X, movement.Velocity.Y, 0);
-                location.Height = mapHeight;
+                location.Elevation = mapHeight;
             }
         }
 
 
-        private static void ApplyFriction(MovementComponent movement)
+        private void ApplyFriction(LocationComponent location, MovementComponent movement)
         {
-            const float Friction = 0.95f; // Ideally this would be a property of the map tile
+            var friction = _mapService.GetFriction(location.Location);
 
-            movement.Velocity *= Friction;
+            movement.Velocity *= friction;
         }
 
         private static void ApplyBrakeForce(MovementComponent movement)
@@ -168,7 +168,7 @@ namespace MapEngine.Handlers
                 var movementComponent = entity.GetComponent<MovementComponent>();
 
                 var destination = entityDestinations[entity];
-                var path = _pathfinding.GetPath(entity.Location(), destination);
+                var path = _pathfinding.GetPath(entity, destination);
                 var orders = ToMoveOrders(path, command.MovementMode);
 
                 if (!command.Queue)

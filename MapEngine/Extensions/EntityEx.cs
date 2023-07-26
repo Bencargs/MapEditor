@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using Common;
 using Common.Collision;
@@ -6,6 +7,7 @@ using Common.Entities;
 using MapEngine.Entities.Components;
 using MapEngine.Factories;
 using MapEngine.Handlers;
+using MapEngine.Services.Map;
 
 namespace MapEngine.Entities
 {
@@ -25,10 +27,10 @@ namespace MapEngine.Entities
             return location.Location;
         }
 
-        public static int Height(this Entity entity)
+        public static int Elevation(this Entity entity)
         {
             var location = entity.GetComponent<LocationComponent>();
-            return location.Height;
+            return location.Elevation;
         }
 
         public static bool IsMoving(this Entity entity)
@@ -71,6 +73,17 @@ namespace MapEngine.Entities
             //return rotated;
 
             return collider;
+        }
+
+        public static bool IsNavigable(this Entity entity, Tile tile)
+        {
+            var movementComponent = entity.GetComponent<MovementComponent>();
+            if (movementComponent == null || tile is null) return false;
+
+            var terrainTypes = movementComponent.Terrains;
+            var tileGradient = tile.GetGradient();
+
+            return terrainTypes.Contains(tile.Type) && tileGradient <= movementComponent.MaxGradient;
         }
 
         public static void ReplaceOrders(this Entity entity, IEnumerable<MoveOrder> orders)

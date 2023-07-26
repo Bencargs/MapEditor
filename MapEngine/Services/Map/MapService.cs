@@ -3,6 +3,7 @@ using MapEngine.Factories;
 using MapEngine.Services.Effects.FluidEffect;
 using MapEngine.Services.Effects.WaveEffect;
 using System;
+using System.Numerics;
 using Vector2 = System.Numerics.Vector2;
 
 namespace MapEngine.Services.Map
@@ -38,9 +39,10 @@ namespace MapEngine.Services.Map
             return PathfindingTiles[x, y];
         }
 
-        public int GetHeight(Vector2 location)
+        public int GetElevation(Vector2 location)
         {
-            var tile = GetTile(location);
+            //var tile = GetTile(location);
+            var tile = GetTile(new Vector2(0, 0));
 
             if (TextureFactory.TryGetTexture(tile.HeightmapTextureId, out var heightmap))
             {
@@ -56,20 +58,65 @@ namespace MapEngine.Services.Map
             return 0;
         }
 
-        public (int X, int Y) GetCoordinates(Tile tile)
+        public void CalculateNormals(Tile[,] tiles)
         {
-            for (int x = 0; x < _map.Tiles.GetLength(0); x++)
+            int width = tiles.GetLength(0);
+            int height = tiles.GetLength(1);
+
+            //Vector3[,] normals = new Vector3[width, height];
+
+            for (int x = 0; x < width; x++)
             {
-                for (int y = 0; y < _map.Tiles.GetLength(1); y++)
+                for (int y = 0; y < height; y++)
                 {
-                    if (_map.Tiles[x, y].Id == tile.Id)
-                        return (x, y);
+                    // Get the height values of neighboring tiles
+                    int elevation = GetElevation(tiles[x, y].Location); // elevation is cooked
+                    int elevationLeft = (x > 0) ? GetElevation(tiles[x - 1, y].Location) : elevation;
+                    int elevationRight = (x < width - 1) ? GetElevation(tiles[x + 1, y].Location) : elevation;
+                    int elevationUp = (y > 0) ? GetElevation(tiles[x, y - 1].Location) : elevation;
+                    int elevationDown = (y < height - 1) ? GetElevation(tiles[x, y + 1].Location) : elevation;
+
+                    // Calculate the slopes in the X and Y directions
+                    float slopeX = elevationRight - elevationLeft;
+                    float slopeY = elevationDown - elevationUp;
+
+                    // Calculate the normal vector using the cross-product method
+                    Vector3 normal = Vector3.Normalize(new Vector3(-slopeX, -slopeY, 2f));
+
+                    tiles[x, y].Normal = normal;
                 }
             }
-            return (0, 0);
         }
 
-        // We want an array of 4x4 tiles, rather than the large texture tiles in the map
+        public float GetFriction(Vector2 location)
+        {
+            // todo: custom friction lookup for each terrain type?
+            // terrainType.Friction * surfaceGradient?
+
+            var tile = GetTile(location);
+            var surfaceGradient = tile.GetGradient();
+
+            // todo: this logic seems backwards
+            float highFrictionCoefficient = 0.2f;     // High friction coefficient for steep surfaces
+            float mediumFrictionCoefficient = 0.5f;   // Medium friction coefficient for moderate surfaces
+            float lowFrictionCoefficient = 0.95f;      // Low friction coefficient for gentle surfaces
+
+            // Determine the friction value based on the surface gradient
+            if (surfaceGradient > 45.0f)
+            {
+                return highFrictionCoefficient;
+            }
+
+            if (surfaceGradient > 15.0f)
+            {
+                return mediumFrictionCoefficient;
+            }
+
+            return lowFrictionCoefficient;
+        }
+
+        // We want a big array of small tiles for nimbler pathfinding
+        // rather than the large texture tiles in the map
         private void ResizeTileArray(Map map, int scale)
         {
             var originalWidth = map.Tiles.GetLength(0);
@@ -97,10 +144,12 @@ namespace MapEngine.Services.Map
                         Location = new Vector2(x * scale, y * scale),
                         TextureId = originalTile.TextureId,
                         Type = originalTile.Type,
-                        HeightmapTextureId = originalTile.HeightmapTextureId
+                        HeightmapTextureId = originalTile.HeightmapTextureId,
+                        //Normal = CalculateNormal(x, y)
                     };
                 }
             }
+            CalculateNormals(PathfindingTiles);
         }
     }
 }

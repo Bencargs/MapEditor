@@ -86,7 +86,6 @@
     <Compile Include="Engine\IHandleCommand.cs" />
     <Compile Include="Engine\ITarget.cs" />
     <Compile Include="Engine\Terrain.cs" />
-    <Compile Include="Engine\TerrainType.cs" />
     <Compile Include="File\MapFile.cs" />
     <Compile Include="Handlers\CollisionHandler\ColliderType.cs" />
     <Compile Include="Handlers\CollisionHandler\CollisionHandler.cs" />

@@ -6,6 +6,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Windows.Forms;
+using Common;
 using MapEditor.Commands;
 using MapEditor.Components;
 using MapEditor.Engine;
@@ -14,6 +15,7 @@ using MapEditor.File;
 using MapEditor.Handlers;
 using MapEditor.Repository;
 using Newtonsoft.Json;
+using Rectangle = System.Drawing.Rectangle;
 
 namespace MapEditor
 {

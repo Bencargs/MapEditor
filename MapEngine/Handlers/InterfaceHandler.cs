@@ -114,7 +114,7 @@ namespace MapEngine.Handlers
                     {
                         Vector2 rotatedPoint = RotatePoint(new Vector2(x, y), new Vector2(centerX, centerY), facingAngle);
                         int pixelIndex = ((int)rotatedPoint.Y * stride) + ((int)rotatedPoint.X * bytesPerPixel);
-                        if (pixelIndex < 0) continue;
+                        if (pixelIndex < 0 || pixelIndex > image.Length - 1) continue;
 
                         image[pixelIndex] = 0;       // Red component
                         image[pixelIndex + 1] = 255; // Green component
