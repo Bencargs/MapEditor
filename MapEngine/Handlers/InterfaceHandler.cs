@@ -110,7 +110,7 @@ namespace MapEngine.Handlers
             {
                 for (int x = startX; x <= endX; x++)
                 {
-                    if (x == startX || x == endX - 1 || y == startY || y == endY - 1)
+                    if (x == startX || x == endX || y == startY || y == endY)
                     {
                         Vector2 rotatedPoint = RotatePoint(new Vector2(x, y), new Vector2(centerX, centerY), facingAngle);
                         int pixelIndex = ((int)rotatedPoint.Y * stride) + ((int)rotatedPoint.X * bytesPerPixel);

@@ -71,6 +71,14 @@ namespace MapEngine.Services.PathfindingService
                 ? GetDistance(current.Item, tile)
                 : 0;
 
+            // todo:
+            // issues:
+            // - currently a tile's normal/height is just the 0,0 point of the tile
+            // anywhere else in the tile may be an obstruction
+            // could we include all obstructions in the tile pathing cost?
+            // eg a flat tile has no additional cost, lots of change in elevation does?
+            // - what about friction? this would enable preferential travel on roads
+
             return new Node<Tile>(tile)
             {
                 Previous = current,
@@ -114,8 +122,7 @@ namespace MapEngine.Services.PathfindingService
             int destX = (int)destination.Location.X / _map.Scale;
             int destY = (int)destination.Location.Y / _map.Scale;
 
-            // Perform raycasting from source to destination using the _grid variable
-            // Assuming the grid has the same dimensions as the tile array
+            // Perform raycasting from source to destination via bresenhams
 
             // Determine the delta values for x and y
             int deltaX = Math.Abs(destX - sourceX);

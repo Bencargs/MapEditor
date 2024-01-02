@@ -77,6 +77,11 @@ namespace MapEngine.Entities
 
         public static bool IsNavigable(this Entity entity, Tile tile)
         {
+            // todo: if a unit is larger than a tile, it will navigate through a space smaller than itself
+            // get unit bounding box
+            // get all contained tiles centered on this tile
+            // if we fit within them all - then navigable
+
             var movementComponent = entity.GetComponent<MovementComponent>();
             if (movementComponent == null || tile is null) return false;
 

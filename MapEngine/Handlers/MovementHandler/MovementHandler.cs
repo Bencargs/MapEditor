@@ -45,6 +45,14 @@ namespace MapEngine.Handlers
                 return;
 
             ApplyGravity(location, movement);
+
+            // pathing into un-navigable terrain - hard stop
+            var tile = _mapService.GetTile(location.Location);
+            if (!entity.IsNavigable(tile))
+            {
+                movement.Velocity = Vector3.Zero;
+            }
+
             if (TryGetTarget(location, movement, out var target))
             {
                 switch (target.MovementMode)
@@ -102,7 +110,7 @@ namespace MapEngine.Handlers
             movement.Velocity -= movement.Velocity.Truncate(movement.BrakeForce);
         }
 
-        private static bool TryGetTarget(LocationComponent location, MovementComponent movement, out MoveOrder target)
+        private bool TryGetTarget(LocationComponent location, MovementComponent movement, out MoveOrder target)
         {
             target = movement.Destinations.FirstOrDefault();
             if (target == null)

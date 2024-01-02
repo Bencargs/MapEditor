@@ -42,6 +42,19 @@ namespace MapEngine.Services.Map
         public int GetElevation(Vector2 location)
         {
             //var tile = GetTile(location);
+            // todo: should each tile have a heightmap?
+            // pretty cumbersome to load in thousands of differant heightmaps for a map file
+            // what about a single heightmap is divided into individual tile heights?
+
+            //options:
+            // 1. get heightmap texture
+            // find the relative point in the texture of this location
+            // tiles are uneccessary
+
+            // 2. get texture on load
+            // divide up heightmap to each tile
+            // save a byte array to each tile
+
             var tile = GetTile(new Vector2(0, 0));
 
             if (TextureFactory.TryGetTexture(tile.HeightmapTextureId, out var heightmap))
@@ -63,14 +76,13 @@ namespace MapEngine.Services.Map
             int width = tiles.GetLength(0);
             int height = tiles.GetLength(1);
 
-            //Vector3[,] normals = new Vector3[width, height];
-
             for (int x = 0; x < width; x++)
             {
                 for (int y = 0; y < height; y++)
                 {
+                    //todo: average all points of elevation in tile bounds?
                     // Get the height values of neighboring tiles
-                    int elevation = GetElevation(tiles[x, y].Location); // elevation is cooked
+                    int elevation = GetElevation(tiles[x, y].Location);
                     int elevationLeft = (x > 0) ? GetElevation(tiles[x - 1, y].Location) : elevation;
                     int elevationRight = (x < width - 1) ? GetElevation(tiles[x + 1, y].Location) : elevation;
                     int elevationUp = (y > 0) ? GetElevation(tiles[x, y - 1].Location) : elevation;

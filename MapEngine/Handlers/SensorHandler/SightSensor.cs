@@ -33,7 +33,7 @@ using MapEngine.Services.Map;
             // the collision polygon only needs updating in certain circumstances
             if (sensor.VisibilityRaycast is null || entity.IsMoving())
             {
-                var entityHeight = entity.Height();
+                var entityHeight = entity.Elevation();
                 GenerateVisibilityRaycast(entityHeight, entityLocation, center, sensor);
             }
 
@@ -95,7 +95,7 @@ using MapEngine.Services.Map;
                     }
 
                     // Test for intersections above maximum view elevation
-                    var mapHeight = _mapService.GetHeight(mapLocation);
+                    var mapHeight = _mapService.GetElevation(mapLocation);
                     if (mapHeight > maxRayHeight++) // assuming horizontal vision is start 45 degree arc
                     {
                         sensor.VisibilityRaycast.Points.Add(r);
