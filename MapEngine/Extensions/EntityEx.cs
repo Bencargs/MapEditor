@@ -1,10 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
+using Common;
 using Common.Collision;
 using Common.Entities;
 using MapEngine.Entities.Components;
 using MapEngine.Factories;
 using MapEngine.Handlers;
+using MapEngine.Services.Map;
 
 namespace MapEngine.Entities
 {
@@ -24,10 +27,10 @@ namespace MapEngine.Entities
             return location.Location;
         }
 
-        public static int Height(this Entity entity)
+        public static int Elevation(this Entity entity)
         {
             var location = entity.GetComponent<LocationComponent>();
-            return location.Height;
+            return location.Elevation;
         }
 
         public static bool IsMoving(this Entity entity)
@@ -61,9 +64,31 @@ namespace MapEngine.Entities
             if (colliderComponent == null)
                 return null; //  todo: null object?
 
-            var sourceLocation = entity.GetComponent<LocationComponent>().Location;
-            var collider = colliderComponent.GetCollider(sourceLocation);// yuck
+            var sourceLocation = entity.Location();
+            var test = new Vector2(sourceLocation.X - 12, sourceLocation.Y - 12);
+            var collider = colliderComponent.GetCollider(test);// yuck
+
+            //var facingAngle = entity.GetComponent<LocationComponent>().FacingAngle;
+            //var rotated = collider.Rotate(facingAngle);
+            //return rotated;
+
             return collider;
+        }
+
+        public static bool IsNavigable(this Entity entity, Tile tile)
+        {
+            // todo: if a unit is larger than a tile, it will navigate through a space smaller than itself
+            // get unit bounding box
+            // get all contained tiles centered on this tile
+            // if we fit within them all - then navigable
+
+            var movementComponent = entity.GetComponent<MovementComponent>();
+            if (movementComponent == null || tile is null) return false;
+
+            var terrainTypes = movementComponent.Terrains;
+            var tileGradient = tile.GetGradient();
+
+            return terrainTypes.Contains(tile.Type) && tileGradient <= movementComponent.MaxGradient;
         }
 
         public static void ReplaceOrders(this Entity entity, IEnumerable<MoveOrder> orders)

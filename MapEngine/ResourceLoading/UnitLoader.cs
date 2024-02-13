@@ -104,18 +104,14 @@ namespace MapEngine.ResourceLoading
                     Velocity = Vector3.Zero,
                     Steering = Vector2.Zero,
                     MaxVelocity = (float)movement.MaxVelocity,
+                    MaxGradient = (float)(movement.MaxGradient ?? 0.45f),
                     Mass = (float)(movement.Mass ?? 1),
                     MaxForce = (float)movement.MaxForce,
                     StopRadius = (float)movement.StopRadius,
                     BrakeForce = (float)movement.BrakeForce,
                     Terrains = movement.Terrains != null 
                         ? ((IEnumerable<dynamic>)movement.Terrains).Select(x => (TerrainType)x).ToArray()
-                        : DefaultTerrain,
-                    MovementMask = movement.MovementMask != null
-                        ? ((IEnumerable<dynamic>)unitData.Movement.MovementMask).Select(x =>
-                            ((IEnumerable<dynamic>)x).Select(y => ((int)y.Item1, (int)y.Item2)))
-                            .To2DArray()
-                        : DefaultMask
+                        : DefaultTerrain
                 });
             }
 
@@ -175,13 +171,7 @@ namespace MapEngine.ResourceLoading
             return entity;
         }
 
-        private static readonly (int, int)[,] DefaultMask = {
-			{ (-1, -1), (0, -1), (1, -1) },
-            { (-1,  0), (0,  0), (1,  0) },
-            { (-1,  1), (0,  1), (1,  1) }
-        };
-
-        private static readonly TerrainType[] DefaultTerrain = new[] { TerrainType.Land };
+        private static readonly TerrainType[] DefaultTerrain = { TerrainType.Land };
 
         // todo: move this to an entity extension class?
         // or put it on entity class?

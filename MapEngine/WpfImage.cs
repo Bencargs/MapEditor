@@ -72,6 +72,8 @@ namespace MapEngine
             get
             {
                 var index = (x * 4) + ((y * 4) * Width);
+                if (index > Buffer.Length)
+                    return new Colour(0, 0, 0, 100);
 
                 var colour = new Colour(
                     Buffer[index],

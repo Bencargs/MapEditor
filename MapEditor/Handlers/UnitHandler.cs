@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using Common;
 using MapEditor.Commands;
 using MapEditor.Common;
 using MapEditor.Components;
@@ -13,6 +14,7 @@ using MapEditor.Entities;
 using MapEditor.Handlers.CollisionHandler;
 using MapEditor.Repository;
 using Newtonsoft.Json;
+using Rectangle = System.Drawing.Rectangle;
 
 namespace MapEditor.Handlers
 {

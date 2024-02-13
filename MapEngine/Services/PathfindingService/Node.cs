@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace MapEngine.Services.PathfindingService
 {
@@ -13,7 +14,7 @@ namespace MapEngine.Services.PathfindingService
             Item = source;
         }
 
-        public T[] ToArray()
+        public List<T> ToList()
         {
             var results = new Stack<T>();
             var latest = this;
@@ -22,7 +23,7 @@ namespace MapEngine.Services.PathfindingService
                 results.Push(latest.Item);
                 latest = latest.Previous;
             }
-            return results.ToArray();
+            return results.ToList();
         }
     }
 }

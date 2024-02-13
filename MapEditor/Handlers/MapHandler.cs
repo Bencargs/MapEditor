@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using Common;
 using MapEditor.Commands;
 using MapEditor.Common;
 using MapEditor.Engine;
 using MapEditor.Entities;
 using MapEditor.Repository;
+using Rectangle = System.Drawing.Rectangle;
+using Tile = MapEditor.Engine.Tile;
 
 namespace MapEditor.Handlers
 {

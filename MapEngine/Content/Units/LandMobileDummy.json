@@ -1,5 +1,5 @@
 {
-	"Type":"MobileDummy",
+	"Type":"LandMobileDummy",
 	"Image": {
 		"Width":24,
 		"Height":24,
@@ -8,12 +8,11 @@
 	"Movement": {
 		"MaxVelocity":100,
 		"MaxGradient": 0.45,
-		"Mass":1000,
+		"Mass":300,
 		"MaxForce":100,
 		"StopRadius":12,
-		"BrakeForce":0.05,
+		"BrakeForce":1.0,
 		"Terrains":[
-			1,
 			2
 		]
 	},
@@ -23,13 +22,4 @@
 			"Height":24,
 		}
 	},
-	//"Sensors": [{
-	//		"Type": "Sight",
-	//		"Radius": 200
-	//	},
-	//	{
-	//		"Type": "Radar",
-	//		"Radius": 200
-	//	}
-	//]
 }

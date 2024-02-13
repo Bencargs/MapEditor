@@ -16,12 +16,12 @@ namespace MapEngine.Entities.Components
         public float BrakeForce { get; set; }
 
         public float MaxVelocity { get; set; }
+        public float MaxGradient { get; set; }
         public float Mass { get; set; }
         public float MaxForce { get; set; }
         public float StopRadius { get; set; }
 
         public Queue<MoveOrder> Destinations = new Queue<MoveOrder>();
-        public (int X, int Y)[,] MovementMask { get; set; }
         public TerrainType[] Terrains { get; set; }
 
         public IComponent Clone()
@@ -31,11 +31,11 @@ namespace MapEngine.Entities.Components
                 Velocity = Velocity,
                 Steering = Steering,
                 MaxVelocity = MaxVelocity,
+                MaxGradient = MaxGradient,
                 Mass = Mass,
                 MaxForce = MaxForce,
                 StopRadius = StopRadius,
                 BrakeForce = BrakeForce,
-                MovementMask = MovementMask,
                 Terrains = Terrains,
                 Destinations = new Queue<MoveOrder>(Destinations.Select(x => x.Clone()))
             };

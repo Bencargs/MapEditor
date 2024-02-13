@@ -1,4 +1,5 @@
-﻿using Common;
+﻿using System.Numerics;
+using Common;
 using MapEngine.Commands;
 using MapEngine.Entities;
 using MapEngine.Entities.Components;
@@ -83,8 +84,8 @@ namespace MapEngine.Handlers
         public void Handle(CreateEntityCommand command)
         {
             var entity = command.Entity;
-            var mapHeight = _mapService.GetHeight(entity.Location());
-            entity.GetComponent<LocationComponent>().Height = mapHeight;
+            var mapHeight = _mapService.GetElevation(entity.Location());
+            entity.GetComponent<LocationComponent>().Elevation = mapHeight;
         }
     }
 }

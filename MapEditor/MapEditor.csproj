@@ -65,7 +65,7 @@
     <Compile Include="Commands\SelectUnitsCommand.cs" />
     <Compile Include="Commands\StopCommand.cs" />
     <Compile Include="Commands\UndoCommand.cs" />
-    <Compile Include="Commands\UnitComponent.cs" />
+    <Compile Include="Entities\Components\UnitComponent.cs" />
     <Compile Include="Common\CollisionEx.cs" />
     <Compile Include="Common\EntityEx.cs" />
     <Compile Include="Common\Matrix.cs" />
@@ -86,7 +86,6 @@
     <Compile Include="Engine\IHandleCommand.cs" />
     <Compile Include="Engine\ITarget.cs" />
     <Compile Include="Engine\Terrain.cs" />
-    <Compile Include="Engine\TerrainType.cs" />
     <Compile Include="File\MapFile.cs" />
     <Compile Include="Handlers\CollisionHandler\ColliderType.cs" />
     <Compile Include="Handlers\CollisionHandler\CollisionHandler.cs" />

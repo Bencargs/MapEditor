@@ -2,8 +2,9 @@
 {
 	public enum TerrainType
 	{
-		Empty = 0,
-		Water,
-		Land,
-	}
+        Empty = 0,
+        Water,
+        Land,
+        Impassable,
+    }
 }

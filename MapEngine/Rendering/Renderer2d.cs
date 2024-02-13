@@ -36,7 +36,8 @@ namespace MapEngine.Rendering
 
                 // Rotate image to movement / facing angle
                 var texture = entity.Texture();
-                var rotated = texture.Image.Rotate(location.FacingAngle);
+                // todo: figure out why must this negative to rotate the right direction
+                var rotated = texture.Image.Rotate(-location.FacingAngle);
                 
                 // Translate against camera movement
                 var area = rotated.Area(location.Location);

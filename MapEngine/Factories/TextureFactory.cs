@@ -16,7 +16,7 @@ namespace MapEngine.Factories
                 var name = Path.GetFileNameWithoutExtension(file).ToUpper();
                 var animation = TextureLoader.LoadAnimation(file);
                 var texture = new Texture(animation);
-                _textures.Add(name, texture);
+                _textures[name] = texture;
             }
 
             foreach (var file in Directory.GetFiles(filepath, "*.png"))
@@ -24,7 +24,7 @@ namespace MapEngine.Factories
                 var name = Path.GetFileNameWithoutExtension(file);
                 var image = TextureLoader.LoadImage(file);
                 var texture = new Texture(image);
-                _textures.Add(name, texture);
+                _textures[name] = texture;
             }
         }
 

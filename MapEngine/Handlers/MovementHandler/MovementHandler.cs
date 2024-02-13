@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using MapEngine.Entities;
 using MapEngine.Services.PathfindingService;
 using MapEngine.Services.Map;
 
@@ -44,6 +45,14 @@ namespace MapEngine.Handlers
                 return;
 
             ApplyGravity(location, movement);
+
+            // pathing into un-navigable terrain - hard stop
+            var tile = _mapService.GetTile(location.Location);
+            if (!entity.IsNavigable(tile))
+            {
+                movement.Velocity = Vector3.Zero;
+            }
+
             if (TryGetTarget(location, movement, out var target))
             {
                 switch (target.MovementMode)
@@ -57,15 +66,15 @@ namespace MapEngine.Handlers
                         // 2. Update Speed
                         // 3. Update Position?
                         Seek(location, movement, target.Destination);
-                        ApplyFriction(movement);
+                        ApplyFriction(location, movement);
                         break;
                 }
             }
-            else
+            else if (movement.Velocity.Length() > 0)
             {
                 // eg. an entity having a force applied to it
                 location.Location += movement.Velocity.ToVector2();
-                ApplyFriction(movement);
+                ApplyFriction(location, movement);
             }
         }
 
@@ -73,26 +82,27 @@ namespace MapEngine.Handlers
         {
             //todo: this is ick
             const int Gravity = -1;// 9.81 in tenths of meters rounded to int
-            var mapHeight = _mapService.GetHeight(location.Location);
-            
+
+            var mapHeight = _mapService.GetElevation(location.Location);
+
             // Eg. airborne - apply gravity to velocity, and apply velocity to height
             movement.Velocity += new Vector3(0, 0, Gravity);
-            location.Height += (int)movement.Velocity.Z;
+            location.Elevation += (int)movement.Velocity.Z;
 
             // Eg. on surface - follow terrain and remove downward velocity
-            if (location.Height <= mapHeight)
+            if (location.Elevation <= mapHeight)
             {
                 movement.Velocity = new Vector3(movement.Velocity.X, movement.Velocity.Y, 0);
-                location.Height = mapHeight;
+                location.Elevation = mapHeight;
             }
         }
 
 
-        private static void ApplyFriction(MovementComponent movement)
+        private void ApplyFriction(LocationComponent location, MovementComponent movement)
         {
-            const float Friction = 0.95f; // Ideally this would be a property of the map tile
+            var friction = _mapService.GetFriction(location.Location);
 
-            movement.Velocity *= Friction;
+            movement.Velocity *= friction;
         }
 
         private static void ApplyBrakeForce(MovementComponent movement)
@@ -100,7 +110,7 @@ namespace MapEngine.Handlers
             movement.Velocity -= movement.Velocity.Truncate(movement.BrakeForce);
         }
 
-        private static bool TryGetTarget(LocationComponent location, MovementComponent movement, out MoveOrder target)
+        private bool TryGetTarget(LocationComponent location, MovementComponent movement, out MoveOrder target)
         {
             target = movement.Destinations.FirstOrDefault();
             if (target == null)
@@ -117,7 +127,7 @@ namespace MapEngine.Handlers
 
         private static bool HasArrived(Vector2 location, Vector2 target, float stopRadius)
         {
-            return Math.Abs(location.Distance(target)) < stopRadius;
+            return Math.Abs(Vector2.Distance(location, target)) < stopRadius;
         }
 
         private static void Seek(LocationComponent location, MovementComponent target, Vector2 destination)
@@ -160,18 +170,23 @@ namespace MapEngine.Handlers
 
         public void Handle(MoveCommand command)
         {
-            var movementComponent = command.Entity.GetComponent<MovementComponent>();
+            var entityDestinations = FormationService.GetFormationPositions(command.Entities, command.Destination);
+            foreach (var entity in command.Entities)
+            {
+                var movementComponent = entity.GetComponent<MovementComponent>();
 
-            var path = _pathfinding.GetPath(command.Entity, command.Destination);
-            var orders = ToMoveOrders(path, command.MovementMode);
+                var destination = entityDestinations[entity];
+                var path = _pathfinding.GetPath(entity, destination);
+                var orders = ToMoveOrders(path, command.MovementMode);
 
-            if (!command.Queue)
-                movementComponent.Destinations.Clear();
+                if (!command.Queue)
+                    movementComponent.Destinations.Clear();
 
-            movementComponent.Destinations.Enqueue(orders);
+                movementComponent.Destinations.Enqueue(orders);
+            }
         }
 
-        private static IEnumerable<MoveOrder> ToMoveOrders(Tile[] path, MovementMode movementMode) =>
+        private static IEnumerable<MoveOrder> ToMoveOrders(List<Tile> path, MovementMode movementMode) =>
             path.Select(x => new MoveOrder
             {
                 MovementMode = movementMode,

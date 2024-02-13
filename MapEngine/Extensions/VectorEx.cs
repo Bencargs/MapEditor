@@ -58,11 +58,6 @@ namespace MapEngine
             return Vector3.Normalize(source);
         }
 
-        public static float Distance(this Vector2 source, Vector2 destination)
-        {
-            return Vector2.Distance(source, destination);
-        }
-
         public static Vector2 ToVector2(this Vector3 source)
         {
             return new Vector2(source.X, source.Y);
