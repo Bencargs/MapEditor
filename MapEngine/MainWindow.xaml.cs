@@ -7,6 +7,7 @@ using System.Numerics;
 using System.Runtime.Remoting.Channels;
 using System.Windows;
 using System.Windows.Threading;
+using Common;
 using Common.Entities;
 using MapEngine.Entities.Components;
 using MapEngine.Factories;
@@ -29,7 +30,9 @@ namespace MapEngine
 
             var messageHub = container.Resolve<MessageHub>();
             var graphics = container.Resolve<WpfGraphics>();
+
             _scene = new Scene(graphics, messageHub,
+                container.Resolve<GameTime>(),
                 container.Resolve<MapHandler>(),
                 container.Resolve<EntityHandler>(),
                 container.Resolve<CameraHandler>(),

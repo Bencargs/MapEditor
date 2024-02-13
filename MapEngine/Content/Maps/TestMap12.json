@@ -1,0 +1,71 @@
+{
+  "Width": 768,
+  "Height": 512,
+  "Description":"Day Night Cycle",
+  "TileWidth":1,
+  "TileHeight":1,
+  "GameTime": {
+	  "HourOfDay": 12,
+	  "SecondsPerSecond": 3600 
+  },
+  "Camera": {
+	"X": 0,
+	"Y": 0,
+	"Z": 10,
+	"Width": 768,
+	"Height": 512
+  },
+  "Teams": [
+	{
+		"Id":0,
+		"Name":"Player"
+	}
+  ],
+  "Effects": [
+	{
+	  "Name": "DiffuseEffect",
+	  "Sources": [
+	    {
+		  "Name": "Night",
+		  "Colour": {"R": 24, "B": 0, "G": 0, "A": 160},
+		  "On": 19,
+		  "Off": 5
+		},
+		{
+		  "Name": "Morning",
+		  "Colour": {"R": 96, "B": 8, "G": 8, "A": 64},
+		  "IsTransition": true,
+		  "On": 5,
+		  "Off": 8
+		},
+		{
+		  "Name": "Midday",
+		  "Colour": {"R": 0, "B": 0, "G": 0, "A": 1},
+		  "On": 8,
+		  "Off": 17
+		},
+		{
+		  "Name": "Evening",
+		  "Colour": {"R": 8, "B": 8, "G": 96, "A": 64},
+		  "IsTransition": true,
+		  "On": 17,
+		  "Off": 19
+		}
+	  ]
+	}
+  ],
+  "Tiles": [
+   {
+    "Id": 0,
+	"TextureId": "BridgeTexture",
+	"LightMapIds": {
+		"Night": "BridgeLightmapNight"
+	},
+    "Location": {
+      "X": 0.0,
+      "Y": 0.0
+    },
+    "Type": 2
+  }
+ ]
+}

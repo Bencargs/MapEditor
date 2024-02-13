@@ -7,7 +7,6 @@ using MapEngine.Factories;
 using MapEngine.ResourceLoading;
 using MapEngine.Rendering;
 using MapEngine.Services.Map;
-using MapEngine.Handlers.SensorHandler;
 
 namespace MapEngine.Handlers
 {

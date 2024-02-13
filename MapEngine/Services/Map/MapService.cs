@@ -4,6 +4,7 @@ using MapEngine.Services.Effects.FluidEffect;
 using MapEngine.Services.Effects.WaveEffect;
 using System;
 using System.Numerics;
+using MapEngine.Services.Effects.LightingEffect;
 using Vector2 = System.Numerics.Vector2;
 
 namespace MapEngine.Services.Map
@@ -20,6 +21,7 @@ namespace MapEngine.Services.Map
         public int Height => _map.Height;
         public FluidEffects FluidEffects => _map.FluidEffects; // todo: this all seems a little redundant, whats the value add here?
         public WaveEffects WaveEffects => _map.WaveEffects;
+        public LightingEffects LightingEffects => _map.LightingEffects;
 
         public void Initialise(Map map)
         {
