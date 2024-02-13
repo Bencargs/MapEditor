@@ -4,6 +4,7 @@ using MapEngine.Commands;
 using MapEngine.Services.Effect;
 using MapEngine.Services.Effects.WaveEffect;
 using System.Collections.Generic;
+using MapEngine.Services.Effects.LightingEffect;
 
 namespace MapEngine.Handlers
 {
@@ -16,14 +17,15 @@ namespace MapEngine.Handlers
     {
         private readonly WaveEffectService _waveService;
         private readonly FluidEffectService _fluidEffectService;
-        private readonly List<Entity> _entities = new List<Entity>();
+        private readonly LightingEffectService _lightingEffectService;
 
         public EffectsHandler(
             WaveEffectService waveService,
-            FluidEffectService fluidEffectService)
+            FluidEffectService fluidEffectService, LightingEffectService lightingEffectService)
         {
             _waveService = waveService;
             _fluidEffectService = fluidEffectService;
+            _lightingEffectService = lightingEffectService;
         }
 
         public void Initialise()
@@ -46,6 +48,9 @@ namespace MapEngine.Handlers
 
             var fluidRender = _fluidEffectService.GenerateBitmap();
             graphics.DrawBytes(fluidRender, viewport);
+
+            var diffuseRender = _lightingEffectService.ApplyDiffuseLight(viewport);
+            graphics.DrawBytes(diffuseRender, viewport);
         }
 
         public void Handle(CreateEntityCommand command)

@@ -2,6 +2,7 @@
 using System;
 using System.Numerics;
 using System.Windows.Media.Imaging;
+using MapEngine.Extensions;
 
 namespace MapEngine
 {
@@ -83,6 +84,7 @@ namespace MapEngine
                     continue;
 
                 var opacity = buffer[i + 3] / 255f;
+                // todo: keep previous pixel operations? averaging washes out the image
                 _backBuffer[k + 0] = MergePixel(_backBuffer[k + 0], buffer[i + 0], opacity);
                 _backBuffer[k + 1] = MergePixel(_backBuffer[k + 1], buffer[i + 1], opacity);
                 _backBuffer[k + 2] = MergePixel(_backBuffer[k + 2], buffer[i + 2], opacity);
@@ -103,9 +105,9 @@ namespace MapEngine
                 var original = GetPixel(x, y);
 
                 var newColour = new Colour(
-                    (byte)Math.Max(0, original.Red - 255 * amount),
-                    (byte)Math.Max(0, original.Blue - 255 * amount),
-                    (byte)Math.Max(0, original.Green - 255 * amount),
+                    (byte)(original.Red - 255 * amount).Clamp(0, 255),
+                    (byte)(original.Blue - 255 * amount).Clamp(0, 255),
+                    (byte)(original.Green - 255 * amount).Clamp(0, 255),
                     original.Alpha);
 
                 SetPixel(x, y, newColour);

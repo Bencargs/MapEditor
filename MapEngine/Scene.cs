@@ -11,6 +11,7 @@ namespace MapEngine
     {
         private readonly IGraphics _graphics;
         private readonly MessageHub _messageHub;
+        private readonly GameTime _gameTime;
         private readonly MapHandler _mapHandler;
         private readonly EntityHandler _unitHandler;
         private readonly CameraHandler _cameraHandler;
@@ -21,6 +22,7 @@ namespace MapEngine
         public Scene(
             IGraphics graphics,
             MessageHub messageHub,
+            GameTime gameTime,
             MapHandler mapHandler,
             EntityHandler unitHandler,
             CameraHandler cameraHandler,
@@ -30,6 +32,7 @@ namespace MapEngine
         {
             _graphics = graphics;
             _messageHub = messageHub;
+            _gameTime = gameTime;
             _mapHandler = mapHandler;
             _unitHandler = unitHandler;
             _cameraHandler = cameraHandler;
@@ -40,7 +43,7 @@ namespace MapEngine
 
         public void Initialise()
         {
-            var mapFilename = @"C:\Source\MapEditor\MapEngine\Content\Maps\TestMap11.json";
+            var mapFilename = @"C:\Source\MapEditor\MapEngine\Content\Maps\TestMap12.json";
             _cameraHandler.Initialise(mapFilename);
             _mapHandler.Initialise(mapFilename);
             
@@ -53,23 +56,19 @@ namespace MapEngine
             _effectsHandler.Initialise();
         }
 
-        double _totalElapsed = 0;
-        int _frameCount = 0;
         public void Display()
         {
+            // todo: move to gametime
             // todo: currently fixed timestep gameloop - upgrade to variable
-            var startTime = DateTime.Now;
+            _gameTime.StartFrame();
 
             Update();
 
             Render();
 
-            var endTime = DateTime.Now;
-            var elapsed = (endTime - startTime).TotalMilliseconds;
-            _totalElapsed += elapsed;
-            _frameCount++;
+            _gameTime.EndFrame();
 
-            Console.WriteLine($"Average FPS: {_frameCount / _totalElapsed * 1000f}");
+            Console.WriteLine($"Average FPS: {_gameTime.CalculateAverageFps()}");
         }
 
         private void Update()
