@@ -53,6 +53,7 @@ namespace MapEngine
             builder.RegisterType<PathfindingService>().SingleInstance();
             builder.RegisterType<WaveEffectService>().SingleInstance();
             builder.RegisterType<FluidEffectService>().SingleInstance();
+            builder.RegisterType<ShadowEffectService>().SingleInstance();
             builder.RegisterType<LightingEffectService>().SingleInstance();
         }
 

@@ -57,7 +57,7 @@ namespace MapEngine.Handlers.SensorHandler
             }
         }
 
-        public void DrawLayer(Rectangle viewport, IGraphics graphics)
+        public float[] GenerateBitmap(Rectangle viewport, IGraphics graphics)
         {
             var fieldOfView = new float[viewport.Width * viewport.Height];
             for (int i = 0; i < fieldOfView.Length; i++) fieldOfView[i] = 0.25f;
@@ -83,7 +83,7 @@ namespace MapEngine.Handlers.SensorHandler
                 }
             }
 
-            graphics.Desaturate(fieldOfView, viewport);
+            return fieldOfView;
         }
 
         public void Handle(CreateEntityCommand command)

@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using MapEngine.Extensions;
 
 namespace MapEngine.ResourceLoading
 {
@@ -89,10 +90,10 @@ namespace MapEngine.ResourceLoading
                 ambientLighting = ((IEnumerable<dynamic>)ambientConfig.Sources)
                     .Select(x => new LightingEffects.AmbientLight
                     {
-                        Name = x.Name,
                         TextureId = x.TextureId,
                         On = (int)x.On,
                         Off = (int)x.Off,
+                        Location = new Vector2((int)x.Location.X, (int)x.Location.Y)
                     }).ToArray();
             }
 
@@ -105,7 +106,7 @@ namespace MapEngine.ResourceLoading
                     {
                         Name = x.Name,
                         Colour = new Colour((byte)x.Colour.R, (byte)x.Colour.B, (byte)x.Colour.G, (byte)x.Colour.A),
-                        IsTransition = (bool)(x.IsTransition ?? false),
+                        TransitionType =  EnumEx.ParseOrDefault<LightingEffects.TransitionType>((string) x.TransitionType),
                         On = (int)x.On,
                         Off = (int)x.Off,
                     }).ToArray();

@@ -22,32 +22,75 @@
 	}
   ],
   "Effects": [
+    {
+	  "Name": "AmbientEffect",
+	  "Sources": [
+	    {
+	      "TextureId": "PointLight",
+	      "On": 17,
+	      "Off": 6,
+		  "Location": {
+			"X": 40,
+			"Y": 0
+		  }
+	    },
+		{
+	      "TextureId": "PointLight",
+	      "On": 18,
+	      "Off": 7,
+		  "Location": {
+			"X": 50,
+			"Y": 78
+		  }
+	    },
+		{
+	      "TextureId": "PointLight",
+	      "On": 18,
+	      "Off": 7,
+		  "Location": {
+			"X": 10,
+			"Y": 82
+		  }
+	    },
+		{
+	      "TextureId": "Footlights",
+	      "On": 18.5,
+	      "Off": 7.3,
+		  "Location": {
+			"X": 384,
+			"Y": 268
+		  }
+	    },
+	  ]
+    },
 	{
 	  "Name": "DiffuseEffect",
 	  "Sources": [
 	    {
 		  "Name": "Night",
 		  "Colour": {"R": 24, "B": 0, "G": 0, "A": 160},
+		  "TransitionType": "Immediate",
 		  "On": 19,
 		  "Off": 5
 		},
 		{
 		  "Name": "Morning",
 		  "Colour": {"R": 96, "B": 8, "G": 8, "A": 64},
-		  "IsTransition": true,
+		  "TransitionType": "Fade",
 		  "On": 5,
 		  "Off": 8
 		},
 		{
 		  "Name": "Midday",
 		  "Colour": {"R": 0, "B": 0, "G": 0, "A": 1},
+		  "TransitionType": "Immediate",
 		  "On": 8,
 		  "Off": 17
 		},
 		{
 		  "Name": "Evening",
 		  "Colour": {"R": 8, "B": 8, "G": 96, "A": 64},
-		  "IsTransition": true,
+		  "TransitionType": "Fade",
 		  "On": 17,
 		  "Off": 19
 		}
@@ -58,9 +101,7 @@
    {
     "Id": 0,
 	"TextureId": "BridgeTexture",
-	"LightMapIds": {
-		"Night": "BridgeLightmapNight"
-	},
+	"HeightmapTextureId": "BridgeHeightmap",
     "Location": {
       "X": 0.0,
       "Y": 0.0
