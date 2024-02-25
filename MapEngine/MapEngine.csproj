@@ -107,6 +107,7 @@
     <Compile Include="Extensions\EntityEx.cs" />
     <Compile Include="Extensions\DegreesEx.cs" />
     <Compile Include="Extensions\EnumerableEx.cs" />
+    <Compile Include="Extensions\EnumEx.cs" />
     <Compile Include="Extensions\MathEx.cs" />
     <Compile Include="Factories\ModelFactory.cs" />
     <Compile Include="Factories\ParticleFactory.cs" />
@@ -140,6 +141,7 @@
     <Compile Include="Services\Effects\FluidEffect\FluidEffectService.cs" />
     <Compile Include="Services\Effects\LightingEffect\LightingEffects.cs" />
     <Compile Include="Services\Effects\LightingEffect\LightingEffectService.cs" />
+    <Compile Include="Services\Effects\LightingEffect\ShadowEffectService.cs" />
     <Compile Include="Services\Effects\WaveEffect\WaterParticle.cs" />
     <Compile Include="Services\Effects\WaveEffect\WaveEffects.cs" />
     <Compile Include="Services\Effects\WaveEffect\WaveEffectService.cs" />

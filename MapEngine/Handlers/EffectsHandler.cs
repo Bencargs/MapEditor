@@ -1,37 +1,42 @@
 ﻿using Common;
-using Common.Entities;
 using MapEngine.Commands;
 using MapEngine.Services.Effect;
 using MapEngine.Services.Effects.WaveEffect;
-using System.Collections.Generic;
 using MapEngine.Services.Effects.LightingEffect;
 
 namespace MapEngine.Handlers
 {
-    // todo: too broard? should there be a seperate handler for each effect type?
     public class EffectsHandler
         : IHandleCommand<CreateEntityCommand>
         , IHandleCommand<DestroyEntityCommand>
         , IHandleCommand<MoveCommand>
         , IHandleCommand<CreateEffectCommand>
     {
+        private readonly SensorHandler.SensorHandler _sensorHandler;
         private readonly WaveEffectService _waveService;
         private readonly FluidEffectService _fluidEffectService;
         private readonly LightingEffectService _lightingEffectService;
+        private readonly ShadowEffectService _shadowService;
 
         public EffectsHandler(
             WaveEffectService waveService,
-            FluidEffectService fluidEffectService, LightingEffectService lightingEffectService)
+            FluidEffectService fluidEffectService, 
+            LightingEffectService lightingEffectService, 
+            SensorHandler.SensorHandler sensorHandler, 
+            ShadowEffectService shadowService)
         {
             _waveService = waveService;
             _fluidEffectService = fluidEffectService;
             _lightingEffectService = lightingEffectService;
+            _sensorHandler = sensorHandler;
+            _shadowService = shadowService;
         }
 
         public void Initialise()
         {
             _waveService.Initialise();
             _fluidEffectService.Initialise();
+            _shadowService.Initialise();
         }
 
         public void Update()
@@ -49,8 +54,14 @@ namespace MapEngine.Handlers
             var fluidRender = _fluidEffectService.GenerateBitmap();
             graphics.DrawBytes(fluidRender, viewport);
 
-            var diffuseRender = _lightingEffectService.ApplyDiffuseLight(viewport);
-            graphics.DrawBytes(diffuseRender, viewport);
+            var lightingRender = _lightingEffectService.GenerateBitmap(viewport);
+            graphics.DrawBytes(lightingRender, viewport);
+
+            var shadowRender = _shadowService.GenerateBitmap(viewport);
+            graphics.DrawBytes(shadowRender, viewport);
+
+            var sensorRender = _sensorHandler.GenerateBitmap(viewport, graphics);
+            graphics.Desaturate(sensorRender, viewport);
         }
 
         public void Handle(CreateEntityCommand command)

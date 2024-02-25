@@ -75,7 +75,6 @@ namespace MapEngine.Handlers
 
         public void Render(Rectangle viewport, IGraphics graphics)
         {
-            _sensorHandler.DrawLayer(viewport, graphics);
             _3dRenderer.DrawLayer(viewport, graphics);
             _2dRenderer.DrawLayer(viewport, graphics);
         }
