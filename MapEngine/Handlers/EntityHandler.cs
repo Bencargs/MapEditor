@@ -7,7 +7,6 @@ using MapEngine.Factories;
 using MapEngine.ResourceLoading;
 using MapEngine.Rendering;
 using MapEngine.Services.Map;
-using MapEngine.Handlers.SensorHandler;
 
 namespace MapEngine.Handlers
 {
@@ -76,7 +75,6 @@ namespace MapEngine.Handlers
 
         public void Render(Rectangle viewport, IGraphics graphics)
         {
-            _sensorHandler.DrawLayer(viewport, graphics);
             _3dRenderer.DrawLayer(viewport, graphics);
             _2dRenderer.DrawLayer(viewport, graphics);
         }

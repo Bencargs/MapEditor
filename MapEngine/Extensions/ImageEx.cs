@@ -68,7 +68,7 @@ namespace MapEngine
                 InterpolateComponent(endPoint1, endPoint2, fraction, x => x.Red),
                 InterpolateComponent(endPoint1, endPoint2, fraction, x => x.Blue),
                 InterpolateComponent(endPoint1, endPoint2, fraction, x => x.Green),
-                255);
+                InterpolateComponent(endPoint1, endPoint2, fraction, x => x.Alpha));
 
             return color;
         }

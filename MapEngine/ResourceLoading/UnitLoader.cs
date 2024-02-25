@@ -20,7 +20,7 @@ namespace MapEngine.ResourceLoading
             var json = File.ReadAllText(mapFile);
             dynamic mapData = JsonConvert.DeserializeObject(json);
 
-            var units = ((IEnumerable<dynamic>)mapData.Units).Select(u =>
+            var units = ((IEnumerable<dynamic>)mapData.Units)?.Select(u =>
             {
                 //Eg. flyweight pattern
                 UnitFactory.TryGetUnit((string)u.Type, out var prototype);
@@ -61,7 +61,7 @@ namespace MapEngine.ResourceLoading
                 return entity;
             }).ToArray();
 
-            return units;
+            return units ?? Array.Empty<Entity>();
         }
 
         public static Entity LoadUnitDefinition(string filename)
