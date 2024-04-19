@@ -12,6 +12,7 @@ namespace MapEngine.Services.Effects.LightingEffect
         {
             // todo: refactor this, really just need a colour and a radius
             public string TextureId { get; set; }
+            public bool LineOfSight { get; set; }
             public int On { get; set; }
             public int Off { get; set; }
             public Vector2 Location { get; set; }

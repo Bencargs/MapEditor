@@ -27,6 +27,7 @@
 	  "Sources": [
 	    {
 	      "TextureId": "PointLight",
+		  "LineOfSight": true,
 	      "On": 17,
 	      "Off": 6,
 		  "Location": {
@@ -36,6 +37,7 @@
 	    },
 		{
 	      "TextureId": "PointLight",
+		  "LineOfSight": true,
 	      "On": 18,
 	      "Off": 7,
 		  "Location": {
@@ -45,6 +47,7 @@
 	    },
 		{
 	      "TextureId": "PointLight",
+		  "LineOfSight": true,
 	      "On": 18,
 	      "Off": 7,
 		  "Location": {
@@ -54,6 +57,7 @@
 	    },
 		{
 	      "TextureId": "Footlights",
+		  "LineOfSight": false,
 	      "On": 18.5,
 	      "Off": 7.3,
 		  "Location": {

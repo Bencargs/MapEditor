@@ -91,6 +91,7 @@ namespace MapEngine.ResourceLoading
                     .Select(x => new LightingEffects.AmbientLight
                     {
                         TextureId = x.TextureId,
+                        LineOfSight = (bool)x.LineOfSight,
                         On = (int)x.On,
                         Off = (int)x.Off,
                         Location = new Vector2((int)x.Location.X, (int)x.Location.Y)

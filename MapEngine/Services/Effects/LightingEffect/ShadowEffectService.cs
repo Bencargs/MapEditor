@@ -55,7 +55,7 @@ namespace MapEngine.Services.Effects.LightingEffect
                         continue;
 
                     var index = (int)(shadowPoint.Y * viewport.Width + shadowPoint.X) * 4;
-                    fieldOfView[index + 3] = (byte)(fieldOfView[index + 3] + (128 * shadowIntensity));
+                    fieldOfView[index + 3] = (byte)(fieldOfView[index + 3] + (148 * shadowIntensity));
                 }
             }
 
