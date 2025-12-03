@@ -50,7 +50,8 @@ namespace MapEngine.Handlers
             var tile = _mapService.GetTile(location.Location);
             if (!entity.IsNavigable(tile))
             {
-                movement.Velocity = Vector3.Zero;
+                movement.Velocity = -movement.Velocity/2;
+                ApplyFriction(location, movement);
             }
 
             if (TryGetTarget(location, movement, out var target))
@@ -174,6 +175,8 @@ namespace MapEngine.Handlers
             foreach (var entity in command.Entities)
             {
                 var movementComponent = entity.GetComponent<MovementComponent>();
+                if (movementComponent == null)
+                    continue;
 
                 var destination = entityDestinations[entity];
                 var path = _pathfinding.GetPath(entity, destination);

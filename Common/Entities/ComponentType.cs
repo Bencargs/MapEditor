@@ -12,5 +12,6 @@
         Model,
         Sensor,
         Particle,
+        Cargo,
     }
 }

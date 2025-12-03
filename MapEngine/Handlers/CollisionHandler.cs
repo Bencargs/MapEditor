@@ -63,6 +63,8 @@ namespace MapEngine.Handlers
                         // If its a meaningful impact, modify velocity
                         var selfLocation = i.GetComponent<LocationComponent>();
                         var selfVelocity = i.GetComponent<MovementComponent>();
+                        if (selfVelocity == null || selfLocation == null)
+                            continue;
 
                         //https://gamedev.stackexchange.com/questions/15911/how-do-i-calculate-the-exit-vectors-of-colliding-projectiles
                         var collisionVector = (selfLocation.Location - sourceLocation.Location).Normalize();

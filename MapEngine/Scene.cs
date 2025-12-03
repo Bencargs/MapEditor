@@ -40,14 +40,14 @@ namespace MapEngine
 
         public void Initialise()
         {
-            var mapFilename = @"C:\Source\MapEditor\MapEngine\Content\Maps\TestMap11.json";
+            var mapFilename = @"C:\src\MapEditor\MapEngine\Content\Maps\TestMap12.json";
             _cameraHandler.Initialise(mapFilename);
             _mapHandler.Initialise(mapFilename);
             
-            var weaponsPath = @"C:\Source\MapEditor\MapEngine\Content\Weapons\";
-            var unitsPath = @"C:\Source\MapEditor\MapEngine\Content\Units\";
-            var modelsPath = @"C:\Source\MapEditor\MapEngine\Content\Models";
-            var particlesPath = @"C:\Source\MapEditor\MapEngine\Content\Particles";
+            var weaponsPath = @"C:\src\MapEditor\MapEngine\Content\Weapons\";
+            var unitsPath = @"C:\src\MapEditor\MapEngine\Content\Units\";
+            var modelsPath = @"C:\src\MapEditor\MapEngine\Content\Models";
+            var particlesPath = @"C:\src\MapEditor\MapEngine\Content\Particles";
             _unitHandler.Initialise(unitsPath, mapFilename, weaponsPath, modelsPath, particlesPath);
 
             _effectsHandler.Initialise();
