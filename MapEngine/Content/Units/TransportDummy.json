@@ -1,0 +1,26 @@
+{
+	"Type":"TransportDummy",
+	"Image": {
+		"Width":642,
+		"Height":82,
+		"TextureId": "Shipyard"
+	},
+	"Area": {
+		"BoundingBox": {
+			"Width":642,
+			"Height":82,
+		}
+	},
+	"Weapons": [
+		"Cannon",
+	],
+	"Cargo": {
+		"Capacity":1,
+		"UnloadPoint":{
+			"X":120,
+			"Y":14
+		},
+		"StopRadius":10.0,
+		"UnloadVelocity":10.0
+	}
+}

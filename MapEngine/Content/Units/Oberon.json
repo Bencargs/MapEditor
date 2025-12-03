@@ -1,0 +1,25 @@
+{
+	"Type":"Oberon",
+	"Image": {
+		"Width":200,
+		"Height":24,
+		"TextureId": "Oberon"
+	},
+	"Movement": {
+		"MaxVelocity":100,
+		"MaxGradient": 0.45,
+		"Mass":1000,
+		"MaxForce":100,
+		"StopRadius":12,
+		"BrakeForce":0.05,
+		"Terrains":[
+			1
+		]
+	},
+	"Area": {
+		"BoundingBox": {
+			"Width":200,
+			"Height":24,
+		}
+	},
+}

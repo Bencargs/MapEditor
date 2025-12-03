@@ -51,6 +51,8 @@ namespace MapEngine.ResourceLoading
                 Id = x.Id,
                 Location = new Vector2((int)x.Location.X, (int)x.Location.Y),
                 TextureId = x.TextureId,
+                SurfaceTextureId = x.SurfaceTextureId,
+                SubSurfaceTextureId = x.SubSurfaceTextureId,
                 HeightmapTextureId = x.HeightmapTextureId,
                 Type = x.Type // todo: refactor this - convert an enum string to enum - more maintainable than enum int
             }).ToArray();
