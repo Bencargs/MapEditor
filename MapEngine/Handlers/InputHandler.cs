@@ -16,6 +16,7 @@ namespace MapEngine.Handlers
     public class InputState
     {
         public Vector2 Location { get; set; }
+        public Entity? HoveredEntity { get; set; }
         public Vector2? SelectionStart { get; set; }
         public Command CurrentCommand = Command.None;
         public readonly List<Entity> SelectedEntities = new List<Entity>();
@@ -137,6 +138,12 @@ namespace MapEngine.Handlers
         public void HandleMouseMove(Vector2 location)
         {
             _inputState.Location = location;
+
+            var area = new BoundingCircle { Radius = 2, Location = location };
+            _inputState.HoveredEntity = _entities.FirstOrDefault(entity => 
+                entity.Hitbox().HasCollided(area));
+
+
             //_cameraHandler.GetViewport()
             //IGraphics _graphics
             //_2dRenderer.DrawLayer(); / /cant draw directly, missing dependencies

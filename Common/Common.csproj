@@ -49,6 +49,7 @@
     <Compile Include="Collision\CollisionEx.cs" />
     <Compile Include="Collision\ICollider.cs" />
     <Compile Include="Colour.cs" />
+    <Compile Include="CursorDefinition.cs" />
     <Compile Include="Entities\ComponentType.cs" />
     <Compile Include="Entities\Entity.cs" />
     <Compile Include="Entities\IComponent.cs" />
