@@ -1,0 +1,8 @@
+{
+	"Name": "unload",
+	"Framerate": 120,
+	"Hotspot": {
+		"X": 15,
+		"Y": 15
+	}
+}

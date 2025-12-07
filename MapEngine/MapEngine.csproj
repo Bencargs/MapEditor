@@ -118,6 +118,7 @@
     <Compile Include="Handlers\CameraHandler.cs" />
     <Compile Include="Handlers\CargoHandler.cs" />
     <Compile Include="Handlers\CollisionHandler.cs" />
+    <Compile Include="Handlers\CursorHandler.cs" />
     <Compile Include="Handlers\InputHandler.cs" />
     <Compile Include="Handlers\InterfaceHandler.cs" />
     <Compile Include="Handlers\MapHandler.cs" />
@@ -139,6 +140,7 @@
     <Compile Include="Rendering\IRenderer.cs" />
     <Compile Include="Rendering\Renderer2d.cs" />
     <Compile Include="Rendering\Renderer3d.cs" />
+    <Compile Include="ResourceLoading\CursorLoader.cs" />
     <Compile Include="Services\Effects\FluidEffect\Direction.cs" />
     <Compile Include="Services\Effects\FluidEffect\Field.cs" />
     <Compile Include="Services\Effects\FluidEffect\FluidEffects.cs" />

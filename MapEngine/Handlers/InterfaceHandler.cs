@@ -22,13 +22,21 @@ namespace MapEngine.Handlers
     {
         private readonly MapService _mapService;
         private readonly InputState _inputState;
+        private readonly CursorHandler _cursorHandler;
 
         public InterfaceHandler(
             MapService mapService,
-            InputState inputState)
+            InputState inputState,
+            CursorHandler cursorHandler)
         {
             _mapService = mapService;
             _inputState = inputState;
+            _cursorHandler = cursorHandler;
+        }
+
+        public void Initialise(string cursorFile)
+        {
+            _cursorHandler.Initialise(cursorFile);
         }
 
         public void Render(Rectangle viewport, IGraphics graphics)
@@ -37,6 +45,7 @@ namespace MapEngine.Handlers
 
             DrawSelectionBox(buffer);
             DrawSelectedEntities(buffer);
+            _cursorHandler.Render(viewport, graphics);
 
             graphics.DrawBytes(buffer, viewport);
         }
@@ -46,10 +55,11 @@ namespace MapEngine.Handlers
             if (_inputState.SelectionStart is null) return;
 
             var width = _mapService.Width;
+            var height = _mapService.Height;
             var startX = (int)Math.Min(_inputState.SelectionStart.Value.X, _inputState.Location.X).Clamp(0, width);
-            var startY = (int)Math.Min(_inputState.SelectionStart.Value.Y, _inputState.Location.Y).Clamp(0, width);
+            var startY = (int)Math.Min(_inputState.SelectionStart.Value.Y, _inputState.Location.Y).Clamp(0, height);
             var endX = (int)Math.Max(_inputState.SelectionStart.Value.X, _inputState.Location.X).Clamp(0, width);
-            var endY = (int)Math.Max(_inputState.SelectionStart.Value.Y, _inputState.Location.Y).Clamp(0, width);
+            var endY = (int)Math.Max(_inputState.SelectionStart.Value.Y, _inputState.Location.Y).Clamp(0, height);
 
             var bytesPerPixel = 4; // RGBA format
             var stride = width * bytesPerPixel;
