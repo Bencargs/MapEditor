@@ -14,6 +14,7 @@
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <LangVersion>8</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -87,6 +88,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Commands\ICommandStrategy.cs" />
     <Compile Include="Commands\CreateEffectCommand.cs" />
     <Compile Include="Commands\CreateEntityCommand.cs" />
     <Compile Include="Commands\DestroyEntityCommand.cs" />
@@ -94,7 +96,10 @@
     <Compile Include="Commands\IHandleCommand.cs" />
     <Compile Include="Commands\MessageHub.cs" />
     <Compile Include="Commands\MoveCommand.cs" />
+    <Compile Include="Commands\UnloadCommand.cs" />
+    <Compile Include="Commands\UnloadCommandStrategy.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="Entities\Components\CargoComponent.cs" />
     <Compile Include="Entities\Components\CollisionComponent.cs" />
     <Compile Include="Entities\Components\ModelComponent.cs" />
     <Compile Include="Entities\Components\ParticleComponent.cs" />
@@ -111,7 +116,9 @@
     <Compile Include="Factories\ParticleFactory.cs" />
     <Compile Include="Factories\UnitFactory.cs" />
     <Compile Include="Handlers\CameraHandler.cs" />
+    <Compile Include="Handlers\CargoHandler.cs" />
     <Compile Include="Handlers\CollisionHandler.cs" />
+    <Compile Include="Handlers\CursorHandler.cs" />
     <Compile Include="Handlers\InputHandler.cs" />
     <Compile Include="Handlers\InterfaceHandler.cs" />
     <Compile Include="Handlers\MapHandler.cs" />
@@ -133,6 +140,7 @@
     <Compile Include="Rendering\IRenderer.cs" />
     <Compile Include="Rendering\Renderer2d.cs" />
     <Compile Include="Rendering\Renderer3d.cs" />
+    <Compile Include="ResourceLoading\CursorLoader.cs" />
     <Compile Include="Services\Effects\FluidEffect\Direction.cs" />
     <Compile Include="Services\Effects\FluidEffect\Field.cs" />
     <Compile Include="Services\Effects\FluidEffect\FluidEffects.cs" />

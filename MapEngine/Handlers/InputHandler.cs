@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
@@ -15,8 +16,22 @@ namespace MapEngine.Handlers
     public class InputState
     {
         public Vector2 Location { get; set; }
+        public Entity? HoveredEntity { get; set; }
         public Vector2? SelectionStart { get; set; }
+        public Command CurrentCommand = Command.None;
         public readonly List<Entity> SelectedEntities = new List<Entity>();
+        
+        public enum Command
+        {
+            None,
+            Stop,
+            Move,
+            Attack,
+            Load,
+            Unload,
+            Guard,
+            Patrol
+        }
     }
 
     public class InputHandler
@@ -25,13 +40,21 @@ namespace MapEngine.Handlers
         private readonly InputState _inputState;
         private readonly MessageHub _messageHub;
         private readonly List<Entity> _entities = new List<Entity>();
+        private readonly Dictionary<Key, ICommandStrategy> _commandBindings;
 
+        private ICommandStrategy? _commandStrategy = null;
+        
         public InputHandler(
             InputState inputState,
-            MessageHub messageHub)
+            MessageHub messageHub,
+            UnloadCommandStrategy unloadCommandStrategy)
         {
             _inputState = inputState;
             _messageHub = messageHub;
+            _commandBindings = new Dictionary<Key, ICommandStrategy>
+            {
+                [Key.U] = unloadCommandStrategy
+            };
         }
 
         public Vector2 GetMouseLocation(MouseEventArgs args, Image image)
@@ -67,6 +90,17 @@ namespace MapEngine.Handlers
 
         public void HandleLeftMouseUp(Vector2 currentLocation)
         {
+            if (_commandStrategy != null)
+            {
+                var command = _commandStrategy.CreateCommand(currentLocation, _inputState.SelectedEntities);
+                _messageHub.Post(command);
+                
+                _commandStrategy = null;
+                _inputState.SelectionStart = null;
+                _inputState.CurrentCommand = InputState.Command.None;
+                return;
+            }
+            
             if (_inputState.SelectionStart is null) return;
 
             // todo: this will need to convert screen to map - eg. mouseLocation + cameraLocation
@@ -81,14 +115,21 @@ namespace MapEngine.Handlers
                 Height = height
             };
 
+            var selectedEntities = _entities
+                .Where(entity => entity.BelongsTo(Constants.PlayerTeam))
+                .Where(entity => entity.Hitbox().HasCollided(selectionArea))
+                .OrderBy(entity => Vector2.Distance(selectionArea.Location, entity.Location()));
+            
             _inputState.SelectedEntities.Clear();
-            foreach (var entity in _entities)
-            {
-                if (!entity.BelongsTo(Constants.PlayerTeam) ||
-                    !entity.Hitbox().HasCollided(selectionArea))
-                    continue;
-
+            foreach (var entity in selectedEntities)
+            { 
                 _inputState.SelectedEntities.Add(entity);
+                if (width == 0 && height == 0)
+                {
+                    // eg if single click, not selection box drag
+                    // todo: there's probably a better way to do this
+                    break;
+                }
             }
 
             _inputState.SelectionStart = null;
@@ -97,6 +138,12 @@ namespace MapEngine.Handlers
         public void HandleMouseMove(Vector2 location)
         {
             _inputState.Location = location;
+
+            var area = new BoundingCircle { Radius = 2, Location = location };
+            _inputState.HoveredEntity = _entities.FirstOrDefault(entity => 
+                entity.Hitbox().HasCollided(area));
+
+
             //_cameraHandler.GetViewport()
             //IGraphics _graphics
             //_2dRenderer.DrawLayer(); / /cant draw directly, missing dependencies
@@ -104,6 +151,55 @@ namespace MapEngine.Handlers
             //message passing
             // todo: mouse over logic
             // render
+        }
+
+        public void HandleKeyDown(Key key)
+        {
+            if (!_commandBindings.TryGetValue(key, out var commandStrategy))
+            {
+                _commandStrategy = null;
+                _inputState.CurrentCommand = InputState.Command.None;
+                return;
+            }
+
+            var applicableUnits = _inputState.SelectedEntities
+                .Where(commandStrategy.IsApplicable)
+                .ToList();
+            if (!applicableUnits.Any())
+            {
+                _commandStrategy = null;
+                _inputState.CurrentCommand = InputState.Command.None;
+                return;
+            }
+            
+            _inputState.SelectedEntities.Clear();
+            _inputState.SelectedEntities.AddRange(applicableUnits);
+            
+            _commandStrategy = commandStrategy;
+            _inputState.CurrentCommand = commandStrategy.CommandType;
+
+            // var command = InputState.Command.None;
+            // List<Entity> applicableUnits = new List<Entity>();
+            // switch (key)
+            // {
+            //     case Key.U:
+            //         command = InputState.Command.Unload;
+            //         applicableUnits = _inputState.SelectedEntities.Where(x => x.GetComponents<CargoComponent>().Any()).ToList();
+            //         break;
+            //     default:
+            //         _inputState.CurrentCommand = InputState.Command.None;
+            //         break;
+            // }
+            //
+            // if (!applicableUnits.Any())
+            // {
+            //     _inputState.CurrentCommand = InputState.Command.None;
+            //     return;
+            // }
+            //
+            // _inputState.CurrentCommand = command;
+            // _inputState.SelectedEntities.Clear();
+            // _inputState.SelectedEntities.AddRange(applicableUnits);
         }
 
         public void Handle(CreateEntityCommand command)

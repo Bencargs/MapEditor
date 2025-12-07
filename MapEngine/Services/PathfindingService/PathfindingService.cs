@@ -39,7 +39,9 @@ namespace MapEngine.Services.PathfindingService
                 var mask = GetMask(current.Item, _map.PathfindingTiles);
                 foreach (var c in mask)
                 {
-                    if (!entity.IsNavigable(c) || visited.ContainsKey(c.Id))
+                    var neighbours = GetMask(c, _map.PathfindingTiles);
+                    var allNavigable = neighbours.All(entity.IsNavigable);
+                    if (!allNavigable || visited.ContainsKey(c.Id))
                         continue;
 
                     var node = CreateNode(c, destination, current);

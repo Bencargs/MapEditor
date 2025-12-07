@@ -58,8 +58,38 @@ namespace MapEngine.ResourceLoading
                     }
                 }
 
+                var cargo = u.Cargo;
+                if (cargo != null)
+                {
+                    var cargoComponent = entity.GetComponent<CargoComponent>();
+                    if (cargoComponent != null)
+                    {
+                        cargoComponent.Content = ((IEnumerable<dynamic>)cargo.Content).Select(u => new Entity
+                        {
+                            Id = (int)u
+                        }).ToList();
+                    }
+                }
+
                 return entity;
             }).ToArray();
+
+            foreach (var unit in units)
+            {
+                var cargoComponent = unit.GetComponent<CargoComponent>();
+                if (cargoComponent == null)
+                    continue;
+
+                for (int i = 0; i < cargoComponent.Content.Count; i++)
+                {
+                    var placeholder = cargoComponent.Content[i];
+                    var actualEntity = units.FirstOrDefault(x => x.Id == placeholder.Id);
+                    if (actualEntity != null)
+                    {
+                        cargoComponent.Content[i] = actualEntity;
+                    }
+                }
+            }
 
             return units;
         }
@@ -166,6 +196,18 @@ namespace MapEngine.ResourceLoading
 
                     entity.AddComponent(weapon);
                 }
+            }
+
+            var cargo = unitData.Cargo;
+            if (cargo != null)
+            {
+                entity.AddComponent(new CargoComponent
+                {
+                    Capacity = (int)cargo.Capacity,
+                    UnloadPoint = new Vector2((float)cargo.UnloadPoint.X, (float)cargo.UnloadPoint.Y),
+                    StopRadius = (float)cargo.StopRadius,
+                    UnloadVelocity = (float)cargo.UnloadVelocity
+                });
             }
 
             return entity;

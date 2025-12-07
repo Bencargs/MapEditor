@@ -17,7 +17,7 @@ namespace MapEngine.Handlers
         public void Initialise(string mapFile)
         {
             // todo: create directory of specific map textures - rather than loading everything
-            TextureFactory.LoadTextures(@"C:\Source\MapEditor\MapEngine\Content\Textures");
+            TextureFactory.LoadTextures(@"C:\src\MapEditor\MapEngine\Content\Textures");
 
             var map = MapLoader.LoadMap(mapFile);
             _mapService.Initialise(map);
@@ -39,6 +39,19 @@ namespace MapEngine.Handlers
                 {
                     var area = new Rectangle((int)tile.Location.X, (int)tile.Location.Y, texture.Width, texture.Height);
                     area.Translate(viewport.X, viewport.Y);
+                    
+                    if (tile.SubSurfaceTextureId != null &&
+                        TextureFactory.TryGetTexture(tile.SubSurfaceTextureId, out var subSurfaceTexture))
+                    {
+                        graphics.DrawImage(subSurfaceTexture.Image, area);
+                    }
+                    
+                    if (tile.SurfaceTextureId != null &&
+                        TextureFactory.TryGetTexture(tile.SurfaceTextureId, out var surfaceTexture))
+                    { 
+                        graphics.DrawImage(surfaceTexture.Image, area);
+                    }
+                    
                     graphics.DrawImage(texture.Image, area);
                 }
             }

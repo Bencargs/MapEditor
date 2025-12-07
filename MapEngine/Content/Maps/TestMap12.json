@@ -1,0 +1,76 @@
+{
+  "Width": 1779,
+  "Height": 743,
+  "Description":"Factory Test",
+  "TileWidth":1,
+  "TileHeight":1,
+  "Camera": {
+	"X": 0,
+	"Y": 0,
+	"Z": 10,
+	"Width": 1779,
+	"Height": 743
+  },
+  "Teams": [
+	{
+		"Id":0,
+		"Name":"Player"
+	},
+	{
+		"Id":1,
+		"Name":"AI"
+	}
+  ],
+  "Units": [
+	{
+		"Id":0,
+		"Team":0,
+		"Type":"TransportDummy",
+		"Location":{
+			"X":1080,
+			"Y":350,
+			"Z":2,
+			"FacingAngle": 187
+		},
+		"Rotation": {
+			"X":0,
+			"Y":0,
+			"Z":0
+		},
+		"Cargo":{
+			"Content": [
+				1
+			]
+		}
+	},
+	{
+		"Id":1,
+		"Team":0,
+		"Type":"Oberon",
+		"Location":{
+			"X":1258,
+			"Y":372,
+			"Z":2,
+			"FacingAngle": 188
+		},
+		"Rotation": {
+			"X":0,
+			"Y":0,
+			"Z":0
+		}
+	}
+  ],
+  "Tiles": [
+   {
+    "Id": 0,
+	"TextureId": "FremantleForeground",
+	"SubSurfaceTextureId": "FremantleBackground",
+	"HeightmapTextureId": "FremantleHeightmap",
+    "Location": {
+      "X": 0.0,
+      "Y": 0.0
+    },
+    "Type": 0
+  }
+ ]
+}

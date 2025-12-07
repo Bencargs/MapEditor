@@ -7,14 +7,15 @@ namespace MapEngine.Factories
 {
     public class TextureFactory
     {
-        public static Dictionary<string, Texture> _textures = new Dictionary<string, Texture>(StringComparer.OrdinalIgnoreCase);
+        private static Dictionary<string, Texture> _textures = new Dictionary<string, Texture>(StringComparer.OrdinalIgnoreCase);
 
-        public static void LoadTextures(string filepath)
+        // todo: passing in a framerate for all files in a directory is definitely not right
+        public static void LoadTextures(string filepath, int? framerate = null)
         {
             foreach (var file in Directory.GetFiles(filepath, "*.gif"))
             {
                 var name = Path.GetFileNameWithoutExtension(file).ToUpper();
-                var animation = TextureLoader.LoadAnimation(file);
+                var animation = TextureLoader.LoadAnimation(file, framerate);
                 var texture = new Texture(animation);
                 _textures[name] = texture;
             }

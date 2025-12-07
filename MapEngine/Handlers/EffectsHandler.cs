@@ -35,7 +35,6 @@ namespace MapEngine.Handlers
         public void Update()
         {
             _waveService.Simulate();
-
             _fluidEffectService.Simulate(1 / 60f, 5);
         }
 
