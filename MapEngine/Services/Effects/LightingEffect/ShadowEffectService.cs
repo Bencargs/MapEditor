@@ -8,6 +8,7 @@ namespace MapEngine.Services.Effects.LightingEffect
 {
     public class ShadowEffectService
     {
+        private byte[] _fieldOfView;
         private readonly GameTime _gameTime;
         private readonly MapService _mapService;
         private List<Vector3> _edgePoints;
@@ -27,12 +28,13 @@ namespace MapEngine.Services.Effects.LightingEffect
 
         public byte[] GenerateBitmap(Rectangle viewport)
         {
-            var fieldOfView = new byte[viewport.Width * viewport.Height * 4];
-
+            ClearShadowBuffer(viewport);
             var (sunDirection, shadowIntensity) = GetSunDirectionVector(_gameTime.TimeOfDay);
+            if (sunDirection == Vector2.Zero)
+                return _fieldOfView;
 
             // Find all the edges of regions on the heightmap - reduces processing vs checking every pixel
-            var shadowsHashSet = new HashSet<Vector2>();
+            var shadows = new HashSet<int>();
             foreach (var edge in _edgePoints)
             {
                 // for each point on the heightmap edges, project a shadow using sun vector
@@ -45,33 +47,45 @@ namespace MapEngine.Services.Effects.LightingEffect
                 foreach (var shadowPoint in shadowRay)
                 {
                     // this prevents double rendering shadows on a pixel
-                    if (!shadowsHashSet.Add(shadowPoint))
+                    var (x, y) = ((int)shadowPoint.X, (int)shadowPoint.Y);
+                    int key = y * viewport.Width + x;
+                    if (!shadows.Add(key))
                         continue;
 
                     // only draw a shadow if it is projected below the terrains height
-                    //var originalColor = texture.GetPixel(shadowPoint.X, shadowPoint.Y);
-                    var shadowHeight = _mapService.GetElevation(new Vector2(shadowPoint.X, shadowPoint.Y));
+                    var shadowHeight = _mapService.GetElevation(new Vector2(x, y));
                     if (shadowHeight > edge.Z)
                         continue;
 
                     var index = (int)(shadowPoint.Y * viewport.Width + shadowPoint.X) * 4;
-                    fieldOfView[index + 3] = (byte)(fieldOfView[index + 3] + (148 * shadowIntensity));
+                    _fieldOfView[index + 3] = (byte)(_fieldOfView[index + 3] + (148 * shadowIntensity));
                 }
             }
 
-            return fieldOfView;
+            return _fieldOfView;
+        }
+
+        private void ClearShadowBuffer(Rectangle viewport)
+        {
+            if (_fieldOfView == null)
+            {
+                _fieldOfView = new byte[viewport.Width * viewport.Height * 4];
+                return;
+            }
+            
+            Array.Clear(_fieldOfView, 0, viewport.Width * viewport.Height * 4);
         }
 
         private static (Vector2 Direction, float Intensity) GetSunDirectionVector(TimeSpan currentTime)
         {
             // todo: from config?
             // Define key times of the day.
-            var morningStart = TimeSpan.FromHours(4f);  // 6 AM
+            var morningStart = TimeSpan.FromHours(4);  // 6 AM
             var midday = TimeSpan.FromHours(12);       // 12 PM
             var eveningEnd = TimeSpan.FromHours(20);   // 6 PM
 
             // Initialize the sun direction vector.
-            var sunDirection = new Vector2(0, 0);
+            var sunDirection = Vector2.Zero;
             var sunIntensity = 0f;
             var shadowLength = 100;
 
@@ -80,14 +94,14 @@ namespace MapEngine.Services.Effects.LightingEffect
                 // Interpolate from (-1, 1) at 6 AM to (0, 0) at midday.
                 var progress = (float)(currentTime - morningStart).TotalHours / (float)(midday - morningStart).TotalHours;
                 sunDirection = new Vector2(-shadowLength, shadowLength - (shadowLength * progress));
-                sunIntensity = (progress);
+                sunIntensity = progress;
             }
             else if (currentTime > midday && currentTime <= eveningEnd)
             {
                 // Interpolate from (0, 0) at midday to (1, -1) at 6 PM.
                 var progress = (float)(currentTime - midday).TotalHours / (float)(eveningEnd - midday).TotalHours;
-                sunDirection = new Vector2(-shadowLength, (shadowLength * -progress));
-                sunIntensity = (1 - progress);
+                sunDirection = new Vector2(-shadowLength, shadowLength * -progress);
+                sunIntensity = 1f - progress;
             }
             // From 6 PM to 6 AM, sunDirection remains at (0, 0), as initialized.
 
@@ -99,27 +113,28 @@ namespace MapEngine.Services.Effects.LightingEffect
         // Bresenham's line algorithm variables
         private static List<Vector2> DrawShadowRay(Vector3 start, Vector2 end)
         {
-            int dx = (int)Math.Abs(end.X - start.X), sx = start.X < end.X ? 1 : -1;
-            int dy = (int)-Math.Abs(end.Y - start.Y), sy = start.Y < end.Y ? 1 : -1;
+            var (startX, startY, endX, endY) = ((int)start.X, (int)start.Y, (int)end.X, (int)end.Y);
+            int dx = Math.Abs(endX - startX), sx = startX < endX ? 1 : -1;
+            int dy = -Math.Abs(endY - startY), sy = startY < endY ? 1 : -1;
             int err = dx + dy;
 
             var shadowRayPoints = new List<Vector2>();
             while (true)
             {
-                if (start.X == end.X && start.Y == end.Y) break;
+                if (startX == endX && startY == endY) break;
 
                 var e2 = 2 * err;
                 if (e2 >= dy)
                 {
-                    if (start.X == end.X) break;
-                    err += dy; start.X += sx;
+                    if (startX == endX) break;
+                    err += dy; startX += sx;
                 }
                 if (e2 <= dx)
                 {
-                    if (start.Y == end.Y) break;
-                    err += dx; start.Y += sy;
+                    if (startY == endY) break;
+                    err += dx; startY += sy;
                 }
-                shadowRayPoints.Add(new Vector2(start.X, start.Y));
+                shadowRayPoints.Add(new Vector2(startX, startY));
             }
             return shadowRayPoints;
         }
@@ -183,37 +198,31 @@ namespace MapEngine.Services.Effects.LightingEffect
 
         private Vector2? CastShadowFromPoint(Vector3 startPoint, Vector2 sunDirection)
         {
-            var x = startPoint.X;
-            var y = startPoint.Y;
+            var x = (int)startPoint.X;
+            var y = (int)startPoint.Y;
             var currentHeight = startPoint.Z;
 
             // Calculate the initial step increments based on the sun direction.
-            var stepX = sunDirection.X;
-            var stepY = sunDirection.Y;
+            var stepX = (int)sunDirection.X;
+            var stepY = (int)sunDirection.Y;
 
             // Determine how far we should check for shadows based on the multiplier.
-            float maxDistance = Math.Max(_mapService.Width, _mapService.Height);
+            var maxDistance = Math.Max(_mapService.Width, _mapService.Height);
 
-            float distanceChecked = 0;
-            while (distanceChecked < maxDistance)
+            var distanceChecked = 0;
+            while (distanceChecked++ < maxDistance)
             {
-                x -= (int)stepX;
-                y -= (int)stepY;
+                x -= stepX;
+                y -= stepY;
 
                 // Break if outside heightmap boundaries.
                 if (x < 0 || x >= _mapService.Width || y < 0 || y >= _mapService.Height)
-                {
                     break;
-                }
 
-                float heightAtCurrentStep = _mapService.GetElevation(new Vector2(x, y));
+                var point = new Vector2(x, y);
+                var heightAtCurrentStep = _mapService.GetElevation(point);
                 if (heightAtCurrentStep <= currentHeight)
-                {
-                    return new Vector2(x, y); // The point is in shadow.
-                }
-
-                // Increment the distance checked based on the step increments.
-                distanceChecked++;
+                    return point; // The point is in shadow.
             }
 
             return null; // No higher terrain was found, the point is not in shadow.

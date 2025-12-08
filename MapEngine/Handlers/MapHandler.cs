@@ -17,7 +17,7 @@ namespace MapEngine.Handlers
         public void Initialise(string mapFile)
         {
             // todo: create directory of specific map textures - rather than loading everything
-            TextureFactory.LoadTextures(@"C:\Source\MapEditor\MapEngine\Content\Textures");
+            TextureFactory.LoadTextures(@"C:\src\MapEditor\MapEngine\Content\Textures");
 
             var map = MapLoader.LoadMap(mapFile);
             _mapService.Initialise(map);

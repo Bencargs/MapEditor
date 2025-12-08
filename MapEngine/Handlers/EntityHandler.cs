@@ -53,7 +53,7 @@ namespace MapEngine.Handlers
             // LoadTexture(unit.Texture);
             // factories.Initialise..?
             ParticleFactory.LoadParticles(particleFilepath);
-            TextureFactory.LoadTextures(@"C:\Source\MapEditor\MapEngine\Content\Textures");
+            TextureFactory.LoadTextures(@"C:\src\MapEditor\MapEngine\Content\Textures");
             WeaponFactory.LoadWeapons(weaponFilepath); // todo: code stink - requires factories to be initialised in an order
             UnitFactory.LoadUnits(unitsFilepath);
             ModelFactory.LoadModel(modelFilepath);
