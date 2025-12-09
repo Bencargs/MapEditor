@@ -3,6 +3,7 @@ using System.Numerics;
 using MapEngine.Commands;
 using MapEngine.Handlers;
 using System;
+using System.Diagnostics;
 using MapEngine.Handlers.ParticleHandler;
 
 namespace MapEngine
@@ -68,7 +69,7 @@ namespace MapEngine
 
             _gameTime.EndFrame();
 
-            Console.WriteLine($"Average FPS: {_gameTime.CalculateAverageFps()}");
+            Debug.WriteLine($"Average FPS: {_gameTime.CalculateAverageFps()}");
         }
 
         private void Update()
