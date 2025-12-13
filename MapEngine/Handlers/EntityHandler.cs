@@ -7,7 +7,6 @@ using MapEngine.Factories;
 using MapEngine.ResourceLoading;
 using MapEngine.Rendering;
 using MapEngine.Services.Map;
-using MapEngine.Handlers.SensorHandler;
 
 namespace MapEngine.Handlers
 {
@@ -54,7 +53,7 @@ namespace MapEngine.Handlers
             // LoadTexture(unit.Texture);
             // factories.Initialise..?
             ParticleFactory.LoadParticles(particleFilepath);
-            TextureFactory.LoadTextures(@"C:\Source\MapEditor\MapEngine\Content\Textures");
+            TextureFactory.LoadTextures(@"C:\src\MapEditor\MapEngine\Content\Textures");
             WeaponFactory.LoadWeapons(weaponFilepath); // todo: code stink - requires factories to be initialised in an order
             UnitFactory.LoadUnits(unitsFilepath);
             ModelFactory.LoadModel(modelFilepath);
@@ -76,7 +75,6 @@ namespace MapEngine.Handlers
 
         public void Render(Rectangle viewport, IGraphics graphics)
         {
-            _sensorHandler.DrawLayer(viewport, graphics);
             _3dRenderer.DrawLayer(viewport, graphics);
             _2dRenderer.DrawLayer(viewport, graphics);
         }

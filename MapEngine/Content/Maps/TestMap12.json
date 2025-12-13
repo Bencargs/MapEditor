@@ -1,0 +1,116 @@
+{
+  "Width": 768,
+  "Height": 512,
+  "Description":"Day Night Cycle",
+  "TileWidth":1,
+  "TileHeight":1,
+  "GameTime": {
+	  "HourOfDay": 12,
+	  "SecondsPerSecond": 3600 
+  },
+  "Camera": {
+	"X": 0,
+	"Y": 0,
+	"Z": 10,
+	"Width": 768,
+	"Height": 512
+  },
+  "Teams": [
+	{
+		"Id":0,
+		"Name":"Player"
+	}
+  ],
+  "Effects": [
+    {
+	  "Name": "AmbientEffect",
+	  "Sources": [
+	    {
+	      "TextureId": "PointLight",
+		  "LineOfSight": true,
+	      "On": 17,
+	      "Off": 6,
+		  "Location": {
+			"X": 40,
+			"Y": 0
+		  }
+	    },
+		{
+	      "TextureId": "PointLight",
+		  "LineOfSight": true,
+	      "On": 18,
+	      "Off": 7,
+		  "Location": {
+			"X": 50,
+			"Y": 78
+		  }
+	    },
+		{
+	      "TextureId": "PointLight",
+		  "LineOfSight": true,
+	      "On": 18,
+	      "Off": 7,
+		  "Location": {
+			"X": 10,
+			"Y": 82
+		  }
+	    },
+		{
+	      "TextureId": "Footlights",
+		  "LineOfSight": false,
+	      "On": 18.5,
+	      "Off": 7.3,
+		  "Location": {
+			"X": 384,
+			"Y": 268
+		  }
+	    },
+	  ]
+    },
+	{
+	  "Name": "DiffuseEffect",
+	  "Sources": [
+	    {
+		  "Name": "Night",
+		  "Colour": {"R": 24, "B": 0, "G": 0, "A": 160},
+		  "TransitionType": "Immediate",
+		  "On": 19,
+		  "Off": 5
+		},
+		{
+		  "Name": "Morning",
+		  "Colour": {"R": 96, "B": 8, "G": 8, "A": 64},
+		  "TransitionType": "Fade",
+		  "On": 5,
+		  "Off": 8
+		},
+		{
+		  "Name": "Midday",
+		  "Colour": {"R": 0, "B": 0, "G": 0, "A": 1},
+		  "TransitionType": "Immediate",
+		  "On": 8,
+		  "Off": 17
+		},
+		{
+		  "Name": "Evening",
+		  "Colour": {"R": 8, "B": 8, "G": 96, "A": 64},
+		  "TransitionType": "Fade",
+		  "On": 17,
+		  "Off": 19
+		}
+	  ]
+	}
+  ],
+  "Tiles": [
+   {
+    "Id": 0,
+	"TextureId": "BridgeTexture",
+	"HeightmapTextureId": "BridgeHeightmap",
+    "Location": {
+      "X": 0.0,
+      "Y": 0.0
+    },
+    "Type": 2
+  }
+ ]
+}
