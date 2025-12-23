@@ -65,8 +65,7 @@ namespace MapEngine.Entities
                 return null; //  todo: null object?
 
             var sourceLocation = entity.Location();
-            var test = new Vector2(sourceLocation.X - 12, sourceLocation.Y - 12);
-            var collider = colliderComponent.GetCollider(test);// yuck
+            var collider = colliderComponent.GetCollider(sourceLocation);
 
             //var facingAngle = entity.GetComponent<LocationComponent>().FacingAngle;
             //var rotated = collider.Rotate(facingAngle);

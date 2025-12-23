@@ -95,7 +95,7 @@ namespace MapEngine.Handlers.ParticleHandler
                 // rotate image to facing angle
                 var rotated = texture.Image
                     .Scale(p.Size)
-                    .Rotate(p.FacingAngle)
+                    .Rotate(-p.FacingAngle)
                     .Fade(p.Fade);
 
                 if (TextureFactory.TryGetTexture(p.PaletteTextureId, out var palette))
@@ -141,7 +141,7 @@ namespace MapEngine.Handlers.ParticleHandler
             if (particleComponent.MinVelocity != null && (movementComponent.Velocity.Length() <= particleComponent.MinVelocity))
                 return false;
 
-            if (particleComponent.SpawnRate != null && (elapsed < particleComponent.SpawnRate))
+            if (particleComponent.SpawnRate != null && elapsed < particleComponent.SpawnRate)
                 return false;
 
             if (particleComponent.TotalCount != null && particleComponent.TotalCount < 1)

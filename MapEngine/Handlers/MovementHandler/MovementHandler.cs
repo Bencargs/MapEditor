@@ -146,13 +146,36 @@ namespace MapEngine.Handlers
             target.Steering = target.Steering.Truncate(target.MaxForce) / target.Mass;
 
             //then add it to velocity to get the new velocity
-            var targetVelocity2 = (target.Velocity.ToVector2() + target.Steering).Truncate(target.MaxVelocity);
-            target.Velocity = new Vector3(targetVelocity2.X, targetVelocity2.Y, 0);
-
+            var targetVelocity = (target.Velocity.ToVector2() + target.Steering).Truncate(target.MaxVelocity);
+            target.Velocity = new Vector3(targetVelocity.X, targetVelocity.Y, 0);
+            
+            // Face toward destination (or: face toward velocity if moving fast enough)
+            var dtSeconds = 4f;
+            
+            var desiredFacing = directionVector.Angle();
+            var turnSpeedDegPerSec = 1f;// target.MaxTurnSpeedDegPerSec; // add this property, or use a constant
+            var maxTurnThisFrame = turnSpeedDegPerSec * dtSeconds;
+            
             //Set the facingAngle (used to draw the image, in radians) to velocity
-            location.FacingAngle = target.Velocity.ToVector2().Angle();
+            location.FacingAngle = MoveTowardsAngleDegrees(location.FacingAngle, desiredFacing, maxTurnThisFrame);
 
-            location.Location += target.Velocity.ToVector2();
+            location.Location += target.Velocity.ToVector2() * dtSeconds;
+        }
+        
+        // todo: move these to common methods / extensions
+        private static float WrapDegrees(float deg)
+        {
+            deg %= 360f;
+            if (deg < -180f) deg += 360f;
+            if (deg > 180f) deg -= 360f;
+            return deg;
+        }
+
+        private static float MoveTowardsAngleDegrees(float current, float target, float maxDelta)
+        {
+            var delta = WrapDegrees(target - current);
+            if (Math.Abs(delta) <= maxDelta) return target;
+            return current + Math.Sign(delta) * maxDelta;
         }
 
         public void Handle(CreateEntityCommand command)

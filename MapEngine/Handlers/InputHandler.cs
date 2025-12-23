@@ -137,20 +137,14 @@ namespace MapEngine.Handlers
 
         public void HandleMouseMove(Vector2 location)
         {
+            if (location == _inputState.Location)
+                return;
+            
             _inputState.Location = location;
 
             var area = new BoundingCircle { Radius = 2, Location = location };
             _inputState.HoveredEntity = _entities.FirstOrDefault(entity => 
                 entity.Hitbox().HasCollided(area));
-
-
-            //_cameraHandler.GetViewport()
-            //IGraphics _graphics
-            //_2dRenderer.DrawLayer(); / /cant draw directly, missing dependencies
-            //shared dependency?
-            //message passing
-            // todo: mouse over logic
-            // render
         }
 
         public void HandleKeyDown(Key key)
