@@ -17,8 +17,8 @@
 	"Cargo": {
 		"Capacity":1,
 		"UnloadPoint":{
-			"X":120,
-			"Y":14
+			"X":380,
+			"Y":44
 		},
 		"StopRadius":10.0,
 		"UnloadVelocity":10.0

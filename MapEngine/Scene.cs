@@ -77,9 +77,9 @@ namespace MapEngine
         {
             _messageHub.Notify();
             _cameraHandler.Update();
+            _particleHandler.Update();
             _unitHandler.Update();
             _effectsHandler.Update();
-            _particleHandler.Update();
         }
 
         private void Render()
@@ -87,9 +87,9 @@ namespace MapEngine
             // Todo: need to order rendering by Z height
             var viewport = _cameraHandler.GetViewport();
             _mapHandler.Render(viewport, _graphics);
+            _particleHandler.Render(viewport, _graphics);
             _unitHandler.Render(viewport, _graphics);
             _effectsHandler.Render(viewport, _graphics);
-            _particleHandler.Render(viewport, _graphics);
             _interfaceHandler.Render(viewport, _graphics);
 
             _graphics.Render();
