@@ -2,6 +2,7 @@
 using System.Linq;
 using Common.Entities;
 using System.Numerics;
+using Common;
 using MapEngine.Entities.Components;
 using MapEngine.Handlers;
 
@@ -13,6 +14,10 @@ namespace MapEngine.Commands
 
         public bool IsApplicable(Entity entity)
         {
+            var state = entity.GetComponent<StateComponent>();
+            if (!state?.CanTransition(State.Unloading) ?? false)
+                return false;
+            
             // Any entity with a cargo hold, that has loaded cargo
             return entity.GetComponents<CargoComponent>()
                 .Any(x => x.Content.Any());

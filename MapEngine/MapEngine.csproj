@@ -105,6 +105,7 @@
     <Compile Include="Entities\Components\ModelComponent.cs" />
     <Compile Include="Entities\Components\ParticleComponent.cs" />
     <Compile Include="Entities\Components\SensorComponent.cs" />
+    <Compile Include="Entities\Components\StateComponent.cs" />
     <Compile Include="Entities\Components\UnitComponent.cs" />
     <Compile Include="Entities\Components\ImageComponent.cs" />
     <Compile Include="Entities\Components\MovementComponent.cs" />
@@ -230,6 +231,5 @@
       <Name>SoftEngine</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -90,6 +90,24 @@ namespace MapEngine.Entities
             return terrainTypes.Contains(tile.Type) && tileGradient <= movementComponent.MaxGradient;
         }
 
+        public static void ChangeState(this Entity entity, State state)
+        {
+            var stateComponent = entity.GetComponent<StateComponent>();
+            stateComponent?.ChangeState(state);
+        }
+
+        public static void Complete(this Entity entity)
+        {
+            var stateComponent = entity.GetComponent<StateComponent>();
+            stateComponent?.ChangeState(State.Idle);
+        }
+        
+        public static void Cancel(this Entity entity)
+        {
+            var stateComponent = entity.GetComponent<StateComponent>();
+            stateComponent?.ChangeState(State.Stopping);
+        }
+
         public static void ReplaceOrders(this Entity entity, IEnumerable<MoveOrder> orders)
         {
             var movementComponent = entity.GetComponent<MovementComponent>();

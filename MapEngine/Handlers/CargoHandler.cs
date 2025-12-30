@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
+using Common;
 using Common.Entities;
 using MapEngine.Commands;
 using MapEngine.Entities;
@@ -41,6 +42,7 @@ namespace MapEngine.Handlers
                 foreach (var cargo in arrivedCargo)
                 {
                     cargoComponent.Content.Remove(cargo);
+                    cargo.Complete();
                 }
             }
         }
@@ -60,6 +62,8 @@ namespace MapEngine.Handlers
                 cargoComponent.Destination = cargoComponent.UnloadPoint != null
                     ? entity.Location() - cargoComponent.UnloadPoint
                     : command.Destination;
+
+                entity.ChangeState(State.Unloading);
             }
         }
 

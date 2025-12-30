@@ -57,6 +57,8 @@ namespace MapEngine.ResourceLoading
                             : new Queue<MoveOrder>();
                     }
                 }
+                
+                // todo: initial state
 
                 var cargo = u.Cargo;
                 if (cargo != null)
@@ -106,6 +108,11 @@ namespace MapEngine.ResourceLoading
             entity.AddComponent(new UnitComponent
             {
                 UnitType = (string)unitData.Type
+            });
+            
+            entity.AddComponent(new StateComponent
+            {
+                CurrentState = State.Idle
             });
 
             var image = unitData.Image;

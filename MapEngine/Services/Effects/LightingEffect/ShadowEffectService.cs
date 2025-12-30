@@ -9,6 +9,7 @@ namespace MapEngine.Services.Effects.LightingEffect
     {
         private float[] _heights;
         private byte[] _fieldOfView;
+        private bool _enabled = false; // todo: there should be a better way to configure effects per map
         private readonly GameTime _gameTime;
         private readonly MapService _mapService;
 
@@ -22,6 +23,8 @@ namespace MapEngine.Services.Effects.LightingEffect
 
         public void Initialise()
         {
+            _enabled = true;
+            
             // todo: rather than an efficient height cache here,
             // should uplift map service to make it not slow
             _heights = EnsureHeightCache();
@@ -29,6 +32,8 @@ namespace MapEngine.Services.Effects.LightingEffect
 
         public byte[] GenerateBitmap(Rectangle viewport)
         {
+            if (!_enabled) return new byte[0];
+            
             ClearShadowBuffer(viewport);
             var (sunDirection, shadowIntensity) = GetSunDirectionVector(_gameTime.TimeOfDay);
             if (sunDirection == Vector2.Zero)

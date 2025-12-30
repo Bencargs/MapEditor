@@ -12,6 +12,7 @@ namespace MapEngine.Handlers.SensorHandler
         : IHandleCommand<CreateEntityCommand>
         , IHandleCommand<DestroyEntityCommand>
     {
+        private bool _enabled = false; // todo: there should be a better way to configure effects per map
         private readonly List<Entity> _entities = new List<Entity>();
         private readonly RadarSensor _radarSensor;
         private readonly SightSensor _sightSensor;
@@ -37,6 +38,8 @@ namespace MapEngine.Handlers.SensorHandler
 
         public void Update()
         {
+            if (!_enabled) return;
+            
             foreach (var e in _entities)
             {
                 var sensorComponents = e.GetComponents<SensorComponent>();
@@ -59,6 +62,8 @@ namespace MapEngine.Handlers.SensorHandler
 
         public float[] GenerateBitmap(Rectangle viewport, IGraphics graphics)
         {
+            if (!_enabled) return new float[0];
+            
             var fieldOfView = new float[viewport.Width * viewport.Height];
             for (int i = 0; i < fieldOfView.Length; i++) fieldOfView[i] = 0.25f;
 

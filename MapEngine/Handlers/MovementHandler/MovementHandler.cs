@@ -77,6 +77,10 @@ namespace MapEngine.Handlers
                 location.Location += movement.Velocity.ToVector2();
                 ApplyFriction(location, movement);
             }
+            else
+            {
+                entity.Complete();
+            }
         }
 
         private void ApplyGravity(LocationComponent location, MovementComponent movement)
@@ -104,6 +108,10 @@ namespace MapEngine.Handlers
             var friction = _mapService.GetFriction(location.Location);
 
             movement.Velocity *= friction;
+            if (movement.Velocity.Length() < 0.01f)
+            {
+                movement.Velocity = Vector3.Zero;
+            }
         }
 
         private static void ApplyBrakeForce(MovementComponent movement)
@@ -209,6 +217,7 @@ namespace MapEngine.Handlers
                     movementComponent.Destinations.Clear();
 
                 movementComponent.Destinations.Enqueue(orders);
+                entity.ChangeState(State.Moving);
             }
         }
 

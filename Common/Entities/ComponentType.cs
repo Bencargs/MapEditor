@@ -13,5 +13,6 @@
         Sensor,
         Particle,
         Cargo,
+        State
     }
 }

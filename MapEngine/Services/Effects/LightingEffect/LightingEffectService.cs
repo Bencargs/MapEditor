@@ -11,6 +11,7 @@ namespace MapEngine.Services.Effects.LightingEffect
 {
     public class LightingEffectService
     {
+        private bool _enabled = false; // todo: there should be a better way to configure effects per map
         private readonly GameTime _gameTime;
         private readonly MapService _mapService;
 
@@ -220,6 +221,7 @@ namespace MapEngine.Services.Effects.LightingEffect
             return results;
         }
 
+        // todo: please stop repeating this method
         private static IEnumerable<Vector2> GetRay(Vector2 start, Vector2 end)
         {
             var startX = (int)start.X;
@@ -270,6 +272,8 @@ namespace MapEngine.Services.Effects.LightingEffect
 
         public byte[] GenerateBitmap(Rectangle viewport)
         {
+            if (!_enabled) return new byte[0];
+            
             var fieldOfView = new byte[viewport.Width * viewport.Height * 4];
 
             ApplyDiffuseLight(viewport, fieldOfView);
