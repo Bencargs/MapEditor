@@ -99,7 +99,7 @@ namespace MapEngine.Entities
         public static void Complete(this Entity entity)
         {
             var stateComponent = entity.GetComponent<StateComponent>();
-            stateComponent?.ChangeState(State.Idle);
+            stateComponent?.ChangeState(State.Standby);
         }
         
         public static void Cancel(this Entity entity)

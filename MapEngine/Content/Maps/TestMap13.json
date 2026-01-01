@@ -46,7 +46,7 @@
 	{
 		"Id":1,
 		"Team":0,
-		"Type":"Oberon",
+		"Type":"SubmarineDummy",
 		"Location":{
 			"X":1258,
 			"Y":372,

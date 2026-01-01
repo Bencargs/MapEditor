@@ -9,6 +9,5 @@
         Cursor="None">
     <Grid Background="Black">
         <Image x:Name="frontBuffer" />
-        <Image x:Name="cursorImage" />
     </Grid>
 </Window>

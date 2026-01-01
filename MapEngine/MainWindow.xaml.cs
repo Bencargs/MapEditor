@@ -68,6 +68,10 @@ namespace MapEngine
             {
                 inputHandler.HandleKeyDown(args.Key);
             };
+            TextInput += (sender, args) =>
+            {
+                inputHandler.HandleTextInput(args.Text);
+            };
 
             frontBuffer.Source = graphics.Bitmap;
 

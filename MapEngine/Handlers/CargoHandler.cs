@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using Common;
 using Common.Entities;
@@ -18,10 +19,10 @@ namespace MapEngine.Handlers
         
         public void Update()
         {
-            foreach (var e in _entities)
+            foreach (var entity in _entities)
             {
                 var arrivedCargo = new List<Entity>();
-                var cargoComponent = e.GetComponent<CargoComponent>();
+                var cargoComponent = entity.GetComponent<CargoComponent>();
                 foreach (var cargo in cargoComponent.Content)
                 {
                     var cargoLocation = cargo.GetComponent<LocationComponent>();
@@ -43,6 +44,11 @@ namespace MapEngine.Handlers
                 {
                     cargoComponent.Content.Remove(cargo);
                     cargo.Complete();
+                }
+
+                if (!cargoComponent.Content.Any())
+                {
+                    entity.Complete();
                 }
             }
         }

@@ -55,7 +55,9 @@ namespace MapEngine
             _unitHandler.Initialise(unitsPath, mapFilename, weaponsPath, modelsPath, particlesPath);
 
             _effectsHandler.Initialise();
-            _interfaceHandler.Initialise(@"C:\src\MapEditor\MapEngine\Content\Cursors");
+            _interfaceHandler.Initialise(
+                @"C:\src\MapEditor\MapEngine\Content\Cursors",
+                @"C:\src\MapEditor\MapEngine\Content\Fonts");
         }
 
         public void Display()

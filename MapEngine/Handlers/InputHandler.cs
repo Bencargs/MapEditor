@@ -21,6 +21,9 @@ namespace MapEngine.Handlers
         public Command CurrentCommand = Command.None;
         public readonly List<Entity> SelectedEntities = new List<Entity>();
         
+        public bool IsTyping { get; set; }
+        public string TextInput { get; set; }
+        
         public enum Command
         {
             None,
@@ -53,7 +56,7 @@ namespace MapEngine.Handlers
             _messageHub = messageHub;
             _commandBindings = new Dictionary<Key, ICommandStrategy>
             {
-                [Key.U] = unloadCommandStrategy
+                [Key.U] = unloadCommandStrategy,
             };
         }
 
@@ -143,12 +146,51 @@ namespace MapEngine.Handlers
             _inputState.Location = location;
 
             var area = new BoundingCircle { Radius = 2, Location = location };
-            _inputState.HoveredEntity = _entities.FirstOrDefault(entity => 
-                entity.Hitbox().HasCollided(area));
+            _inputState.HoveredEntity = _entities
+                .Where(entity => entity.Hitbox().HasCollided(area))
+                .OrderBy(entity => Vector2.Distance(area.Location, entity.Location()))
+                .FirstOrDefault();
         }
 
         public void HandleKeyDown(Key key)
         {
+            // todo: move to a TextHandler class?
+            if (_inputState.IsTyping)
+            {
+                switch (key)
+                {
+                    case Key.Enter:
+                        CommitTypedText();
+                        return;
+
+                    case Key.Escape:
+                        _inputState.IsTyping = false;
+                        _inputState.TextInput = "";
+                        return;
+
+                    case Key.Back:
+                        if (!string.IsNullOrEmpty(_inputState.TextInput))
+                            _inputState.TextInput = _inputState.TextInput.Substring(0, _inputState.TextInput.Length - 1);
+                        return;
+
+                    case Key.Space:
+                        _inputState.TextInput += " ";
+                        return;
+
+                    // Ignore everything else here – characters come via HandleTextInput
+                    default:
+                        return;
+                }
+            }
+            
+            // start typing
+            if (key == Key.Enter)
+            {
+                _inputState.IsTyping = true;
+                _inputState.TextInput = "";
+                return;
+            }
+            
             if (!_commandBindings.TryGetValue(key, out var commandStrategy))
             {
                 _commandStrategy = null;
@@ -195,6 +237,13 @@ namespace MapEngine.Handlers
             // _inputState.SelectedEntities.Clear();
             // _inputState.SelectedEntities.AddRange(applicableUnits);
         }
+        
+        public void HandleTextInput(string text)
+        {
+            if (!_inputState.IsTyping) return;
+
+            _inputState.TextInput += text;
+        }
 
         public void Handle(CreateEntityCommand command)
         {
@@ -202,6 +251,18 @@ namespace MapEngine.Handlers
                 return;
 
             _entities.Add(command.Entity);
+        }
+        
+        private void CommitTypedText()
+        {
+            var text = _inputState.TextInput.Trim();
+            _inputState.IsTyping = false;
+            _inputState.TextInput = "";
+
+            if (string.IsNullOrWhiteSpace(text))
+                return;
+            
+            _messageHub.Post(new TextCommand { Text = text });
         }
     }
 }

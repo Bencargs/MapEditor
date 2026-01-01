@@ -14,17 +14,17 @@ public class StateComponent : IComponent
     {
         return (from, to) switch
         {
-            ( State.Idle, State.Moving ) => true,
-            ( State.Idle, State.Attacking ) => true,
-            ( State.Idle, State.Loading ) => true,
-            ( State.Idle, State.Unloading ) => true,
+            ( State.Standby, State.Moving ) => true,
+            ( State.Standby, State.Attacking ) => true,
+            ( State.Standby, State.Loading ) => true,
+            ( State.Standby, State.Unloading ) => true,
 
-            ( State.Moving, State.Idle ) => true,
+            ( State.Moving, State.Standby ) => true,
             ( State.Moving, State.Stopping ) => true,
             ( State.Moving, State.Loading ) => true,
      
-            ( State.Loading, State.Idle ) => true,
-            ( State.Unloading, State.Idle ) => true,
+            ( State.Loading, State.Standby ) => true,
+            ( State.Unloading, State.Standby ) => true,
 
             _ => false
         };

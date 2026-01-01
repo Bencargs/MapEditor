@@ -97,6 +97,7 @@
     <Compile Include="Commands\IHandleCommand.cs" />
     <Compile Include="Commands\MessageHub.cs" />
     <Compile Include="Commands\MoveCommand.cs" />
+    <Compile Include="Commands\TextCommand.cs" />
     <Compile Include="Commands\UnloadCommand.cs" />
     <Compile Include="Commands\UnloadCommandStrategy.cs" />
     <Compile Include="Constants.cs" />
@@ -115,9 +116,11 @@
     <Compile Include="Extensions\EnumerableEx.cs" />
     <Compile Include="Extensions\EnumEx.cs" />
     <Compile Include="Extensions\MathEx.cs" />
+    <Compile Include="Factories\FontFactory.cs" />
     <Compile Include="Factories\ModelFactory.cs" />
     <Compile Include="Factories\ParticleFactory.cs" />
     <Compile Include="Factories\UnitFactory.cs" />
+    <Compile Include="Font.cs" />
     <Compile Include="Handlers\CameraHandler.cs" />
     <Compile Include="Handlers\CargoHandler.cs" />
     <Compile Include="Handlers\CollisionHandler.cs" />
@@ -140,6 +143,7 @@
     <Compile Include="Handlers\SensorHandler\SensorHandler.cs" />
     <Compile Include="Handlers\EffectsHandler.cs" />
     <Compile Include="Handlers\SensorHandler\SightSensor.cs" />
+    <Compile Include="Handlers\TextHandler.cs" />
     <Compile Include="Rendering\IRenderer.cs" />
     <Compile Include="Rendering\Renderer2d.cs" />
     <Compile Include="Rendering\Renderer3d.cs" />

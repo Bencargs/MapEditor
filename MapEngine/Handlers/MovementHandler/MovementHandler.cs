@@ -71,14 +71,15 @@ namespace MapEngine.Handlers
                         break;
                 }
             }
-            else if (movement.Velocity.Length() > 0)
+            else if (movement.Velocity.Length() > 0.5f)
             {
                 // eg. an entity having a force applied to it
                 location.Location += movement.Velocity.ToVector2();
                 ApplyFriction(location, movement);
             }
-            else
+            else if (movement.Velocity.Length() < 1f)
             {
+                movement.Velocity = Vector3.Zero;
                 entity.Complete();
             }
         }
@@ -108,10 +109,6 @@ namespace MapEngine.Handlers
             var friction = _mapService.GetFriction(location.Location);
 
             movement.Velocity *= friction;
-            if (movement.Velocity.Length() < 0.01f)
-            {
-                movement.Velocity = Vector3.Zero;
-            }
         }
 
         private static void ApplyBrakeForce(MovementComponent movement)

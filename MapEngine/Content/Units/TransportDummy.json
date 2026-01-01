@@ -1,5 +1,6 @@
 {
 	"Type":"TransportDummy",
+	"Name":"Shipyard",
 	"Image": {
 		"Width":642,
 		"Height":82,

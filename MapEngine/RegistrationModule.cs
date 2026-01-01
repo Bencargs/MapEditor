@@ -75,6 +75,7 @@ namespace MapEngine
             builder.RegisterType<InterfaceHandler>().SingleInstance();
             builder.RegisterType<CargoHandler>().SingleInstance();
             builder.RegisterType<CursorHandler>().SingleInstance();
+            builder.RegisterType<TextHandler>().SingleInstance();
         }
 
         private static void RegisterRenderers(ContainerBuilder builder)

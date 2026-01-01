@@ -107,12 +107,13 @@ namespace MapEngine.ResourceLoading
 
             entity.AddComponent(new UnitComponent
             {
-                UnitType = (string)unitData.Type
+                UnitType = (string)unitData.Type,
+                Name = (string)unitData.Name
             });
             
             entity.AddComponent(new StateComponent
             {
-                CurrentState = State.Idle
+                CurrentState = State.Standby
             });
 
             var image = unitData.Image;

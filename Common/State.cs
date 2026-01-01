@@ -3,7 +3,7 @@
     public enum State
     {
         None = 0,
-        Idle,
+        Standby,
         Moving,
         Attacking,
         Loading,
