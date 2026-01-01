@@ -93,6 +93,7 @@ namespace MapEngine
 
         private static void RegisterCommands(ContainerBuilder builder)
         {
+            builder.RegisterType<MoveCommandStrategy>();
             builder.RegisterType<UnloadCommandStrategy>();
         }
     }

@@ -36,7 +36,7 @@ namespace MapEngine.Entities
         public static bool IsMoving(this Entity entity)
         {
             var movement = entity.GetComponent<MovementComponent>();
-            return (movement?.Velocity.Length() ?? 0) > 0;
+            return (movement?.Velocity.Length() ?? 0) > 0.1f;
         }
 
         public static Texture Texture(this Entity entity)
@@ -96,15 +96,21 @@ namespace MapEngine.Entities
             stateComponent?.ChangeState(state);
         }
 
-        public static void Complete(this Entity entity)
+        public static void Complete(this Entity entity, State state)
         {
             var stateComponent = entity.GetComponent<StateComponent>();
-            stateComponent?.ChangeState(State.Standby);
+            if (stateComponent?.CurrentState != state)
+                return;
+            
+            stateComponent.ChangeState(State.Standby);
         }
         
-        public static void Cancel(this Entity entity)
+        public static void Cancel(this Entity entity, State state)
         {
             var stateComponent = entity.GetComponent<StateComponent>();
+            if (stateComponent?.CurrentState != state)
+                return;
+            
             stateComponent?.ChangeState(State.Stopping);
         }
 

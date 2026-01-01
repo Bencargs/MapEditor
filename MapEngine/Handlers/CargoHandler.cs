@@ -43,12 +43,12 @@ namespace MapEngine.Handlers
                 foreach (var cargo in arrivedCargo)
                 {
                     cargoComponent.Content.Remove(cargo);
-                    cargo.Complete();
+                    cargo.Complete(State.Unloading);
                 }
 
                 if (!cargoComponent.Content.Any())
                 {
-                    entity.Complete();
+                    entity.Complete(State.Unloading);
                 }
             }
         }
@@ -70,6 +70,10 @@ namespace MapEngine.Handlers
                     : command.Destination;
 
                 entity.ChangeState(State.Unloading);
+                foreach (var cargo in cargoComponent.Content)
+                {
+                    cargo.ChangeState(State.Unloading);
+                }
             }
         }
 

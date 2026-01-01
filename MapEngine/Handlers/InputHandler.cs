@@ -43,20 +43,28 @@ namespace MapEngine.Handlers
         private readonly InputState _inputState;
         private readonly MessageHub _messageHub;
         private readonly List<Entity> _entities = new List<Entity>();
-        private readonly Dictionary<Key, ICommandStrategy> _commandBindings;
+        private readonly Dictionary<Key, InputState.Command> _keyBindings;
+        private readonly Dictionary<InputState.Command, ICommandStrategy> _commandStrategies;
 
         private ICommandStrategy? _commandStrategy = null;
         
         public InputHandler(
             InputState inputState,
             MessageHub messageHub,
+            MoveCommandStrategy moveCommandStrategy,
             UnloadCommandStrategy unloadCommandStrategy)
         {
             _inputState = inputState;
             _messageHub = messageHub;
-            _commandBindings = new Dictionary<Key, ICommandStrategy>
+            _keyBindings = new Dictionary<Key, InputState.Command>
             {
-                [Key.U] = unloadCommandStrategy,
+                [Key.U] = InputState.Command.Unload,
+                [Key.M] = InputState.Command.Move
+            };
+            _commandStrategies = new Dictionary<InputState.Command, ICommandStrategy>
+            {
+                [InputState.Command.Move] = moveCommandStrategy,
+                [InputState.Command.Unload] = unloadCommandStrategy,
             };
         }
 
@@ -79,15 +87,13 @@ namespace MapEngine.Handlers
 
         public void HandleRightMouseDown(Vector2 location)
         {
-            if (_inputState.SelectedEntities.Count == 0) return;
+            var movementCommandStrategy = _commandStrategies[InputState.Command.Move];
+            var entities = _inputState.SelectedEntities
+                .Where(movementCommandStrategy.IsApplicable)
+                .ToList();
+            if (entities.Count == 0) return;
 
-            var moveCommand = new MoveCommand
-            {
-                Entities = _inputState.SelectedEntities,
-                Destination = location,
-                MovementMode = MovementMode.Seek,
-                Queue = false, // todo: check of shift is down
-            };
+            var moveCommand = movementCommandStrategy.CreateCommand(location, entities);
             _messageHub.Post(moveCommand);
         }
 
@@ -191,13 +197,15 @@ namespace MapEngine.Handlers
                 return;
             }
             
-            if (!_commandBindings.TryGetValue(key, out var commandStrategy))
+            if (!_keyBindings.TryGetValue(key, out var command))
             {
                 _commandStrategy = null;
                 _inputState.CurrentCommand = InputState.Command.None;
                 return;
             }
 
+            // don't silently fail here - a bound key without a bound function is a bug
+            var commandStrategy = _commandStrategies[command];
             var applicableUnits = _inputState.SelectedEntities
                 .Where(commandStrategy.IsApplicable)
                 .ToList();

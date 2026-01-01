@@ -97,6 +97,7 @@
     <Compile Include="Commands\IHandleCommand.cs" />
     <Compile Include="Commands\MessageHub.cs" />
     <Compile Include="Commands\MoveCommand.cs" />
+    <Compile Include="Commands\MoveCommandStrategy.cs" />
     <Compile Include="Commands\TextCommand.cs" />
     <Compile Include="Commands\UnloadCommand.cs" />
     <Compile Include="Commands\UnloadCommandStrategy.cs" />

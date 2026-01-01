@@ -7,6 +7,7 @@
         Moving,
         Attacking,
         Loading,
+        Loaded,
         Unloading,
         Stopping
     }

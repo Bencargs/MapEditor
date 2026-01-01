@@ -47,6 +47,7 @@
 		"Id":1,
 		"Team":0,
 		"Type":"SubmarineDummy",
+		"State": "Loaded",
 		"Location":{
 			"X":1258,
 			"Y":372,

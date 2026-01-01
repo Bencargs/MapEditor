@@ -40,6 +40,13 @@ namespace MapEngine.ResourceLoading
                     entity.GetComponent<UnitComponent>().TeamId = team;
                 }
 
+                var state = u.State;
+                if (state != null)
+                {
+                    var stateEnum = (State)Enum.Parse(typeof(State), (string)state);
+                    entity.GetComponent<StateComponent>().CurrentState = stateEnum;
+                }
+
                 var movement = u.Movement;
                 if (movement != null)
                 {

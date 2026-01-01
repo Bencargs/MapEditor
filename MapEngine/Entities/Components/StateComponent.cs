@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Common;
+﻿using Common;
 using Common.Entities;
 
 namespace MapEngine.Entities.Components;
@@ -19,12 +17,15 @@ public class StateComponent : IComponent
             ( State.Standby, State.Loading ) => true,
             ( State.Standby, State.Unloading ) => true,
 
+            ( State.Moving, State.Moving ) => true, // Eg. different move location
             ( State.Moving, State.Standby ) => true,
             ( State.Moving, State.Stopping ) => true,
             ( State.Moving, State.Loading ) => true,
      
             ( State.Loading, State.Standby ) => true,
             ( State.Unloading, State.Standby ) => true,
+            
+            ( State.Loaded, State.Unloading ) => true,
 
             _ => false
         };

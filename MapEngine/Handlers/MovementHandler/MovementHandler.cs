@@ -54,7 +54,7 @@ namespace MapEngine.Handlers
                 ApplyFriction(location, movement);
             }
 
-            if (TryGetTarget(location, movement, out var target))
+            if (TryGetTarget(location, movement, entity, out var target))
             {
                 switch (target.MovementMode)
                 {
@@ -80,7 +80,6 @@ namespace MapEngine.Handlers
             else if (movement.Velocity.Length() < 1f)
             {
                 movement.Velocity = Vector3.Zero;
-                entity.Complete();
             }
         }
 
@@ -116,7 +115,7 @@ namespace MapEngine.Handlers
             movement.Velocity -= movement.Velocity.Truncate(movement.BrakeForce);
         }
 
-        private bool TryGetTarget(LocationComponent location, MovementComponent movement, out MoveOrder target)
+        private bool TryGetTarget(LocationComponent location, MovementComponent movement, Entity entity, out MoveOrder target)
         {
             target = movement.Destinations.FirstOrDefault();
             if (target == null)
@@ -126,6 +125,7 @@ namespace MapEngine.Handlers
             {
                 movement.Destinations.Dequeue();
                 ApplyBrakeForce(movement);
+                entity.Complete(State.Moving);
             }
 
             return true;
@@ -219,7 +219,7 @@ namespace MapEngine.Handlers
         }
 
         private static IEnumerable<MoveOrder> ToMoveOrders(List<Tile> path, MovementMode movementMode) =>
-            path.Select(x => new MoveOrder
+            path.Skip(1).Select(x => new MoveOrder
             {
                 MovementMode = movementMode,
                 Destination = new Vector2(x.Location.X, x.Location.Y)
