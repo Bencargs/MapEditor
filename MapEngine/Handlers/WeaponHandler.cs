@@ -81,6 +81,7 @@ namespace MapEngine.Handlers
             //var verticalSpeed = weaponComponent.Speed * (float)Math.Sin(45f.ToRadians());
             var verticalSpeed = weaponComponent.Speed * 3;
 
+            // todo: this should be loaded from a definition file
             var projectile = new Entity
             {
                 Id = 72, // todo: EntityFactory
@@ -100,6 +101,7 @@ namespace MapEngine.Handlers
                         MaxVelocity = weaponComponent.Speed,
                         Mass = 0,
                         MaxForce = weaponComponent.MaxImpactForce,
+                        MaxGradient = float.PositiveInfinity,
                         Destinations = new Queue<MoveOrder>(new[]
                         {
                             new MoveOrder

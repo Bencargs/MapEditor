@@ -25,7 +25,7 @@ namespace MapEngine
 
         public void Clear()
         {
-            Bitmap.Clear();
+            Array.Clear(_backBuffer, 0, _backBuffer.Length);
         }
 
         public void DrawCircle(Colour colour, Rectangle area)
@@ -48,6 +48,64 @@ namespace MapEngine
         }
 
         public void DrawImage(IImage image, Rectangle area)
+        {
+            int destX0 = Math.Max(0, area.X);
+            int destY0 = Math.Max(0, area.Y);
+            int destX1 = Math.Min(Width,  area.X + area.Width);
+            int destY1 = Math.Min(Height, area.Y + area.Height);
+
+            int copyW = destX1 - destX0;
+            int copyH = destY1 - destY0;
+            if (copyW <= 0 || copyH <= 0) return;
+
+            int srcX0 = destX0 - area.X;
+            int srcY0 = destY0 - area.Y;
+
+            copyW = Math.Min(copyW, image.Width  - srcX0);
+            copyH = Math.Min(copyH, image.Height - srcY0);
+            if (copyW <= 0 || copyH <= 0) return;
+
+            const int bpp = 4;
+            int srcStride = image.Width * bpp;
+            int dstStride = Width * bpp;
+
+            for (int row = 0; row < copyH; row++)
+            {
+                int sRow = (srcY0 + row) * srcStride + srcX0 * bpp;
+                int dRow = (destY0 + row) * dstStride + destX0 * bpp;
+
+                for (int col = 0; col < copyW; col++)
+                {
+                    int s = sRow + col * bpp;
+                    int d = dRow + col * bpp;
+
+                    // Dont draw something that's entirely transperant
+                    byte alpha = image.Buffer[s + 3];
+                    if (alpha == 0)
+                        continue;
+
+                    if (alpha == 255)
+                    {
+                        // copy pixel
+                        _backBuffer[d + 0] = image.Buffer[s + 0];
+                        _backBuffer[d + 1] = image.Buffer[s + 1];
+                        _backBuffer[d + 2] = image.Buffer[s + 2];
+                        _backBuffer[d + 3] = 255;
+                        continue;
+                    }
+
+                    int inv = 255 - alpha;
+
+                    // [0]=Red, [1]=Blue, [2]=Green, [3]=Alpha
+                    _backBuffer[d + 0] = (byte)((image.Buffer[s + 0] * alpha + _backBuffer[d + 0] * inv + 127) / 255);
+                    _backBuffer[d + 1] = (byte)((image.Buffer[s + 1] * alpha + _backBuffer[d + 1] * inv + 127) / 255);
+                    _backBuffer[d + 2] = (byte)((image.Buffer[s + 2] * alpha + _backBuffer[d + 2] * inv + 127) / 255);
+                    _backBuffer[d + 3] = 255;
+                }
+            }
+        }
+
+        private void PixelDraw(IImage image, Rectangle area)
         {
             // restrict drawing to map bounds
             var minX = Math.Max(0, 0 - area.X);
@@ -80,7 +138,7 @@ namespace MapEngine
                     continue;
 
                 var k = i + (area.X * 4) + (area.Y * 4 * area.Width);
-                if (k > _backBuffer.Length || k < 0)
+                if (k + 4 > _backBuffer.Length || k < 0)
                     continue;
 
                 var opacity = buffer[i + 3] / 255f;
@@ -161,12 +219,75 @@ namespace MapEngine
 
         public void DrawLines(Colour colour, Vector2[] points)
         {
-            throw new NotImplementedException();
+            if (points == null || points.Length < 2)
+                return;
+
+            for (int i = 0; i < points.Length - 1; i++)
+            {
+                DrawLine(colour, points[i], points[i + 1]);
+            }
+        }
+        
+        private void DrawLine(Colour colour, Vector2 from, Vector2 to)
+        {
+            int x0 = (int)Math.Round(from.X);
+            int y0 = (int)Math.Round(from.Y);
+            int x1 = (int)Math.Round(to.X);
+            int y1 = (int)Math.Round(to.Y);
+
+            int dx = Math.Abs(x1 - x0);
+            int dy = Math.Abs(y1 - y0);
+
+            int sx = x0 < x1 ? 1 : -1;
+            int sy = y0 < y1 ? 1 : -1;
+
+            int err = dx - dy;
+
+            while (true)
+            {
+                if ((uint)x0 < (uint)Width && (uint)y0 < (uint)Height)
+                {
+                    SetPixel(x0, y0, colour);
+                }
+
+                if (x0 == x1 && y0 == y1)
+                    break;
+
+                int e2 = err << 1;
+
+                if (e2 > -dy)
+                {
+                    err -= dy;
+                    x0 += sx;
+                }
+
+                if (e2 < dx)
+                {
+                    err += dx;
+                    y0 += sy;
+                }
+            }
         }
 
         public void DrawRectangle(Colour colour, Rectangle area)
         {
-            throw new NotImplementedException();
+            if (area.Width <= 0 || area.Height <= 0)
+                return;
+
+            int x0 = area.X;
+            int y0 = area.Y;
+            int x1 = area.X + area.Width - 1;
+            int y1 = area.Y + area.Height - 1;
+
+            // quick reject if completely offscreen
+            if (x1 < 0 || y1 < 0 || x0 >= Width || y0 >= Height)
+                return;
+
+            
+            DrawLine(colour, new Vector2(x0, y0), new Vector2(x1, y0)); // top
+            DrawLine(colour, new Vector2(x0, y1), new Vector2(x1, y1)); // bottom
+            DrawLine(colour, new Vector2(x0, y0), new Vector2(x0, y1)); // left
+            DrawLine(colour, new Vector2(x1, y0), new Vector2(x1, y1)); // right
         }
 
         public void FillRectangle(Colour colour, Rectangle area)

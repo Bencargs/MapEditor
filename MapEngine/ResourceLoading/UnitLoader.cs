@@ -83,19 +83,22 @@ namespace MapEngine.ResourceLoading
                 return entity;
             }).ToArray();
 
-            foreach (var unit in units)
+            if (units != null)
             {
-                var cargoComponent = unit.GetComponent<CargoComponent>();
-                if (cargoComponent == null)
-                    continue;
-
-                for (int i = 0; i < cargoComponent.Content.Count; i++)
+                foreach (var unit in units)
                 {
-                    var placeholder = cargoComponent.Content[i];
-                    var actualEntity = units.FirstOrDefault(x => x.Id == placeholder.Id);
-                    if (actualEntity != null)
+                    var cargoComponent = unit.GetComponent<CargoComponent>();
+                    if (cargoComponent == null)
+                        continue;
+
+                    for (int i = 0; i < cargoComponent.Content.Count; i++)
                     {
-                        cargoComponent.Content[i] = actualEntity;
+                        var placeholder = cargoComponent.Content[i];
+                        var actualEntity = units.FirstOrDefault(x => x.Id == placeholder.Id);
+                        if (actualEntity != null)
+                        {
+                            cargoComponent.Content[i] = actualEntity;
+                        }
                     }
                 }
             }

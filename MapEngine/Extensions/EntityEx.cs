@@ -62,7 +62,7 @@ namespace MapEngine.Entities
         {
             var colliderComponent = entity.GetComponent<CollisionComponent>();
             if (colliderComponent == null)
-                return null; //  todo: null object?
+                return new NoCollider(); //  todo: null object?
 
             var sourceLocation = entity.Location();
             var collider = colliderComponent.GetCollider(sourceLocation);
@@ -87,7 +87,13 @@ namespace MapEngine.Entities
             var terrainTypes = movementComponent.Terrains;
             var tileGradient = tile.GetGradient();
 
-            return terrainTypes.Contains(tile.Type) && tileGradient <= movementComponent.MaxGradient;
+            if (terrainTypes != null && !terrainTypes.Contains(tile.Type))
+            {
+                // Terrain type restrictions are not relevant for all entities (eg. projectiles)
+                return false;
+            }
+
+            return tileGradient <= movementComponent.MaxGradient;
         }
 
         public static void ChangeState(this Entity entity, State state)

@@ -23,7 +23,7 @@ namespace MapEngine.Services.Effects.LightingEffect
 
         public void Initialise()
         {
-            _enabled = true;
+            _enabled = false;
             
             // todo: rather than an efficient height cache here,
             // should uplift map service to make it not slow
@@ -52,7 +52,11 @@ namespace MapEngine.Services.Effects.LightingEffect
             {
                 for (var x = 0; x < viewport.Width; x++)
                 {
-                    var currentHeight = _heights[y * viewport.Width + x];
+                    var initialIndex = y * viewport.Width + x;
+                    if (initialIndex >= _heights.Length)
+                        break;
+                    
+                    var currentHeight = _heights[initialIndex];
 
                     float sx = x;
                     float sy = y;
@@ -67,7 +71,11 @@ namespace MapEngine.Services.Effects.LightingEffect
                         if (sx < 0 || sx >= viewport.Width || sy < 0 || sy >= viewport.Height)
                             break;
 
-                        var height = _heights[(int)sy * viewport.Width + (int)sx];
+                        var heightIndex = (int)sy * viewport.Width + (int)sx;
+                        if (heightIndex >= _heights.Length)
+                            break;
+
+                        var height = _heights[heightIndex];
                         if (height > currentHeight)
                         {
                             inShadow = true;

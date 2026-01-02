@@ -17,6 +17,9 @@ public class TextHandler : IHandleCommand<TextCommand>
             Colour colour,
             Justification justification = Justification.Left)
         {
+            if (string.IsNullOrWhiteSpace(text))
+                return;
+            
             var shadowColour = new Colour(0, 0, 0);
             var glyphTypeface = font.GlyphTypeface;
             

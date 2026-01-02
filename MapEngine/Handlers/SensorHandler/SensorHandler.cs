@@ -24,6 +24,7 @@ namespace MapEngine.Handlers.SensorHandler
         {
             _radarSensor = radarSensor;
             _sightSensor = sightSensor;
+            _enabled = false;
         }
 
         public bool IsDetected(int team, Entity entity)

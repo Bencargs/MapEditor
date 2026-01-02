@@ -21,6 +21,7 @@ namespace MapEngine.Services.Effects.LightingEffect
         {
             _gameTime = gameTime;
             _mapService = mapService;
+            _enabled = true;
         }
 
         public byte[] ApplyAmbientLight(Rectangle viewport, byte[] fieldOfView)
