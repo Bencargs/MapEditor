@@ -15,6 +15,7 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
     <TargetFrameworkProfile />
+    <LangVersion>10</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -88,6 +89,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Commands\ICommandStrategy.cs" />
     <Compile Include="Commands\CreateEffectCommand.cs" />
     <Compile Include="Commands\CreateEntityCommand.cs" />
     <Compile Include="Commands\DestroyEntityCommand.cs" />
@@ -95,11 +97,17 @@
     <Compile Include="Commands\IHandleCommand.cs" />
     <Compile Include="Commands\MessageHub.cs" />
     <Compile Include="Commands\MoveCommand.cs" />
+    <Compile Include="Commands\MoveCommandStrategy.cs" />
+    <Compile Include="Commands\TextCommand.cs" />
+    <Compile Include="Commands\UnloadCommand.cs" />
+    <Compile Include="Commands\UnloadCommandStrategy.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="Entities\Components\CargoComponent.cs" />
     <Compile Include="Entities\Components\CollisionComponent.cs" />
     <Compile Include="Entities\Components\ModelComponent.cs" />
     <Compile Include="Entities\Components\ParticleComponent.cs" />
     <Compile Include="Entities\Components\SensorComponent.cs" />
+    <Compile Include="Entities\Components\StateComponent.cs" />
     <Compile Include="Entities\Components\UnitComponent.cs" />
     <Compile Include="Entities\Components\ImageComponent.cs" />
     <Compile Include="Entities\Components\MovementComponent.cs" />
@@ -109,11 +117,15 @@
     <Compile Include="Extensions\EnumerableEx.cs" />
     <Compile Include="Extensions\EnumEx.cs" />
     <Compile Include="Extensions\MathEx.cs" />
+    <Compile Include="Factories\FontFactory.cs" />
     <Compile Include="Factories\ModelFactory.cs" />
     <Compile Include="Factories\ParticleFactory.cs" />
     <Compile Include="Factories\UnitFactory.cs" />
+    <Compile Include="Font.cs" />
     <Compile Include="Handlers\CameraHandler.cs" />
+    <Compile Include="Handlers\CargoHandler.cs" />
     <Compile Include="Handlers\CollisionHandler.cs" />
+    <Compile Include="Handlers\CursorHandler.cs" />
     <Compile Include="Handlers\InputHandler.cs" />
     <Compile Include="Handlers\InterfaceHandler.cs" />
     <Compile Include="Handlers\MapHandler.cs" />
@@ -132,9 +144,11 @@
     <Compile Include="Handlers\SensorHandler\SensorHandler.cs" />
     <Compile Include="Handlers\EffectsHandler.cs" />
     <Compile Include="Handlers\SensorHandler\SightSensor.cs" />
+    <Compile Include="Handlers\TextHandler.cs" />
     <Compile Include="Rendering\IRenderer.cs" />
     <Compile Include="Rendering\Renderer2d.cs" />
     <Compile Include="Rendering\Renderer3d.cs" />
+    <Compile Include="ResourceLoading\CursorLoader.cs" />
     <Compile Include="Services\Effects\FluidEffect\Direction.cs" />
     <Compile Include="Services\Effects\FluidEffect\Field.cs" />
     <Compile Include="Services\Effects\FluidEffect\FluidEffects.cs" />
@@ -222,6 +236,5 @@
       <Name>SoftEngine</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

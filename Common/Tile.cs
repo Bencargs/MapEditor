@@ -7,6 +7,8 @@ namespace Common
 		public int Id { get; set; }
 		public Vector2 Location { get; set; }
 		public string TextureId { get; set; }
+		public string SurfaceTextureId { get; set; } = null;
+		public string SubSurfaceTextureId { get; set; } = null;
 		public TerrainType Type { get; set; }
 		public string HeightmapTextureId { get; set; }
         public Vector3 Normal { get; set; }

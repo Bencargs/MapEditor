@@ -44,7 +44,7 @@ namespace MapEngine
 
         public void Initialise()
         {
-            var mapFilename = @"C:\src\MapEditor\MapEngine\Content\Maps\TestMap12.json";
+            var mapFilename = @"C:\src\MapEditor\MapEngine\Content\Maps\TestMap13.json";
             _cameraHandler.Initialise(mapFilename);
             _mapHandler.Initialise(mapFilename);
             
@@ -55,6 +55,9 @@ namespace MapEngine
             _unitHandler.Initialise(unitsPath, mapFilename, weaponsPath, modelsPath, particlesPath);
 
             _effectsHandler.Initialise();
+            _interfaceHandler.Initialise(
+                @"C:\src\MapEditor\MapEngine\Content\Cursors",
+                @"C:\src\MapEditor\MapEngine\Content\Fonts");
         }
 
         public void Display()
@@ -76,9 +79,9 @@ namespace MapEngine
         {
             _messageHub.Notify();
             _cameraHandler.Update();
+            _particleHandler.Update();
             _unitHandler.Update();
             _effectsHandler.Update();
-            _particleHandler.Update();
         }
 
         private void Render()
@@ -86,9 +89,9 @@ namespace MapEngine
             // Todo: need to order rendering by Z height
             var viewport = _cameraHandler.GetViewport();
             _mapHandler.Render(viewport, _graphics);
+            _particleHandler.Render(viewport, _graphics);
             _unitHandler.Render(viewport, _graphics);
             _effectsHandler.Render(viewport, _graphics);
-            _particleHandler.Render(viewport, _graphics);
             _interfaceHandler.Render(viewport, _graphics);
 
             _graphics.Render();

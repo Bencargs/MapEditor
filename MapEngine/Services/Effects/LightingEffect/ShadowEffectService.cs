@@ -9,6 +9,7 @@ namespace MapEngine.Services.Effects.LightingEffect
     {
         private float[] _heights;
         private byte[] _fieldOfView;
+        private bool _enabled = false; // todo: there should be a better way to configure effects per map
         private readonly GameTime _gameTime;
         private readonly MapService _mapService;
 
@@ -22,6 +23,8 @@ namespace MapEngine.Services.Effects.LightingEffect
 
         public void Initialise()
         {
+            _enabled = false;
+            
             // todo: rather than an efficient height cache here,
             // should uplift map service to make it not slow
             _heights = EnsureHeightCache();
@@ -29,6 +32,8 @@ namespace MapEngine.Services.Effects.LightingEffect
 
         public byte[] GenerateBitmap(Rectangle viewport)
         {
+            if (!_enabled) return new byte[0];
+            
             ClearShadowBuffer(viewport);
             var (sunDirection, shadowIntensity) = GetSunDirectionVector(_gameTime.TimeOfDay);
             if (sunDirection == Vector2.Zero)
@@ -47,7 +52,11 @@ namespace MapEngine.Services.Effects.LightingEffect
             {
                 for (var x = 0; x < viewport.Width; x++)
                 {
-                    var currentHeight = _heights[y * viewport.Width + x];
+                    var initialIndex = y * viewport.Width + x;
+                    if (initialIndex >= _heights.Length)
+                        break;
+                    
+                    var currentHeight = _heights[initialIndex];
 
                     float sx = x;
                     float sy = y;
@@ -62,7 +71,11 @@ namespace MapEngine.Services.Effects.LightingEffect
                         if (sx < 0 || sx >= viewport.Width || sy < 0 || sy >= viewport.Height)
                             break;
 
-                        var height = _heights[(int)sy * viewport.Width + (int)sx];
+                        var heightIndex = (int)sy * viewport.Width + (int)sx;
+                        if (heightIndex >= _heights.Length)
+                            break;
+
+                        var height = _heights[heightIndex];
                         if (height > currentHeight)
                         {
                             inShadow = true;

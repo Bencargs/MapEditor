@@ -7,6 +7,7 @@ namespace MapEngine.Entities.Components
     {
         public ComponentType Type => ComponentType.Unit;
         public string UnitType { get; set; }
+        public string Name { get; set; }
         public int TeamId { get; set; }
 
         public IComponent Clone()
@@ -14,7 +15,8 @@ namespace MapEngine.Entities.Components
             return new UnitComponent
             {
                 UnitType = UnitType,
-                TeamId = TeamId
+                TeamId = TeamId,
+                Name = Name
             };
         }
     }

@@ -1,5 +1,4 @@
-﻿using System.Numerics;
-using Common;
+﻿using Common;
 using MapEngine.Commands;
 using MapEngine.Entities;
 using MapEngine.Entities.Components;
@@ -19,6 +18,7 @@ namespace MapEngine.Handlers
     {
         private readonly MessageHub _messageHub;
         private readonly WeaponHandler _weaponHandler;
+        private readonly CargoHandler _cargoHandler;
         private readonly MovementHandler _movementHandler;
         private readonly CollisionHandler _collisionHandler;
         private readonly SensorHandler.SensorHandler _sensorHandler;
@@ -32,6 +32,7 @@ namespace MapEngine.Handlers
             CollisionHandler collisionHandler,
             SensorHandler.SensorHandler sensorHandler,
             WeaponHandler weaponHandler,
+            CargoHandler cargoHandler,
             MapService mapService,
             Renderer2d renderer2d, // todo: RenderFactory.GetRenderers?
             Renderer3d renderer3d)
@@ -39,6 +40,7 @@ namespace MapEngine.Handlers
             _messageHub = messageHub;
             _sensorHandler = sensorHandler;
             _weaponHandler = weaponHandler;
+            _cargoHandler = cargoHandler;
             _2dRenderer = renderer2d;
             _3dRenderer = renderer3d;
             _movementHandler = movementHandler;
@@ -71,6 +73,7 @@ namespace MapEngine.Handlers
             _collisionHandler.Update();
             _sensorHandler.Update();
             _weaponHandler.Update();
+            _cargoHandler.Update();
         }
 
         public void Render(Rectangle viewport, IGraphics graphics)

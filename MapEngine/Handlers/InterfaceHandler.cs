@@ -1,18 +1,10 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Ink;
-using System.Windows.Media;
-using System.Windows.Shapes;
 using Common;
 using MapEngine.Entities;
 using MapEngine.Entities.Components;
 using MapEngine.Extensions;
+using MapEngine.Factories;
 using MapEngine.Services.Map;
 using Rectangle = Common.Rectangle;
 
@@ -22,13 +14,25 @@ namespace MapEngine.Handlers
     {
         private readonly MapService _mapService;
         private readonly InputState _inputState;
+        private readonly TextHandler _textHandler;
+        private readonly CursorHandler _cursorHandler;
 
         public InterfaceHandler(
             MapService mapService,
-            InputState inputState)
+            InputState inputState,
+            TextHandler textHandler,
+            CursorHandler cursorHandler)
         {
             _mapService = mapService;
             _inputState = inputState;
+            _textHandler = textHandler;
+            _cursorHandler = cursorHandler;
+        }
+
+        public void Initialise(string cursorFile, string fontPath)
+        {
+            FontFactory.LoadFonts(fontPath);
+            _cursorHandler.Initialise(cursorFile);
         }
 
         public void Render(Rectangle viewport, IGraphics graphics)
@@ -37,6 +41,9 @@ namespace MapEngine.Handlers
 
             DrawSelectionBox(buffer);
             DrawSelectedEntities(buffer);
+            DrawHoverEntityStatus(buffer);
+            DrawTextInput(buffer);
+            _cursorHandler.Render(viewport, graphics);
 
             graphics.DrawBytes(buffer, viewport);
         }
@@ -46,10 +53,11 @@ namespace MapEngine.Handlers
             if (_inputState.SelectionStart is null) return;
 
             var width = _mapService.Width;
+            var height = _mapService.Height;
             var startX = (int)Math.Min(_inputState.SelectionStart.Value.X, _inputState.Location.X).Clamp(0, width);
-            var startY = (int)Math.Min(_inputState.SelectionStart.Value.Y, _inputState.Location.Y).Clamp(0, width);
+            var startY = (int)Math.Min(_inputState.SelectionStart.Value.Y, _inputState.Location.Y).Clamp(0, height);
             var endX = (int)Math.Max(_inputState.SelectionStart.Value.X, _inputState.Location.X).Clamp(0, width);
-            var endY = (int)Math.Max(_inputState.SelectionStart.Value.Y, _inputState.Location.Y).Clamp(0, width);
+            var endY = (int)Math.Max(_inputState.SelectionStart.Value.Y, _inputState.Location.Y).Clamp(0, height);
 
             var bytesPerPixel = 4; // RGBA format
             var stride = width * bytesPerPixel;
@@ -80,7 +88,7 @@ namespace MapEngine.Handlers
             }
         }
 
-        public void DrawSelectedEntities(byte[] buffer)
+        private void DrawSelectedEntities(byte[] buffer)
         {
             foreach (var selected in _inputState.SelectedEntities)
             {
@@ -92,7 +100,43 @@ namespace MapEngine.Handlers
             }
         }
 
-        public static void DrawBoxOnImage(Vector2 location, int width, int height, float facingAngle, byte[] image, int imageWidth)
+        private void DrawHoverEntityStatus(byte[] buffer)
+        {
+            var hovered = _inputState.HoveredEntity;
+            if (hovered == null) return;
+
+            var unitComponent = hovered.GetComponent<UnitComponent>();
+            var stateComponent = hovered.GetComponent<StateComponent>();
+            if (stateComponent == null || unitComponent == null) return;
+
+            if (!FontFactory.TryGetFont("default", out var font))
+                return;
+
+            // todo: some of this should be interface config
+            var size = 13;
+            var textColour = new Colour(215, 215, 230);
+            var nameLocation = new Rectangle(_mapService.Width / 2, _mapService.Height - size * 2, _mapService.Width, _mapService.Height);
+            var statusLocation = new Rectangle(_mapService.Width / 2, _mapService.Height - size, _mapService.Width, _mapService.Height);
+            
+            _textHandler.DrawText(buffer, unitComponent.Name, nameLocation, font, size, textColour, Justification.Center);
+            _textHandler.DrawText(buffer, $"{stateComponent.CurrentState}", statusLocation, font, size, textColour, Justification.Center);
+        }
+
+        private void DrawTextInput(byte[] buffer)
+        {
+            if (!_inputState.IsTyping) return;
+            
+            if (!FontFactory.TryGetFont("default", out var font))
+                return;
+
+            var size = 13;
+            var text = $"> {_inputState.TextInput}_";
+            var textColour = new Colour(215, 215, 230);
+
+            _textHandler.DrawText(buffer, text, new Rectangle(12, _mapService.Height - size, _mapService.Width, _mapService.Height), font, size, textColour);
+        }
+
+        private static void DrawBoxOnImage(Vector2 location, int width, int height, float facingAngle, byte[] image, int imageWidth)
         {
             int startX = (int)location.X;
             int startY = (int)location.Y;

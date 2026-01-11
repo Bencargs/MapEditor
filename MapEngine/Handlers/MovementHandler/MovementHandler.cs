@@ -50,10 +50,11 @@ namespace MapEngine.Handlers
             var tile = _mapService.GetTile(location.Location);
             if (!entity.IsNavigable(tile))
             {
-                movement.Velocity = Vector3.Zero;
+                movement.Velocity = -movement.Velocity/2;
+                ApplyFriction(location, movement);
             }
 
-            if (TryGetTarget(location, movement, out var target))
+            if (TryGetTarget(location, movement, entity, out var target))
             {
                 switch (target.MovementMode)
                 {
@@ -70,11 +71,15 @@ namespace MapEngine.Handlers
                         break;
                 }
             }
-            else if (movement.Velocity.Length() > 0)
+            else if (movement.Velocity.Length() > 0.5f)
             {
                 // eg. an entity having a force applied to it
                 location.Location += movement.Velocity.ToVector2();
                 ApplyFriction(location, movement);
+            }
+            else if (movement.Velocity.Length() < 1f)
+            {
+                movement.Velocity = Vector3.Zero;
             }
         }
 
@@ -110,7 +115,7 @@ namespace MapEngine.Handlers
             movement.Velocity -= movement.Velocity.Truncate(movement.BrakeForce);
         }
 
-        private bool TryGetTarget(LocationComponent location, MovementComponent movement, out MoveOrder target)
+        private bool TryGetTarget(LocationComponent location, MovementComponent movement, Entity entity, out MoveOrder target)
         {
             target = movement.Destinations.FirstOrDefault();
             if (target == null)
@@ -120,6 +125,7 @@ namespace MapEngine.Handlers
             {
                 movement.Destinations.Dequeue();
                 ApplyBrakeForce(movement);
+                entity.Complete(State.Moving);
             }
 
             return true;
@@ -145,13 +151,36 @@ namespace MapEngine.Handlers
             target.Steering = target.Steering.Truncate(target.MaxForce) / target.Mass;
 
             //then add it to velocity to get the new velocity
-            var targetVelocity2 = (target.Velocity.ToVector2() + target.Steering).Truncate(target.MaxVelocity);
-            target.Velocity = new Vector3(targetVelocity2.X, targetVelocity2.Y, 0);
-
+            var targetVelocity = (target.Velocity.ToVector2() + target.Steering).Truncate(target.MaxVelocity);
+            target.Velocity = new Vector3(targetVelocity.X, targetVelocity.Y, 0);
+            
+            // Face toward destination (or: face toward velocity if moving fast enough)
+            var dtSeconds = 4f;
+            
+            var desiredFacing = directionVector.Angle();
+            var turnSpeedDegPerSec = 1f;// target.MaxTurnSpeedDegPerSec; // add this property, or use a constant
+            var maxTurnThisFrame = turnSpeedDegPerSec * dtSeconds;
+            
             //Set the facingAngle (used to draw the image, in radians) to velocity
-            location.FacingAngle = target.Velocity.ToVector2().Angle();
+            location.FacingAngle = MoveTowardsAngleDegrees(location.FacingAngle, desiredFacing, maxTurnThisFrame);
 
-            location.Location += target.Velocity.ToVector2();
+            location.Location += target.Velocity.ToVector2() * dtSeconds;
+        }
+        
+        // todo: move these to common methods / extensions
+        private static float WrapDegrees(float deg)
+        {
+            deg %= 360f;
+            if (deg < -180f) deg += 360f;
+            if (deg > 180f) deg -= 360f;
+            return deg;
+        }
+
+        private static float MoveTowardsAngleDegrees(float current, float target, float maxDelta)
+        {
+            var delta = WrapDegrees(target - current);
+            if (Math.Abs(delta) <= maxDelta) return target;
+            return current + Math.Sign(delta) * maxDelta;
         }
 
         public void Handle(CreateEntityCommand command)
@@ -174,6 +203,8 @@ namespace MapEngine.Handlers
             foreach (var entity in command.Entities)
             {
                 var movementComponent = entity.GetComponent<MovementComponent>();
+                if (movementComponent == null)
+                    continue;
 
                 var destination = entityDestinations[entity];
                 var path = _pathfinding.GetPath(entity, destination);
@@ -183,11 +214,12 @@ namespace MapEngine.Handlers
                     movementComponent.Destinations.Clear();
 
                 movementComponent.Destinations.Enqueue(orders);
+                entity.ChangeState(State.Moving);
             }
         }
 
         private static IEnumerable<MoveOrder> ToMoveOrders(List<Tile> path, MovementMode movementMode) =>
-            path.Select(x => new MoveOrder
+            path.Skip(1).Select(x => new MoveOrder
             {
                 MovementMode = movementMode,
                 Destination = new Vector2(x.Location.X, x.Location.Y)

@@ -54,9 +54,14 @@ namespace MapEngine.Handlers
         {
             // Calculate the radius that can accommodate at least numPoints
             var numPoints = units.Count;
-            int radius = (int)Math.Ceiling(Math.Sqrt(numPoints / Math.PI));
-
+            if (numPoints == 1)
+            {
+                // Special case: single unit should go exactly to destination
+                return new List<Vector2> { new(0, 0) };
+            }
+            
             // Gets all the points in a circle of that radius
+            int radius = (int)Math.Ceiling(Math.Sqrt(numPoints / Math.PI));
             List<Vector2> allPoints = CalculateCirclePoints(radius);
 
             var centerPoint = new Vector2(0, 0);
@@ -66,9 +71,9 @@ namespace MapEngine.Handlers
                 .ToList();
 
             // Multiply each point location by the square width and take the center of each square
-            float squareWidth = units[0].Width; // todo: assumes all entities have the same width
+            float spacing = units.Max(u => Math.Max(u.Width, u.Height));
             List<Vector2> squareCenters = orderedPoints
-                .Select((p, i) => new Vector2(p.X * squareWidth + squareWidth / 2, p.Y * squareWidth + squareWidth / 2))
+                .Select(p => new Vector2(p.X * spacing, p.Y * spacing))
                 .ToList();
 
             return squareCenters;

@@ -64,6 +64,14 @@ namespace MapEngine
                 var location = inputHandler.GetMouseLocation(args, frontBuffer);
                 inputHandler.HandleMouseMove(location);
             };
+            KeyDown += (sender, args) =>
+            {
+                inputHandler.HandleKeyDown(args.Key);
+            };
+            TextInput += (sender, args) =>
+            {
+                inputHandler.HandleTextInput(args.Text);
+            };
 
             frontBuffer.Source = graphics.Bitmap;
 

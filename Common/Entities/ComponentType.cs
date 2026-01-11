@@ -12,5 +12,7 @@
         Model,
         Sensor,
         Particle,
+        Cargo,
+        State
     }
 }

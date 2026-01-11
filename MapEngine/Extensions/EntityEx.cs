@@ -36,7 +36,7 @@ namespace MapEngine.Entities
         public static bool IsMoving(this Entity entity)
         {
             var movement = entity.GetComponent<MovementComponent>();
-            return (movement?.Velocity.Length() ?? 0) > 0;
+            return (movement?.Velocity.Length() ?? 0) > 0.1f;
         }
 
         public static Texture Texture(this Entity entity)
@@ -62,11 +62,10 @@ namespace MapEngine.Entities
         {
             var colliderComponent = entity.GetComponent<CollisionComponent>();
             if (colliderComponent == null)
-                return null; //  todo: null object?
+                return new NoCollider(); //  todo: null object?
 
             var sourceLocation = entity.Location();
-            var test = new Vector2(sourceLocation.X - 12, sourceLocation.Y - 12);
-            var collider = colliderComponent.GetCollider(test);// yuck
+            var collider = colliderComponent.GetCollider(sourceLocation);
 
             //var facingAngle = entity.GetComponent<LocationComponent>().FacingAngle;
             //var rotated = collider.Rotate(facingAngle);
@@ -88,7 +87,37 @@ namespace MapEngine.Entities
             var terrainTypes = movementComponent.Terrains;
             var tileGradient = tile.GetGradient();
 
-            return terrainTypes.Contains(tile.Type) && tileGradient <= movementComponent.MaxGradient;
+            if (terrainTypes != null && !terrainTypes.Contains(tile.Type))
+            {
+                // Terrain type restrictions are not relevant for all entities (eg. projectiles)
+                return false;
+            }
+
+            return tileGradient <= movementComponent.MaxGradient;
+        }
+
+        public static void ChangeState(this Entity entity, State state)
+        {
+            var stateComponent = entity.GetComponent<StateComponent>();
+            stateComponent?.ChangeState(state);
+        }
+
+        public static void Complete(this Entity entity, State state)
+        {
+            var stateComponent = entity.GetComponent<StateComponent>();
+            if (stateComponent?.CurrentState != state)
+                return;
+            
+            stateComponent.ChangeState(State.Standby);
+        }
+        
+        public static void Cancel(this Entity entity, State state)
+        {
+            var stateComponent = entity.GetComponent<StateComponent>();
+            if (stateComponent?.CurrentState != state)
+                return;
+            
+            stateComponent?.ChangeState(State.Stopping);
         }
 
         public static void ReplaceOrders(this Entity entity, IEnumerable<MoveOrder> orders)
