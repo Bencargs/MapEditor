@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Numerics;
 using Common;
+using Common.Collision;
 using MapEngine.Entities;
 using MapEngine.Entities.Components;
 using MapEngine.Extensions;
 using MapEngine.Factories;
+using MapEngine.Handlers.InputHandler;
 using MapEngine.Services.Map;
 using Rectangle = Common.Rectangle;
 
@@ -15,23 +17,27 @@ namespace MapEngine.Handlers
         private readonly MapService _mapService;
         private readonly InputState _inputState;
         private readonly TextHandler _textHandler;
+        private readonly MinimapHandler _minimapHandler;
         private readonly CursorHandler _cursorHandler;
 
         public InterfaceHandler(
             MapService mapService,
             InputState inputState,
             TextHandler textHandler,
+            MinimapHandler minimapHandler,
             CursorHandler cursorHandler)
         {
             _mapService = mapService;
             _inputState = inputState;
             _textHandler = textHandler;
+            _minimapHandler = minimapHandler;
             _cursorHandler = cursorHandler;
         }
 
         public void Initialise(string cursorFile, string fontPath)
         {
             FontFactory.LoadFonts(fontPath);
+            _minimapHandler.Initialise();
             _cursorHandler.Initialise(cursorFile);
         }
 
@@ -43,6 +49,7 @@ namespace MapEngine.Handlers
             DrawSelectedEntities(buffer);
             DrawHoverEntityStatus(buffer);
             DrawTextInput(buffer);
+            _minimapHandler.Render(viewport, buffer);
             _cursorHandler.Render(viewport, graphics);
 
             graphics.DrawBytes(buffer, viewport);
@@ -92,14 +99,11 @@ namespace MapEngine.Handlers
         {
             foreach (var selected in _inputState.SelectedEntities)
             {
-                var angle = selected.GetComponent<LocationComponent>().FacingAngle;
-                var area = selected.Texture();
-                var location = selected.Location();
-                var centeredLocation = new Vector2(location.X - (area.Width / 2), location.Y - (area.Height / 2));
-                DrawBoxOnImage(centeredLocation, area.Width + 2, area.Height + 2, angle, buffer, _mapService.Width);
+                var bounds = selected.Bounds();
+                DrawBounds(buffer, _mapService.Width, bounds);
             }
         }
-
+        
         private void DrawHoverEntityStatus(byte[] buffer)
         {
             var hovered = _inputState.HoveredEntity;
@@ -135,53 +139,70 @@ namespace MapEngine.Handlers
 
             _textHandler.DrawText(buffer, text, new Rectangle(12, _mapService.Height - size, _mapService.Width, _mapService.Height), font, size, textColour);
         }
-
-        private static void DrawBoxOnImage(Vector2 location, int width, int height, float facingAngle, byte[] image, int imageWidth)
+        
+        private static void DrawBounds(
+            byte[] buffer,
+            int bufferWidth,
+            Vector2[] bounds)
         {
-            int startX = (int)location.X;
-            int startY = (int)location.Y;
-            int endX = startX + width;
-            int endY = startY + height;
+            if (bounds == null || bounds.Length < 2)
+                return;
 
-            // Calculate center point of the box
-            float centerX = startX + (width / 2f);
-            float centerY = startY + (height / 2f);
-
-            int bytesPerPixel = 4; // RGBA format
-            int stride = imageWidth * bytesPerPixel;
-
-            for (int y = startY; y <= endY; y++)
+            for (int i = 0; i < bounds.Length; i++)
             {
-                for (int x = startX; x <= endX; x++)
-                {
-                    if (x == startX || x == endX || y == startY || y == endY)
-                    {
-                        Vector2 rotatedPoint = RotatePoint(new Vector2(x, y), new Vector2(centerX, centerY), facingAngle);
-                        int pixelIndex = ((int)rotatedPoint.Y * stride) + ((int)rotatedPoint.X * bytesPerPixel);
-                        if (pixelIndex < 0 || pixelIndex > image.Length - 1) continue;
+                var a = bounds[i];
+                var b = bounds[(i + 1) % bounds.Length];
 
-                        image[pixelIndex] = 0;       // Red component
-                        image[pixelIndex + 1] = 255; // Green component
-                        image[pixelIndex + 2] = 0;   // Blue component
-                        image[pixelIndex + 3] = 255; // Alpha component
-                    }
-                }
+                DrawLine(buffer, bufferWidth, a, b);
             }
         }
-
-        private static Vector2 RotatePoint(Vector2 point, Vector2 center, float angle)
+        
+        // todo: I'm stuck in a bresenheims repetition hell of my own design
+        private static void DrawLine(
+            byte[] buffer,
+            int bufferWidth,
+            Vector2 a,
+            Vector2 b)
         {
-            float radians = angle.ToRadians();
-            float cos = (float)Math.Cos(radians);
-            float sin = (float)Math.Sin(radians);
+            int x0 = (int)Math.Round(a.X);
+            int y0 = (int)Math.Round(a.Y);
+            int x1 = (int)Math.Round(b.X);
+            int y1 = (int)Math.Round(b.Y);
 
-            float translatedX = point.X - center.X;
-            float translatedY = point.Y - center.Y;
+            int dx = Math.Abs(x1 - x0);
+            int dy = -Math.Abs(y1 - y0);
+            int sx = x0 < x1 ? 1 : -1;
+            int sy = y0 < y1 ? 1 : -1;
+            int err = dx + dy;
 
-            float rotatedX = (translatedX * cos) - (translatedY * sin);
-            float rotatedY = (translatedX * sin) + (translatedY * cos);
+            int stride = bufferWidth * 4;
 
-            return new Vector2(rotatedX + center.X, rotatedY + center.Y);
+            while (true)
+            {
+                int idx = y0 * stride + x0 * 4;
+                if ((uint)idx < buffer.Length - 3)
+                {
+                    buffer[idx + 0] = 0;
+                    buffer[idx + 1] = 255;
+                    buffer[idx + 2] = 0;
+                    buffer[idx + 3] = 255;
+                }
+
+                if (x0 == x1 && y0 == y1)
+                    break;
+
+                int e2 = 2 * err;
+                if (e2 >= dy)
+                {
+                    err += dy;
+                    x0 += sx;
+                }
+                if (e2 <= dx)
+                {
+                    err += dx;
+                    y0 += sy;
+                }
+            }
         }
     }
 }
