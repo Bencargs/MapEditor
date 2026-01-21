@@ -11,6 +11,7 @@ using Common;
 using Common.Entities;
 using MapEngine.Entities.Components;
 using MapEngine.Factories;
+using MapEngine.Handlers.InputHandler;
 using MapEngine.Handlers.ParticleHandler;
 
 namespace MapEngine
@@ -77,7 +78,7 @@ namespace MapEngine
 
             var dispatcherTimer = new DispatcherTimer();
             dispatcherTimer.Tick += Update;
-            dispatcherTimer.Interval = TimeSpan.FromMilliseconds(20); // should be 16 for 60fps
+            dispatcherTimer.Interval = TimeSpan.FromMilliseconds(0); // should be 16 for 60fps
             dispatcherTimer.Start();
         }
 

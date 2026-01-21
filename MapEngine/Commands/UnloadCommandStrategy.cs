@@ -4,7 +4,7 @@ using Common.Entities;
 using System.Numerics;
 using Common;
 using MapEngine.Entities.Components;
-using MapEngine.Handlers;
+using MapEngine.Handlers.InputHandler;
 
 namespace MapEngine.Commands
 {
