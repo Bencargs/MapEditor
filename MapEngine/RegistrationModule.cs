@@ -2,6 +2,7 @@
 using Common;
 using MapEngine.Commands;
 using MapEngine.Handlers;
+using MapEngine.Handlers.InputHandler;
 using MapEngine.Handlers.ParticleHandler;
 using MapEngine.Handlers.SensorHandler;
 using MapEngine.Rendering;
@@ -39,8 +40,10 @@ namespace MapEngine
             builder.RegisterInstance(messageHub);
         }
 
-        public static void RegisterModels(ContainerBuilder builder)
+        private static void RegisterModels(ContainerBuilder builder)
         {
+            builder.RegisterType<Minimap>().SingleInstance();
+            builder.RegisterType<GameTime>().SingleInstance();
             builder.RegisterType<InputState>().SingleInstance();
         }
 
@@ -51,7 +54,6 @@ namespace MapEngine
             //builder.RegisterInstance(new WpfGraphics(768, 512)).SingleInstance();
             builder.RegisterInstance(new WpfGraphics(1779, 743)).SingleInstance();
             //builder.RegisterInstance(new WpfGraphics(640, 480)).SingleInstance();
-            builder.RegisterType<GameTime>().SingleInstance();
             builder.RegisterType<MapService>().SingleInstance();
             builder.RegisterType<PathfindingService>().SingleInstance();
             builder.RegisterType<WaveEffectService>().SingleInstance();
@@ -76,6 +78,7 @@ namespace MapEngine
             builder.RegisterType<CargoHandler>().SingleInstance();
             builder.RegisterType<CursorHandler>().SingleInstance();
             builder.RegisterType<TextHandler>().SingleInstance();
+            builder.RegisterType<MinimapHandler>().SingleInstance();
         }
 
         private static void RegisterRenderers(ContainerBuilder builder)

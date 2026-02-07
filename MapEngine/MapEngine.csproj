@@ -126,9 +126,13 @@
     <Compile Include="Handlers\CargoHandler.cs" />
     <Compile Include="Handlers\CollisionHandler.cs" />
     <Compile Include="Handlers\CursorHandler.cs" />
-    <Compile Include="Handlers\InputHandler.cs" />
+    <Compile Include="Handlers\InputHandler\IInterface.cs" />
+    <Compile Include="Handlers\InputHandler\InputHandler.cs" />
+    <Compile Include="Handlers\InputHandler\InputState.cs" />
+    <Compile Include="Handlers\InputHandler\Minimap.cs" />
     <Compile Include="Handlers\InterfaceHandler.cs" />
     <Compile Include="Handlers\MapHandler.cs" />
+    <Compile Include="Handlers\MinimapHandler.cs" />
     <Compile Include="Handlers\MovementHandler\FormationService.cs" />
     <Compile Include="Handlers\MovementHandler\MovementHandler.cs" />
     <Compile Include="Handlers\MovementHandler\MoveOrder.cs" />

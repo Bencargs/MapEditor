@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using Common;
@@ -7,7 +8,6 @@ using Common.Entities;
 using MapEngine.Entities.Components;
 using MapEngine.Factories;
 using MapEngine.Handlers;
-using MapEngine.Services.Map;
 
 namespace MapEngine.Entities
 {
@@ -58,6 +58,42 @@ namespace MapEngine.Entities
             return ModelFactory.TryGetModel(modelComponent.ModelId, out var model) ? model : null;
         }
 
+        public static Vector2[] Bounds(this Entity entity)
+        {
+            var locationComponent = entity.GetComponent<LocationComponent>();
+            var collisionComponent = entity.GetComponent<CollisionComponent>();
+            if (locationComponent == null || collisionComponent == null)
+                return Array.Empty<Vector2>();
+            
+            var centre = locationComponent.Location;
+            var angle = (float)(locationComponent.FacingAngle * (Math.PI / 180f));
+            var collider = collisionComponent.GetCollider(centre);
+
+            if (collider is BoundingBox box)
+            {
+                var hw = box.Width / 2f;
+                var hh = box.Height / 2f;
+
+                // CCW order
+                var p0 = centre + Rotate(new Vector2(-hw, -hh), angle);
+                var p1 = centre + Rotate(new Vector2( hw, -hh), angle);
+                var p2 = centre + Rotate(new Vector2( hw,  hh), angle);
+                var p3 = centre + Rotate(new Vector2(-hw,  hh), angle);
+                return new[] { p0, p1, p2, p3 };
+            }
+
+            return Array.Empty<Vector2>();
+        }
+        
+        private static Vector2 Rotate(Vector2 v, float radians)
+        {
+            var cos = (float)Math.Cos(radians);
+            var sin = (float)Math.Sin(radians);
+            return new Vector2(
+                v.X * cos - v.Y * sin,
+                v.X * sin + v.Y * cos);
+        }
+
         public static ICollider Hitbox(this Entity entity)
         {
             var colliderComponent = entity.GetComponent<CollisionComponent>();
@@ -66,10 +102,6 @@ namespace MapEngine.Entities
 
             var sourceLocation = entity.Location();
             var collider = colliderComponent.GetCollider(sourceLocation);
-
-            //var facingAngle = entity.GetComponent<LocationComponent>().FacingAngle;
-            //var rotated = collider.Rotate(facingAngle);
-            //return rotated;
 
             return collider;
         }

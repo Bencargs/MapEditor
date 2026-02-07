@@ -2,6 +2,7 @@
 using System.IO;
 using Common;
 using MapEngine.Factories;
+using MapEngine.Handlers.InputHandler;
 using MapEngine.ResourceLoading;
 
 namespace MapEngine.Handlers
