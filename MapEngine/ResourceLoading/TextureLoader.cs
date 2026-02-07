@@ -1,5 +1,6 @@
 ﻿using Common;
 using System;
+using System.IO;
 using System.Linq;
 using System.Windows.Media.Imaging;
 
@@ -21,6 +22,12 @@ namespace MapEngine.ResourceLoading
             var decoder = new GifBitmapDecoder(uri, BitmapCreateOptions.None, BitmapCacheOption.Default);
             var frames = decoder.Frames.Select(x => new WriteableBitmap(x).Scale(0.99)).ToArray();// todo: remove scaling - Why does scaling fix this bug??!
             return new WpfAnimation(frames, framerate ?? 40);
+        }
+
+        public static IAnimation LoadAnimAnimation(string filename, int? framerate = null)
+        {
+            var anim = AnimFile.Load(filename);
+            return new WpfAnimation(anim.Frames, anim.FrameRateMs);
         }
     }
 }

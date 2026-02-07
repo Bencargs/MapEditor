@@ -9,8 +9,8 @@ namespace Common
 		public string TextureId { get; set; }
 		public string SurfaceTextureId { get; set; } = null;
 		public string SubSurfaceTextureId { get; set; } = null;
-		public TerrainType Type { get; set; }
 		public string HeightmapTextureId { get; set; }
+		public TerrainType Type { get; set; }
         public Vector3 Normal { get; set; }
 
         // todo: no idea what black magic i've cast here - probably wrong
