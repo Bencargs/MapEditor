@@ -32,8 +32,9 @@ namespace MapEngine.Handlers
         {
             foreach (var tile in tiles)
             {
-                if (!viewport.Contains(tile.Location))
-                    continue;
+                // todo: fix
+                // if (!viewport.Contains(tile.Location))
+                //     continue;
 
                 if (!TextureFactory.TryGetTexture(tile.TextureId, out var texture)) 
                     continue;

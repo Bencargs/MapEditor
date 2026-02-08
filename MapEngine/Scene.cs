@@ -45,8 +45,8 @@ namespace MapEngine
         public void Initialise()
         {
             var mapFilename = @"C:\src\MapEditor\MapEngine\Content\Maps\TestMap13.json";
-            _cameraHandler.Initialise(mapFilename);
             _mapHandler.Initialise(mapFilename);
+            _cameraHandler.Initialise(mapFilename);
             
             var weaponsPath = @"C:\src\MapEditor\MapEngine\Content\Weapons\";
             var unitsPath = @"C:\src\MapEditor\MapEngine\Content\Units\";
@@ -88,6 +88,7 @@ namespace MapEngine
         {
             // Todo: need to order rendering by Z height
             var viewport = _cameraHandler.GetViewport();
+            _graphics.Clear();
             _mapHandler.Render(viewport, _graphics);
             _particleHandler.Render(viewport, _graphics);
             _unitHandler.Render(viewport, _graphics);

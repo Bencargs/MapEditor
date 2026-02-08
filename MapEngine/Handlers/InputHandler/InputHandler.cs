@@ -19,6 +19,7 @@ namespace MapEngine.Handlers.InputHandler
         private readonly InputState _inputState;
         private readonly MessageHub _messageHub;
         private readonly List<IInterface> _interfaces;
+        private readonly CameraHandler _cameraHandler;
         private readonly List<Entity> _entities = new List<Entity>();
         private readonly Dictionary<Key, InputState.Command> _keyBindings;
         private readonly Dictionary<InputState.Command, ICommandStrategy> _commandStrategies;
@@ -29,11 +30,13 @@ namespace MapEngine.Handlers.InputHandler
             Minimap minimap,
             InputState inputState,
             MessageHub messageHub,
+            CameraHandler cameraHandler,
             MoveCommandStrategy moveCommandStrategy,
             UnloadCommandStrategy unloadCommandStrategy)
         {
             _inputState = inputState;
             _messageHub = messageHub;
+            _cameraHandler = cameraHandler;
             _interfaces = new List<IInterface>
             {
                 minimap
@@ -67,6 +70,16 @@ namespace MapEngine.Handlers.InputHandler
 
         public void HandleLeftMouseDown(Vector2 location)
         {
+            foreach (var ui in _interfaces)
+            {
+                var worldPoint = ui.ScreenToWorld(location);
+                if (worldPoint.HasValue)
+                {
+                    _cameraHandler.Target(worldPoint.Value);
+                    return;
+                }
+            }
+
             _inputState.SelectionStart = location;
         }
 

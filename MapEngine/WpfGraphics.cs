@@ -105,30 +105,6 @@ namespace MapEngine
             }
         }
 
-        private void PixelDraw(IImage image, Rectangle area)
-        {
-            // restrict drawing to map bounds
-            var minX = Math.Max(0, 0 - area.X);
-            var minY = Math.Max(0, 0 - area.Y);
-            var maxX = Math.Min(image.Width, area.Width);
-            var maxY = Math.Min(image.Height, area.Height);
-
-            for (var x = minX; x < maxX && x + area.X < Width - 1; x++)
-            {
-                for (var y = minY; y < maxY && y + area.Y < Height - 1; y++)
-                {
-                    var colour = image[x, y];
-                    if (colour.Alpha == 0)
-                        continue; // Dont draw something that's entirely transperant
-
-                    if (colour.Alpha != 255) // If there's an alpha component, blend with background
-                        colour = BlendColour(x, y, colour);
-
-                    SetPixel(x + area.X, y + area.Y, colour);
-                }
-            }
-        }
-
         public void DrawBytes(byte[] buffer, Rectangle area)
         {
             //todo: array.copy?
@@ -136,11 +112,19 @@ namespace MapEngine
             {
                 if (buffer[i + 3] == 0)
                     continue;
+                
+                int pixelIndex = i / 4;
+                int sourceX = pixelIndex % area.Width;
+                int sourceY = pixelIndex / area.Width;
+                if (sourceY >= area.Height)
+                    break;
 
-                var k = i + (area.X * 4) + (area.Y * 4 * area.Width);
-                if (k + 4 > _backBuffer.Length || k < 0)
+                int destX = sourceX + area.X;
+                int destY = sourceY + area.Y;
+                if ((uint)destX >= (uint)Width || (uint)destY >= (uint)Height)
                     continue;
 
+                var k = (destY * Width + destX) * 4;
                 var opacity = buffer[i + 3] / 255f;
                 // todo: keep previous pixel operations? averaging washes out the image
                 _backBuffer[k + 0] = MergePixel(_backBuffer[k + 0], buffer[i + 0], opacity);

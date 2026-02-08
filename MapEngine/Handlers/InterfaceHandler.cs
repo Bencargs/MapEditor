@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Numerics;
 using Common;
-using Common.Collision;
 using MapEngine.Entities;
 using MapEngine.Entities.Components;
 using MapEngine.Extensions;
@@ -19,6 +18,11 @@ namespace MapEngine.Handlers
         private readonly TextHandler _textHandler;
         private readonly MinimapHandler _minimapHandler;
         private readonly CursorHandler _cursorHandler;
+
+        // todo: interface config
+        private readonly int _fontSize = 13;
+        private readonly Colour _fontColour = new Colour(215, 215, 230);
+        
 
         public InterfaceHandler(
             MapService mapService,
@@ -43,31 +47,29 @@ namespace MapEngine.Handlers
 
         public void Render(Rectangle viewport, IGraphics graphics)
         {
-            var buffer = new byte[_mapService.Width * _mapService.Height * 4]; // todo: dimentions from map
+            var buffer = new byte[viewport.Width * viewport.Height * 4];
 
-            DrawSelectionBox(buffer);
-            DrawSelectedEntities(buffer);
-            DrawHoverEntityStatus(buffer);
-            DrawTextInput(buffer);
+            DrawSelectionBox(viewport, buffer);
+            DrawSelectedEntities(viewport, buffer);
+            DrawHoverEntityStatus(viewport, buffer);
+            DrawTextInput(viewport, buffer);
             _minimapHandler.Render(viewport, buffer);
             _cursorHandler.Render(viewport, graphics);
 
-            graphics.DrawBytes(buffer, viewport);
+            graphics.DrawBytes(buffer, new Rectangle(0, 0, viewport.Width, viewport.Height));
         }
 
-        private void DrawSelectionBox(byte[] buffer)
+        private void DrawSelectionBox(Rectangle viewport, byte[] buffer)
         {
             if (_inputState.SelectionStart is null) return;
 
-            var width = _mapService.Width;
-            var height = _mapService.Height;
-            var startX = (int)Math.Min(_inputState.SelectionStart.Value.X, _inputState.Location.X).Clamp(0, width);
-            var startY = (int)Math.Min(_inputState.SelectionStart.Value.Y, _inputState.Location.Y).Clamp(0, height);
-            var endX = (int)Math.Max(_inputState.SelectionStart.Value.X, _inputState.Location.X).Clamp(0, width);
-            var endY = (int)Math.Max(_inputState.SelectionStart.Value.Y, _inputState.Location.Y).Clamp(0, height);
+            var startX = (int)Math.Min(_inputState.SelectionStart.Value.X, _inputState.Location.X).Clamp(0, viewport.Width);
+            var startY = (int)Math.Min(_inputState.SelectionStart.Value.Y, _inputState.Location.Y).Clamp(0, viewport.Height);
+            var endX = (int)Math.Max(_inputState.SelectionStart.Value.X, _inputState.Location.X).Clamp(0, viewport.Width);
+            var endY = (int)Math.Max(_inputState.SelectionStart.Value.Y, _inputState.Location.Y).Clamp(0, viewport.Height);
 
             var bytesPerPixel = 4; // RGBA format
-            var stride = width * bytesPerPixel;
+            var stride = viewport.Width * bytesPerPixel;
 
             for (var y = startY; y < endY; y++)
             {
@@ -95,16 +97,27 @@ namespace MapEngine.Handlers
             }
         }
 
-        private void DrawSelectedEntities(byte[] buffer)
+        private void DrawSelectedEntities(Rectangle viewport, byte[] buffer)
         {
+            // foreach (var selected in _inputState.SelectedEntities)
+            // {
+            //     var bounds = selected.Bounds();
+            //     DrawBounds(buffer, _mapService.Width, bounds);
+            // }
             foreach (var selected in _inputState.SelectedEntities)
             {
                 var bounds = selected.Bounds();
-                DrawBounds(buffer, _mapService.Width, bounds);
+                var screenBounds = new Vector2[bounds.Length];
+                for (var i = 0; i < bounds.Length; i++)
+                {
+                    screenBounds[i] = new Vector2(bounds[i].X - viewport.X, bounds[i].Y - viewport.Y);
+                }
+
+                DrawBounds(buffer, viewport.Width, screenBounds);
             }
         }
         
-        private void DrawHoverEntityStatus(byte[] buffer)
+        private void DrawHoverEntityStatus(Rectangle viewport, byte[] buffer)
         {
             var hovered = _inputState.HoveredEntity;
             if (hovered == null) return;
@@ -116,28 +129,23 @@ namespace MapEngine.Handlers
             if (!FontFactory.TryGetFont("default", out var font))
                 return;
 
-            // todo: some of this should be interface config
-            var size = 13;
-            var textColour = new Colour(215, 215, 230);
-            var nameLocation = new Rectangle(_mapService.Width / 2, _mapService.Height - size * 2, _mapService.Width, _mapService.Height);
-            var statusLocation = new Rectangle(_mapService.Width / 2, _mapService.Height - size, _mapService.Width, _mapService.Height);
+            var nameLocation = new Rectangle(viewport.Width / 2, viewport.Height - _fontSize * 2, viewport.Width, viewport.Height);
+            var statusLocation = new Rectangle(viewport.Width / 2, viewport.Height - _fontSize, viewport.Width, viewport.Height);
             
-            _textHandler.DrawText(buffer, unitComponent.Name, nameLocation, font, size, textColour, Justification.Center);
-            _textHandler.DrawText(buffer, $"{stateComponent.CurrentState}", statusLocation, font, size, textColour, Justification.Center);
+            _textHandler.DrawText(buffer, unitComponent.Name, nameLocation, font, _fontSize, _fontColour, Justification.Center);
+            _textHandler.DrawText(buffer, $"{stateComponent.CurrentState}", statusLocation, font, _fontSize, _fontColour, Justification.Center);
         }
 
-        private void DrawTextInput(byte[] buffer)
+        private void DrawTextInput(Rectangle viewport, byte[] buffer)
         {
             if (!_inputState.IsTyping) return;
             
             if (!FontFactory.TryGetFont("default", out var font))
                 return;
 
-            var size = 13;
             var text = $"> {_inputState.TextInput}_";
-            var textColour = new Colour(215, 215, 230);
-
-            _textHandler.DrawText(buffer, text, new Rectangle(12, _mapService.Height - size, _mapService.Width, _mapService.Height), font, size, textColour);
+            var area = new Rectangle(12, viewport.Height - _fontSize, viewport.Width, viewport.Height);
+            _textHandler.DrawText(buffer, text, area, font, _fontSize, _fontColour);
         }
         
         private static void DrawBounds(

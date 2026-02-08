@@ -23,8 +23,8 @@ public class MinimapHandler :
 
     //todo: common UI theme colour, via config
     //todo: 'friendlyColor' to property of entity unit component
-    private readonly Colour _friendlyColour = new Colour(50, 50, 240);
-    private readonly Colour _boarderColour = new Colour(50, 50, 240, 60);
+    private readonly Colour _friendlyColour = new Colour(50, 240, 50, 60);
+    private readonly Colour _boarderColour = new Colour(50, 240, 50);
     private readonly Colour _interfaceColour = new Colour(215, 215, 230);
     
     public MinimapHandler(MapService map, Minimap minimap)
@@ -53,37 +53,40 @@ public class MinimapHandler :
 
     public void Render(Rectangle viewport, byte[] buffer)
     {
-        DrawBackground(buffer);
-        DrawEntities(buffer);
-        DrawViewport(buffer, viewport);
-        DrawRectangle(buffer, _map.Width, _map.Height,
-            0, 0, _minimap.Area.Width, _minimap.Area.Height,
-            _interfaceColour); //todo: common UI theme colour
+        DrawBackground(viewport, buffer);
+        DrawEntities(viewport, buffer);
+        DrawViewport(viewport, buffer);
+        DrawRectangle(viewport, buffer,
+            _minimap.Area.Width, _minimap.Area.Height,
+            _interfaceColour);
     }
 
-    private void DrawBackground(byte[] buffer)
+    private void DrawBackground(Rectangle viewport, byte[] buffer)
     {
         for (int x = 0; x < _minimap.Area.Width; x++)
         {
             for (int y = 0; y < _minimap.Area.Height; y++)
             {
                 var colour = _minimap.Background[x, y];
-                var index = (x * 4) + (y * _map.Width * 4);
-                buffer[index + 0] = colour.Red;
-                buffer[index + 1] = colour.Blue;
-                buffer[index + 2] = colour.Green;
-                buffer[index + 3] = 255;
+                var screenX = _minimap.Area.X + x;
+                var screenY = _minimap.Area.Y + y;
+                SetPixel(buffer, _map.Width, _map.Height, screenX, screenY, colour);
+                //var index = (x * 4) + (y * _map.Width * 4);
+                // var index = (x) + (y * viewport.Width);
+                // buffer[index + 0] = colour.Red;
+                // buffer[index + 1] = colour.Blue;
+                // buffer[index + 2] = colour.Green;
+                // buffer[index + 3] = 255;
             }
         }
     }
 
-    private void DrawEntities(byte[] buffer)
+    private void DrawEntities(Rectangle viewport, byte[] buffer)
     {
         foreach (var entity in _entities)
         {
             var locationComponent = entity.GetComponent<LocationComponent>();
             var collisionComponent = entity.GetComponent<CollisionComponent>();
-
             if (locationComponent == null || collisionComponent == null)
                 continue;
             
@@ -92,8 +95,8 @@ public class MinimapHandler :
             var y = (int)mapLocation.Y;
             const int radius = 2;
             
-            DrawFilledCircle(buffer, _map.Width, _map.Height, x, y, radius+1, _friendlyColour);
-            DrawFilledCircle(buffer, _map.Width, _map.Height, x, y, radius, _boarderColour);
+            DrawFilledCircle(buffer, viewport.Width, viewport.Height, x, y, radius+1, _friendlyColour);
+            DrawFilledCircle(buffer, viewport.Width, viewport.Height, x, y, radius, _boarderColour);
         }
     }
     
@@ -126,11 +129,11 @@ public class MinimapHandler :
         }
     }
 
-    private void DrawViewport(byte[] buffer, Rectangle viewport)
+    private void DrawViewport(Rectangle viewport, byte[] buffer)
     {
         // Top-left and bottom-right of the world viewport -> minimap space
-        var topLeft = _minimap.WorldToScreen(new System.Numerics.Vector2(viewport.X, viewport.Y));
-        var bottomRight = _minimap.WorldToScreen(new System.Numerics.Vector2(viewport.X + viewport.Width, viewport.Y + viewport.Height));
+        var topLeft = _minimap.WorldToScreen(new Vector2(viewport.X, viewport.Y));
+        var bottomRight = _minimap.WorldToScreen(new Vector2(viewport.X + viewport.Width, viewport.Y + viewport.Height));
 
         int x = (int)Math.Min(topLeft.X, bottomRight.X);
         int y = (int)Math.Min(topLeft.Y, bottomRight.Y);
@@ -151,23 +154,24 @@ public class MinimapHandler :
         if (w <= 0 || h <= 0) return;
 
         // Draw viewport outline (white-ish)
-        DrawRectangle(buffer, _map.Width, _map.Height, x+1, y, w-2, h-1, _friendlyColour);
+        var area = new Rectangle(x + 1, y, viewport.Width, viewport.Height);
+        DrawRectangle(area, buffer, w-2, h-1, _boarderColour);
     }
 
     // todo: surely stop repeating this and make a common method
-    private static void DrawRectangle(byte[] buffer, int mapWidth, int mapHeight, int x, int y, int minimapWidth, int minimapHeight, Colour colour)
+    private static void DrawRectangle(Rectangle area, byte[] buffer, int minimapWidth, int minimapHeight, Colour colour)
     {
         // top + bottom
         for (int i = 0; i < minimapWidth; i++)
         {
-            SetPixel(buffer, mapWidth, mapHeight, x + i, y, colour);
-            SetPixel(buffer, mapWidth, mapHeight, x + i, y + minimapHeight - 1, colour);
+            SetPixel(buffer, area.Width, area.Height, area.X + i, area.Y, colour);
+            SetPixel(buffer, area.Width, area.Height, area.X + i, area.Y + minimapHeight - 1, colour);
         }
         // left + right
         for (int j = 0; j < minimapHeight; j++)
         {
-            SetPixel(buffer, mapWidth, mapHeight, x, y + j, colour);
-            SetPixel(buffer, mapWidth, mapHeight, x + minimapWidth - 1, y + j, colour);
+            SetPixel(buffer, area.Width, area.Height, area.X, area.Y + j, colour);
+            SetPixel(buffer, area.Width, area.Height, area.X + minimapWidth - 1, area.Y + j, colour);
         }
     }
     
@@ -176,9 +180,9 @@ public class MinimapHandler :
         if ((uint)x >= (uint)w || (uint)y >= (uint)h) return;
 
         int idx = (y * w + x) * 4;
-        buffer[idx + 0] = c.Blue;
-        buffer[idx + 1] = c.Green;
-        buffer[idx + 2] = c.Red;
+        buffer[idx + 0] = c.Red;
+        buffer[idx + 1] = c.Blue;
+        buffer[idx + 2] = c.Green;
         buffer[idx + 3] = c.Alpha;
     }
 
