@@ -56,9 +56,9 @@ public class MinimapHandler :
         DrawBackground(viewport, buffer);
         DrawEntities(viewport, buffer);
         DrawViewport(viewport, buffer);
-        DrawRectangle(viewport, buffer,
-            _minimap.Area.Width, _minimap.Area.Height,
-            _interfaceColour);
+        // DrawRectangle(_minimap.Area, buffer,
+        //     viewport.Width, viewport.Height,
+        //     _interfaceColour);
     }
 
     private void DrawBackground(Rectangle viewport, byte[] buffer)
@@ -70,13 +70,7 @@ public class MinimapHandler :
                 var colour = _minimap.Background[x, y];
                 var screenX = _minimap.Area.X + x;
                 var screenY = _minimap.Area.Y + y;
-                SetPixel(buffer, _map.Width, _map.Height, screenX, screenY, colour);
-                //var index = (x * 4) + (y * _map.Width * 4);
-                // var index = (x) + (y * viewport.Width);
-                // buffer[index + 0] = colour.Red;
-                // buffer[index + 1] = colour.Blue;
-                // buffer[index + 2] = colour.Green;
-                // buffer[index + 3] = 255;
+                SetPixel(buffer, viewport.Width, viewport.Height, screenX, screenY, colour);
             }
         }
     }
@@ -159,19 +153,20 @@ public class MinimapHandler :
     }
 
     // todo: surely stop repeating this and make a common method
-    private static void DrawRectangle(Rectangle area, byte[] buffer, int minimapWidth, int minimapHeight, Colour colour)
+    private static void DrawRectangle(Rectangle area, byte[] buffer, int viewportWidth,
+        int viewportHeight, Colour colour)
     {
         // top + bottom
-        for (int i = 0; i < minimapWidth; i++)
+        for (int i = 0; i < viewportWidth; i++)
         {
             SetPixel(buffer, area.Width, area.Height, area.X + i, area.Y, colour);
-            SetPixel(buffer, area.Width, area.Height, area.X + i, area.Y + minimapHeight - 1, colour);
+            SetPixel(buffer, area.Width, area.Height, area.X + i, area.Y + viewportHeight - 1, colour);
         }
         // left + right
-        for (int j = 0; j < minimapHeight; j++)
+        for (int j = 0; j < viewportHeight; j++)
         {
             SetPixel(buffer, area.Width, area.Height, area.X, area.Y + j, colour);
-            SetPixel(buffer, area.Width, area.Height, area.X + minimapWidth - 1, area.Y + j, colour);
+            SetPixel(buffer, area.Width, area.Height, area.X + viewportWidth - 1, area.Y + j, colour);
         }
     }
     

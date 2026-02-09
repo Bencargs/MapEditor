@@ -28,30 +28,40 @@ namespace MapEngine.Handlers
             _camera = CameraLoader.LoadCamera(mapFilename);
             _camera.Viewport = new Rectangle(
                 _camera.Viewport.X,
-                _camera.Viewport.Y,
+                _camera.Viewport.Y ,
                 _camera.Viewport.Width,
                 _camera.Viewport.Height);
         }
 
         public void Update()
         {
-            // Only ,ove the camera if the mouse is near the window bounds
-            if (_camera.InnerViewport.Contains(_inputState.Location))
+            // todo - move to a method in the camera class
+            var innerWidth = Math.Max(0, _camera.Viewport.Width - (_viewportOffset * 2));
+            var innerHeight = Math.Max(0, _camera.Viewport.Height - (_viewportOffset * 2));
+            var innerViewport = new Rectangle(_viewportOffset, _viewportOffset, innerWidth, innerHeight);
+            
+            // Only move the camera if the mouse is near the window bounds
+            if (innerViewport.Contains(_inputState.Location))
                 return;
             
-            if (_inputState.Location.X < _camera.Viewport.X)
-                _camera.Viewport.X += _moveSpeed;
-            else if (_inputState.Location.X > _camera.Viewport.Width)
+            if (_inputState.Location.X < innerViewport.X)
                 _camera.Viewport.X -= _moveSpeed;
-            if (_inputState.Location.Y < _camera.Viewport.Y)
-                _camera.Viewport.Y += _moveSpeed;
-            else if (_inputState.Location.Y > _camera.Viewport.Height)
+            else if (_inputState.Location.X > innerViewport.X + innerViewport.Width)
+                _camera.Viewport.X += _moveSpeed;
+            if (_inputState.Location.Y < innerViewport.Y)
                 _camera.Viewport.Y -= _moveSpeed;
+            else if (_inputState.Location.Y > innerViewport.Y + innerViewport.Height)
+                _camera.Viewport.Y += _moveSpeed;
             
             ClampViewport();
         }
 
         public Rectangle GetViewport() => _camera.Viewport;
+        
+        public Vector2 ScreenToWorld(Vector2 location)
+        {
+            return new Vector2(location.X + _camera.Viewport.X, location.Y + _camera.Viewport.Y);
+        }
         
         public void Target(Vector2 location)
         {

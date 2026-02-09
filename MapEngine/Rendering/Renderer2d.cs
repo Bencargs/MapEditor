@@ -39,9 +39,8 @@ namespace MapEngine.Rendering
                 // todo: figure out why must this negative to rotate the right direction
                 var rotated = texture.Image.Rotate(-location.FacingAngle);
                 
-                // Translate against camera movement
                 var area = rotated.Area(location.Location);
-                area.Translate(viewport.X, viewport.Y);
+                area.Translate(-viewport.X, -viewport.Y);
 
                 graphics.DrawImage(rotated, area);
             }

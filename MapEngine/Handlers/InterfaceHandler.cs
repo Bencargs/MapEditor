@@ -184,12 +184,13 @@ namespace MapEngine.Handlers
             int err = dx + dy;
 
             int stride = bufferWidth * 4;
+            int bufferHeight = buffer.Length / stride;
 
             while (true)
             {
-                int idx = y0 * stride + x0 * 4;
-                if ((uint)idx < buffer.Length - 3)
+                if (x0 >= 0 && x0 < bufferWidth && y0 >= 0 && y0 < bufferHeight)
                 {
+                    int idx = y0 * stride + x0 * 4;
                     buffer[idx + 0] = 0;
                     buffer[idx + 1] = 255;
                     buffer[idx + 2] = 0;

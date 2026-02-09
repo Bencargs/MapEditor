@@ -49,7 +49,7 @@ namespace MapEngine.Rendering
                 var texture = entity.Texture();
                 var render = _3dEngine.Render(model, texture);
                 var area = render.Area(location.Location);
-                area.Translate(viewport.X, viewport.Y);
+                area.Translate(-viewport.X, -viewport.Y);
 
                 graphics.DrawBytes(render.Buffer, area);
             }
