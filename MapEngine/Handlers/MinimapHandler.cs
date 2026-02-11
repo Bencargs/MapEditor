@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Numerics;
 using Common;
-using Common.Collision;
 using Common.Entities;
 using MapEngine.Commands;
-using MapEngine.Entities;
 using MapEngine.Entities.Components;
 using MapEngine.Factories;
 using MapEngine.Handlers.InputHandler;
@@ -56,14 +54,14 @@ public class MinimapHandler :
         DrawBackground(viewport, buffer);
         DrawEntities(viewport, buffer);
         DrawViewport(viewport, buffer);
-        //DrawRectangle(viewport, buffer, _minimap.Area.Width, _minimap.Area.Height, _interfaceColour);
+        DrawRectangle(viewport, buffer, _minimap.Area, _interfaceColour);
     }
 
     private void DrawBackground(Rectangle viewport, byte[] buffer)
     {
-        for (int x = 0; x < _minimap.Area.Width; x++)
+        for (var x = 0; x < _minimap.Area.Width; x++)
         {
-            for (int y = 0; y < _minimap.Area.Height; y++)
+            for (var y = 0; y < _minimap.Area.Height; y++)
             {
                 var colour = _minimap.Background[x, y];
                 var colourOpaque = new Colour(colour.Red, colour.Blue, colour.Green, 255);
@@ -147,25 +145,32 @@ public class MinimapHandler :
         if (w <= 0 || h <= 0) return;
 
         // Draw viewport outline (white-ish)
-        var area = new Rectangle(x + 1, y, viewport.Width, viewport.Height);
-        DrawRectangle(area, buffer, w-2, h-1, _boarderColour);
+        var minimapViewport = new Rectangle(x + 1, y, w - 2, h - (int)topLeft.Y);
+        DrawRectangle(viewport, buffer, minimapViewport, _boarderColour);
     }
-
+    
     // todo: surely stop repeating this and make a common method
-    private static void DrawRectangle(Rectangle area, byte[] buffer, int viewportWidth,
-        int viewportHeight, Colour colour)
+    private static void DrawRectangle(
+        Rectangle viewport,
+        byte[] buffer,
+        Rectangle minimap,
+        Colour colour)
     {
-        // top + bottom
-        for (int i = 0; i < viewportWidth; i++)
+        int left = minimap.X;
+        int top = minimap.Y;
+        int right = minimap.X + minimap.Width - 1;
+        int bottom = minimap.Y + minimap.Height - 1;
+
+        for (int i = left; i <= right; i++)
         {
-            SetPixel(buffer, area.Width, area.Height, area.X + i, area.Y, colour);
-            SetPixel(buffer, area.Width, area.Height, area.X + i, area.Y + viewportHeight - 1, colour);
+            SetPixel(buffer, viewport.Width, viewport.Height, i, top, colour);
+            SetPixel(buffer, viewport.Width, viewport.Height, i, bottom, colour);
         }
-        // left + right
-        for (int j = 0; j < viewportHeight; j++)
+
+        for (int j = top; j <= bottom; j++)
         {
-            SetPixel(buffer, area.Width, area.Height, area.X, area.Y + j, colour);
-            SetPixel(buffer, area.Width, area.Height, area.X + viewportWidth - 1, area.Y + j, colour);
+            SetPixel(buffer, viewport.Width, viewport.Height, left, j, colour);
+            SetPixel(buffer, viewport.Width, viewport.Height, right, j, colour);
         }
     }
     
