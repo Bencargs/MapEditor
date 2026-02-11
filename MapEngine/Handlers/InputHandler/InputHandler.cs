@@ -80,7 +80,7 @@ namespace MapEngine.Handlers.InputHandler
                 }
             }
 
-            _inputState.SelectionStart = location;
+            _inputState.SelectionStart = _cameraHandler.ScreenToWorld(location);
         }
 
         public void HandleRightMouseDown(Vector2 location)

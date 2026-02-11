@@ -56,9 +56,7 @@ public class MinimapHandler :
         DrawBackground(viewport, buffer);
         DrawEntities(viewport, buffer);
         DrawViewport(viewport, buffer);
-        // DrawRectangle(_minimap.Area, buffer,
-        //     viewport.Width, viewport.Height,
-        //     _interfaceColour);
+        //DrawRectangle(viewport, buffer, _minimap.Area.Width, _minimap.Area.Height, _interfaceColour);
     }
 
     private void DrawBackground(Rectangle viewport, byte[] buffer)
@@ -68,9 +66,10 @@ public class MinimapHandler :
             for (int y = 0; y < _minimap.Area.Height; y++)
             {
                 var colour = _minimap.Background[x, y];
+                var colourOpaque = new Colour(colour.Red, colour.Blue, colour.Green, 255);
                 var screenX = _minimap.Area.X + x;
                 var screenY = _minimap.Area.Y + y;
-                SetPixel(buffer, viewport.Width, viewport.Height, screenX, screenY, colour);
+                SetPixel(buffer, viewport.Width, viewport.Height, screenX, screenY, colourOpaque);
             }
         }
     }

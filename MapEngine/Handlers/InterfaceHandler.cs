@@ -54,19 +54,27 @@ namespace MapEngine.Handlers
             DrawHoverEntityStatus(viewport, buffer);
             DrawTextInput(viewport, buffer);
             _minimapHandler.Render(viewport, buffer);
-            _cursorHandler.Render(viewport, graphics);
-
             graphics.DrawBytes(buffer, new Rectangle(0, 0, viewport.Width, viewport.Height));
+            
+            _cursorHandler.Render(viewport, graphics);
         }
 
         private void DrawSelectionBox(Rectangle viewport, byte[] buffer)
         {
             if (_inputState.SelectionStart is null) return;
 
-            var startX = (int)Math.Min(_inputState.SelectionStart.Value.X, _inputState.Location.X).Clamp(0, viewport.Width);
-            var startY = (int)Math.Min(_inputState.SelectionStart.Value.Y, _inputState.Location.Y).Clamp(0, viewport.Height);
-            var endX = (int)Math.Max(_inputState.SelectionStart.Value.X, _inputState.Location.X).Clamp(0, viewport.Width);
-            var endY = (int)Math.Max(_inputState.SelectionStart.Value.Y, _inputState.Location.Y).Clamp(0, viewport.Height);
+            var startWorld = _inputState.SelectionStart.Value;
+            var currentWorld = new Vector2(_inputState.Location.X + viewport.X, _inputState.Location.Y + viewport.Y);
+            
+            var startScreenX = startWorld.X - viewport.X;
+            var startScreenY = startWorld.Y - viewport.Y;
+            var currentScreenX = currentWorld.X - viewport.X;
+            var currentScreenY = currentWorld.Y - viewport.Y;
+            
+            var startX = (int)Math.Min(startScreenX, currentScreenX).Clamp(0, viewport.Width);
+            var startY = (int)Math.Min(startScreenY, currentScreenY).Clamp(0, viewport.Height);
+            var endX = (int)Math.Max(startScreenX, currentScreenX).Clamp(0, viewport.Width);
+            var endY = (int)Math.Max(startScreenY, currentScreenY).Clamp(0, viewport.Height);
 
             var bytesPerPixel = 4; // RGBA format
             var stride = viewport.Width * bytesPerPixel;
