@@ -62,7 +62,6 @@ namespace MapEngine
 
         public void Display()
         {
-            // todo: move to gametime
             // todo: currently fixed timestep gameloop - upgrade to variable
             _gameTime.StartFrame();
 

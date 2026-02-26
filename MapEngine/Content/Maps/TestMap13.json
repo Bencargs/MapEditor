@@ -75,5 +75,15 @@
     },
     "Type": 1
   }
- ]
+ ],
+ "Effects": [
+	{
+	  "Name": "WaveEffect",
+	  "Resolution": 6,
+	  "Mass": 0.1,
+	  "MaxHeight": 100,
+	  "Sustain": 100,
+	  "Surface": "FremantleWaveSurface"
+	}
+  ]
 }
