@@ -1,4 +1,6 @@
-﻿using Common;
+﻿using System.Collections.Generic;
+using Common;
+using Common.Entities;
 using MapEngine.Commands;
 using MapEngine.Services.Effect;
 using MapEngine.Services.Effects.WaveEffect;
@@ -9,7 +11,6 @@ namespace MapEngine.Handlers
     public class EffectsHandler
         : IHandleCommand<CreateEntityCommand>
         , IHandleCommand<DestroyEntityCommand>
-        , IHandleCommand<MoveCommand>
         , IHandleCommand<CreateEffectCommand>
     {
         private readonly SensorHandler.SensorHandler _sensorHandler;
@@ -41,7 +42,8 @@ namespace MapEngine.Handlers
 
         public void Update()
         {
-            _waveService.Simulate();
+            _waveService.Update();
+            // todo: use gameTime class
             _fluidEffectService.Simulate(1 / 60f, 5);
         }
 
@@ -65,15 +67,12 @@ namespace MapEngine.Handlers
 
         public void Handle(CreateEntityCommand command)
         {
+            _waveService.Handle(command);
         }
 
         public void Handle(DestroyEntityCommand command)
         {
-        }
-
-        public void Handle(MoveCommand command)
-        {
-            // todo: update effect simulations considering entity interactions
+            _waveService.Handle(command);
         }
 
         public void Handle(CreateEffectCommand command)

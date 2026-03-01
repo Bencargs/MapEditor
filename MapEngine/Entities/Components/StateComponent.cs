@@ -8,6 +8,7 @@ public class StateComponent : IComponent
     public ComponentType Type => ComponentType.State;
     public State CurrentState { get; set; }
 
+    // note: should components have logic? or are they just DTOs?
     private static bool StateTransitions(State from, State to)
     {
         return (from, to) switch
