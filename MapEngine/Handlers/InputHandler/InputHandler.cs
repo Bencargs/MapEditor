@@ -19,6 +19,7 @@ namespace MapEngine.Handlers.InputHandler
         private readonly InputState _inputState;
         private readonly MessageHub _messageHub;
         private readonly List<IInterface> _interfaces;
+        private readonly CameraHandler _cameraHandler;
         private readonly List<Entity> _entities = new List<Entity>();
         private readonly Dictionary<Key, InputState.Command> _keyBindings;
         private readonly Dictionary<InputState.Command, ICommandStrategy> _commandStrategies;
@@ -29,11 +30,13 @@ namespace MapEngine.Handlers.InputHandler
             Minimap minimap,
             InputState inputState,
             MessageHub messageHub,
+            CameraHandler cameraHandler,
             MoveCommandStrategy moveCommandStrategy,
             UnloadCommandStrategy unloadCommandStrategy)
         {
             _inputState = inputState;
             _messageHub = messageHub;
+            _cameraHandler = cameraHandler;
             _interfaces = new List<IInterface>
             {
                 minimap
@@ -67,11 +70,22 @@ namespace MapEngine.Handlers.InputHandler
 
         public void HandleLeftMouseDown(Vector2 location)
         {
-            _inputState.SelectionStart = location;
+            foreach (var ui in _interfaces)
+            {
+                var worldPoint = ui.ScreenToWorld(location);
+                if (worldPoint.HasValue)
+                {
+                    _cameraHandler.Target(worldPoint.Value);
+                    return;
+                }
+            }
+
+            _inputState.SelectionStart = _cameraHandler.ScreenToWorld(location);
         }
 
         public void HandleRightMouseDown(Vector2 location)
         {
+            var worldLocation = _cameraHandler.ScreenToWorld(location);
             var movementCommandStrategy = _commandStrategies[InputState.Command.Move];
             var entities = _inputState.SelectedEntities
                 .Where(movementCommandStrategy.IsApplicable)
@@ -86,7 +100,8 @@ namespace MapEngine.Handlers.InputHandler
         {
             if (_commandStrategy != null)
             {
-                var command = _commandStrategy.CreateCommand(currentLocation, _inputState.SelectedEntities);
+                var worldLocation = _cameraHandler.ScreenToWorld(currentLocation);
+                var command = _commandStrategy.CreateCommand(worldLocation, _inputState.SelectedEntities);
                 _messageHub.Post(command);
                 
                 _commandStrategy = null;
@@ -98,10 +113,12 @@ namespace MapEngine.Handlers.InputHandler
             if (_inputState.SelectionStart is null) return;
 
             // todo: this will need to convert screen to map - eg. mouseLocation + cameraLocation
-            var x = (int)Math.Min(_inputState.SelectionStart.Value.X, currentLocation.X);
-            var y = (int)Math.Min(_inputState.SelectionStart.Value.Y, currentLocation.Y);
-            var width = (int)Math.Abs(currentLocation.X - _inputState.SelectionStart.Value.X);
-            var height = (int)Math.Abs(currentLocation.Y - _inputState.SelectionStart.Value.Y);
+            var startWorld = _cameraHandler.ScreenToWorld(_inputState.SelectionStart.Value);
+            var endWorld = _cameraHandler.ScreenToWorld(currentLocation);
+            var x = (int)Math.Min(startWorld.X, endWorld.X);
+            var y = (int)Math.Min(startWorld.Y, endWorld.Y);
+            var width = (int)Math.Abs(endWorld.X - startWorld.X);
+            var height = (int)Math.Abs(endWorld.Y - startWorld.Y);
             var selectionArea = new BoundingBox
             {
                 Location = new Vector2(x, y),
@@ -136,10 +153,11 @@ namespace MapEngine.Handlers.InputHandler
             
             _inputState.Location = location;
 
-            var area = new BoundingCircle { Radius = 2, Location = location };
+            var worldLocation = _cameraHandler.ScreenToWorld(location);
+            var area = new BoundingCircle { Radius = 2, Location = worldLocation };
             _inputState.HoveredEntity = _entities
                 .Where(entity => entity.Hitbox().HasCollided(area))
-                .OrderBy(entity => Vector2.Distance(area.Location, entity.Location()))
+                .OrderBy(entity => Vector2.Distance(worldLocation, entity.Location()))
                 .FirstOrDefault();
         }
 

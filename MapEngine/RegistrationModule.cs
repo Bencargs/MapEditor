@@ -52,8 +52,8 @@ namespace MapEngine
             // todo: read window resolution from a config file
             //builder.RegisterInstance(new WpfGraphics(643, 428)).SingleInstance();
             //builder.RegisterInstance(new WpfGraphics(768, 512)).SingleInstance();
-            builder.RegisterInstance(new WpfGraphics(1779, 743)).SingleInstance();
             //builder.RegisterInstance(new WpfGraphics(640, 480)).SingleInstance();
+            builder.RegisterInstance(new WpfGraphics(1280, 1024)).SingleInstance();
             builder.RegisterType<MapService>().SingleInstance();
             builder.RegisterType<PathfindingService>().SingleInstance();
             builder.RegisterType<WaveEffectService>().SingleInstance();

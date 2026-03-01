@@ -105,9 +105,8 @@ namespace MapEngine.Handlers.ParticleHandler
                     rotated.ChangeHue(hue);
                 }
 
-                // Translate against camera movement
                 var area = rotated.Area(p.Location);
-                area.Translate(viewport.X, viewport.Y);
+                area.Translate(-viewport.X, -viewport.Y);
 
                 graphics.DrawImage(rotated, area);
             }
