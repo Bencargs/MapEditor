@@ -20,6 +20,14 @@ namespace MapEngine.Factories
                 _textures[name] = texture;
             }
 
+            foreach (var file in Directory.GetFiles(filepath, "*.anim"))
+            {
+                var name = Path.GetFileNameWithoutExtension(file).ToUpper();
+                var animation = TextureLoader.LoadAnimAnimation(file, framerate);
+                var texture = new Texture(animation);
+                _textures[name] = texture;
+            }
+
             foreach (var file in Directory.GetFiles(filepath, "*.png"))
             {
                 var name = Path.GetFileNameWithoutExtension(file);
